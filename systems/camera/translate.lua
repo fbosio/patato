@@ -31,7 +31,8 @@ function M.terrain(positions, vcamPosition)
   local translatedPositions = {
     boundaries = {},
     clouds = {},
-    slopes = {}
+    slopes = {},
+    ladders = {}
   }
 
   for _, boundary in ipairs(positions.boundaries or {}) do
@@ -52,6 +53,13 @@ function M.terrain(positions, vcamPosition)
     table.insert(translatedPositions.slopes, {
       slope[1] - vcamPosition.x, slope[2] + vcamPosition.y,
       slope[3] - vcamPosition.x, slope[4] + vcamPosition.y
+    })
+  end
+
+  for _, ladder in ipairs(positions.ladders or {}) do
+    table.insert(translatedPositions.ladders, {
+      ladder[1] - vcamPosition.x, ladder[2] + vcamPosition.y,
+      ladder[3] + vcamPosition.y
     })
   end
 

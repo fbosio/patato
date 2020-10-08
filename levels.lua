@@ -7,6 +7,9 @@ M.level = {
       boundaries = {
         {33, 385, 754, 538},
       },
+      ladders = {
+        {610, 100, 385}
+      }
     },
     entitiesData = {
       player = {

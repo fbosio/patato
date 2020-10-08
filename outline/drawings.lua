@@ -59,6 +59,15 @@ function M.slopes(cornersArray)
     end, 0, 0.3, 0)
 end
 
+function M.ladders(cornersArray)
+  terrainShape(cornersArray,
+    function (corners)
+      local ladderWidthDisplay = 40
+      box{x1 = corners[1], y1 = corners[2], x2 = corners[1] + ladderWidthDisplay,
+          y2 = corners[3]}
+    end, 1, 0.3, 0.6)
+end
+
 function M.collisionBoxes(boxes, positions)
   -- Player box
   boxShape(boxes, positions, 0, 0, 1)
