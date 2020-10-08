@@ -24,7 +24,7 @@ function love.load()
       [playerName] = {control=true},
     },
     speedImpulses = {
-      [playerName] = {walk=400, jump=1200},
+      [playerName] = {walk=400, crouchWalk=200, jump=1200},
     },
     collectors = {
       [playerName] = true

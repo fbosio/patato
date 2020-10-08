@@ -44,7 +44,8 @@ local statesLogic = {
         args.finiteStateMachine:setState("hurt")
       end
 
-      if not love.keyboard.isDown("k") and love.keyboard.isDown("s") then
+      if not love.keyboard.isDown("k") and love.keyboard.isDown("s")
+          and args.velocity.y == 0 then
         args.finiteStateMachine:setState("crouching")
       end
 
@@ -118,12 +119,23 @@ local statesLogic = {
   end,
 
   crouching = function (args)
+    if love.keyboard.isDown("a") and not love.keyboard.isDown("d") then
+      args.velocity.x = -args.speedImpulses.crouchWalk
+      args.animationClip.facingRight = false
+      args.animationClip:setAnimation("crouchWalking")
+    elseif not love.keyboard.isDown("a") and love.keyboard.isDown("d") then
+      args.velocity.x = args.speedImpulses.crouchWalk
+      args.animationClip.facingRight = true
+      args.animationClip:setAnimation("crouchWalking")
+    else
+      args.velocity.x = 0
+      args.animationClip:setAnimation("crouching")
+    end
+
+    -- "descend" state should be considered here
+
     -- Hardcoded height values should be changed in the future
     args.state.collisionBoxes[args.entity].height = 50
-
-    -- Speed should be changed in this state
-    -- "descend" state should be considered
-
     if not love.keyboard.isDown("s") then
       args.state.collisionBoxes[args.entity].height = 100
       args.finiteStateMachine:setState("idle")

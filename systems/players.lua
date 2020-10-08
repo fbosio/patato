@@ -16,7 +16,7 @@ function M.load(name, state)
     state.velocities[name] = {x=0, y=0}
     state.finiteStateMachines = state.finiteStateMachines or {}
     state.finiteStateMachines[name] = fsm.FiniteStateMachine("idle")
-    
+
     -- This might be removed when enemies are created
     local players = state.players or {}
     players[name] = players[name] or {}
@@ -28,6 +28,7 @@ function M.load(name, state)
     local speedImpulses = state.speedImpulses or {}
     speedImpulses[name] = speedImpulses[name] or {}
     speedImpulses[name].walk = speedImpulses[name].walk or 0
+    speedImpulses[name].crouchWalk = speedImpulses[name].crouchWalk or 0
     speedImpulses[name].jump = speedImpulses[name].jump or 0
   end
 end
