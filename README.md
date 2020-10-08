@@ -7,7 +7,6 @@ A platform adventure video game, ported with Löve2D.
 - Items
 
 ## What we need to make
-https://trello.com/b/4wXfOEyt/patato-man
 1. [ ] Development stage 1
 1. [ ] Development stage 2
 1. [ ] Development stage 3
