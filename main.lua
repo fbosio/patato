@@ -70,4 +70,12 @@ function love.draw()
     components.state.living.patato.health,
     1, 0, 0
   )
+  outline.debug(
+    "state",
+    function (state)
+      return tostring(state)
+    end,
+    components.state.finiteStateMachines.patato.currentState,
+    1, 0, 0
+  )
 end
