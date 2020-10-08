@@ -1,0 +1,113 @@
+local box = require "components.box"
+local M = {}
+
+
+-- Replace dofile with AnimationClip parameter
+local spritesPath = "resources/sprites.lua"
+local spritesFile = io.open(spritesPath)
+if spritesFile then
+  spritesFile:close()
+  dofile(spritesPath)
+else
+  sprites = {}
+end
+
+
+-- Constants
+local scale = 0.5
+M.scale = scale  -- export
+
+
+-- Animation Clip
+local function createAnimationsTable(animations, spriteSheet)
+  local animationsTable = {}
+
+  for animationName, animation in pairs(animations) do
+    animationsTable[animationName] = {
+      frames = {},
+      looping = animation[2]
+    }
+    local newAnimation = animationsTable[animationName]
+
+    for _, frame in ipairs(animation[1]) do
+      local x, y, width, height, originX, originY = unpack(sprites[frame[1]])
+      local attackBox = frame[3]
+
+      newAnimation.frames[#newAnimation.frames + 1] = {
+        quad = love.graphics.newQuad(x, y, width, height, spriteSheet:getDimensions()),
+        origin = {x = -originX*scale, y = -originY*scale},
+        duration = frame[2],
+        attackBox = attackBox and box.AttackBox:new{
+          x = attackBox[1]*scale,
+          y = attackBox[2]*scale,
+          width = attackBox[3]*scale,
+          height = attackBox[4]*scale
+        }
+      }
+    end
+
+    function newAnimation:duration()
+      local result = 0
+      for _, frame in ipairs(self.frames) do
+        result = result + frame.duration
+      end
+      return result
+    end
+  end
+
+  return animationsTable
+end
+
+function M.AnimationClip(animations, nameOfCurrentAnimation, spriteSheet)
+  local newComponent = {
+    animations = createAnimationsTable(animations, spriteSheet),
+    nameOfCurrentAnimation = nameOfCurrentAnimation,
+    currentTime = 0,
+    facingRight = true,
+    playing = true,
+    done = false
+  }
+
+  function newComponent:currentFrameNumber()
+    local timeSpent = 0
+    local currentAnimation = self.animations[self.nameOfCurrentAnimation]
+    for frameNumber, frame in ipairs(currentAnimation.frames) do
+      timeSpent = timeSpent + frame.duration
+      if timeSpent > self.currentTime then
+        return frameNumber
+      end
+    end
+    return #currentAnimation.frames
+  end
+
+  function newComponent:setAnimation(animationName)
+    if self.animations[animationName]
+        and self.nameOfCurrentAnimation ~= animationName then
+      self.nameOfCurrentAnimation = animationName
+      self.currentTime = 0
+      self.playing = true
+      self.done = false
+    end
+  end
+
+  function newComponent:done()
+    return self.done
+  end
+
+  return newComponent
+end
+
+function M.DummyAnimationClip(finiteStateMachine)
+  local newComponent = {
+    finiteStateMachine = finiteStateMachine
+  }
+  function newComponent:setAnimation() end
+
+  function newComponent:done()
+    return self.finiteStateMachine.stateTime == 0
+  end
+
+  return newComponent
+end
+
+return M
