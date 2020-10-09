@@ -24,7 +24,7 @@ function love.load()
       [playerName] = {control=true},
     },
     speedImpulses = {
-      [playerName] = {walk=400, jump=1200},
+      [playerName] = {walk=400, crouchWalk=200, jump=1200},
     },
     collectors = {
       [playerName] = true
@@ -79,6 +79,14 @@ function love.draw()
     end,
     components.state.living.patato.health,
     1, 0, 0
+  )
+  outline.debug(
+    "state",
+    function (state)
+      return tostring(state)
+    end,
+    components.state.finiteStateMachines.patato.currentState,
+    0.498039, 0.498039, 0.498039
   )
   outline.debug(
     "camera",
