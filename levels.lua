@@ -3,11 +3,11 @@ local M = {}
 
 M.level = {
   ["test level"] = {
---    terrain = {
---      boundaries = {
---        {33, 385, 754, 600},
---      },
---    },
+    terrain = {
+      boundaries = {
+        {33, 385, 754, 600},
+      },
+    },
     entitiesData = {
       cameraBoundaries = {
         {-244, 80, 865, 700}

@@ -6,14 +6,12 @@ local M = {}
 function M.gravity(componentsTable, dt)
   local gravity = 5000
 
-  -- weight depends on velocity
-  -- components.assertDependency(componentsTable, "weight", "velocity")
-
   for entity, weight in pairs(componentsTable.weights or {}) do
-    local velocity = componentsTable.velocities[entity]
-    -- components.assertExistence(entity, "weight", {velocity, "velocity"})
-
-    velocity.y = velocity.y + gravity*dt
+    local velocities = componentsTable.velocities or {}
+    local velocity = velocities[entity]
+    if velocity then
+      velocity.y = velocity.y + gravity*dt
+    end
   end
 end
 

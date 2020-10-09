@@ -168,16 +168,18 @@ function M.collision(componentsTable, terrain, dt)
   --                             "positions", "velocities")
   terrain = terrain or {}
 
-  for entity, solidComponent in pairs(componentsTable.solids or {}) do
-    local collisionBox = componentsTable.collisionBoxes[entity]
-    local position = componentsTable.positions[entity]
-    local velocity = componentsTable.velocities[entity]
-    -- components.assertExistence(entity, "solid", {collisionBox, "collisionBox"},
-    --                            {position, "position"}, {velocity, "velocity"})
+  local positions = componentsTable.positions
+  local velocities = componentsTable.velocities
+  if positions and velocities then
+    for entity, solidComponent in pairs(componentsTable.solids or {}) do
+      local collisionBox = componentsTable.collisionBoxes[entity]
+      local position = positions[entity]
+      local velocity = componentsTable.velocities[entity]
 
-    checkBoundaries(collisionBox, position, velocity, terrain, dt)
-    checkSlopes(collisionBox, position, velocity, terrain, dt)
-    checkClouds(collisionBox, position, velocity, terrain, dt)
+      checkBoundaries(collisionBox, position, velocity, terrain, dt)
+      checkSlopes(collisionBox, position, velocity, terrain, dt)
+      checkClouds(collisionBox, position, velocity, terrain, dt)
+    end
   end
 end
 

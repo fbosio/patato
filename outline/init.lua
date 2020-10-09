@@ -16,7 +16,7 @@ function M.draw(componentsTable, positions)
   local position
 
   -- Move terrain
-  position = terrainPositions.terrain
+  position = terrainPositions.terrain or {}
   drawings.boundaries(position.boundaries)
   drawings.clouds(position.clouds)
   drawings.slopes(position.slopes)
