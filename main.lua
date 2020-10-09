@@ -47,11 +47,21 @@ function love.draw()
   outline.draw(components.state, camera.positions(components.state))
 
   outline.debug(
-    "mouse",
+    "mouse screen",
     function ()
       return love.mouse.getX() .. ", " .. love.mouse.getY()
     end,
     nil,
+    1, 1, 1
+  )
+  outline.debug(
+    "mouse level",
+    function (position)
+      local x = love.mouse.getX() + position.x
+      local y = love.mouse.getY() - position.y
+      return string.format("%.2f, %.2f", x, y)
+    end,
+    components.state.positions["my camera"],
     1, 1, 1
   )
   outline.debug(
@@ -76,6 +86,14 @@ function love.draw()
       return tostring(state)
     end,
     components.state.finiteStateMachines.patato.currentState,
-    1, 0, 0
+    0.498039, 0.498039, 0.498039
   )
+  outline.debug(
+    "camera",
+    function (position)
+      return string.format("%.2f, %.2f", position.x, position.y)
+    end,
+    components.state.positions["my camera"],
+    0.8, 0.4, 0.8
+    )
 end
