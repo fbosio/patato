@@ -27,26 +27,29 @@ function M.update(state, dt)
       local targetEntity = vcam.target
 
       local vcamPosition = state.positions[vcamEntity]
-      local previousTargetPosition = state.positions[targetEntity]
+      local _targetPosition = state.positions[targetEntity]
       local targetPosition = {  -- copy table
-        x = previousTargetPosition.x,
-        y = previousTargetPosition.y
+        x = _targetPosition.x,
+        y = _targetPosition.y
       }
 
-      -- Boundaries
       if vcam.boundaries then
         local width, height = love.graphics.getDimensions()
+        local x1 = math.min(vcam.boundaries[1], vcam.boundaries[3])
+        local x2 = math.max(vcam.boundaries[1], vcam.boundaries[3])
+        local y1 = math.min(vcam.boundaries[2], vcam.boundaries[4])
+        local y2 = math.max(vcam.boundaries[2], vcam.boundaries[4])
 
-        if targetPosition.x < vcam.boundaries[1] + width/2 then
-          targetPosition.x = vcam.boundaries[1] + width/2
-        elseif targetPosition.x > vcam.boundaries[3] - width/2 then
-          targetPosition.x = vcam.boundaries[3] - width/2
+        if targetPosition.x < x1 + width/2 then
+          targetPosition.x = x1 + width/2
+        elseif targetPosition.x > x2 - width/2 then
+          targetPosition.x = x2 - width/2
         end
 
-        if targetPosition.y < vcam.boundaries[2] + height/2 then
-          targetPosition.y = vcam.boundaries[2] + height/2
-        elseif targetPosition.y > vcam.boundaries[3] - height/2 then
-          targetPosition.y = vcam.boundaries[3] - height/2
+        if targetPosition.y < y1 + height/2 then
+          targetPosition.y = y1 + height/2
+        elseif targetPosition.y > y2 - height/2 then
+          targetPosition.y = y2 - height/2
         end
       end
 

@@ -10,7 +10,7 @@ M.level = {
     },
     entitiesData = {
       cameraBoundaries = {
-        {-244, 80, 865, 100}
+        {-244, 80, 865, 700}
       },
       player = {
         {378, 287}
