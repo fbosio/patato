@@ -29,6 +29,7 @@ function M.load(name, state)
     speedImpulses[name] = speedImpulses[name] or {}
     speedImpulses[name].walk = speedImpulses[name].walk or 0
     speedImpulses[name].jump = speedImpulses[name].jump or 0
+    speedImpulses[name].climb = speedImpulses[name].climb or 0
   end
 end
 

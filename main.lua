@@ -6,6 +6,7 @@ local outline = require "outline"
 local camera = require "systems.camera"
 local systems = require "systems"
 local items = require "systems.items"
+local terrain = require "systems.terrain"
 
 function love.load()
   local currentLevel = levels.level[levels.first]
@@ -24,7 +25,7 @@ function love.load()
       [playerName] = {control=true},
     },
     speedImpulses = {
-      [playerName] = {walk=400, jump=1200},
+      [playerName] = {walk=400, jump=1200, climb=400},
     },
     collectors = {
       [playerName] = true
@@ -34,6 +35,7 @@ function love.load()
   -- Move to init.load
   components.state.currentLevel = currentLevel
 
+  terrain.load(components.state)
   players.load(playerName, components.state)
   items.load(components.state)
   camera.load("my camera", playerName, components.state)

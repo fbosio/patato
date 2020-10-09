@@ -59,7 +59,7 @@ function M.terrain(positions, vcamPosition)
   for _, ladder in ipairs(positions.ladders or {}) do
     table.insert(translatedPositions.ladders, {
       ladder[1] - vcamPosition.x, ladder[2] + vcamPosition.y,
-      ladder[3] + vcamPosition.y
+      ladder[3] - vcamPosition.x, ladder[4] + vcamPosition.y
     })
   end
 

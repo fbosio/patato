@@ -3,7 +3,7 @@ local animation = require "components.animation"
 local M = {}
 
 
-local holdingJumpKey
+local holdingJumpKey, holdingUpKey
 
 local statesLogic = {
   idle = function (args)
@@ -52,6 +52,19 @@ local statesLogic = {
         args.velocity.x = 0
         args.finiteStateMachine:setState("punching")
         args.animationClip:setAnimation("punching")
+      end
+
+      if love.keyboard.isDown("w") and args.collisionBox.ladder
+          and not holdingUpKey then
+        local weights = args.state.weights or {}
+        weights[args.entity] = nil
+        args.collisionBox.climbing = true
+        args.velocity.x = 0
+        args.finiteStateMachine:setState("climbing")
+        args.animationClip:setAnimation("climbingIdle")
+        holdingUpKey = true
+      elseif not love.keyboard.isDown("w") and holdingUpKey then
+        holdingUpKey = false
       end
   end,
 
@@ -126,6 +139,27 @@ local statesLogic = {
     if args.animationClip:done() then
       args.finiteStateMachine:setState("idle")
     end
+  end,
+
+  climbing = function (args)
+    if love.keyboard.isDown("w") and not love.keyboard.isDown("s") then
+      args.velocity.y = -args.speedImpulses.climb
+      args.animationClip:setAnimation("climbingUp")
+    elseif love.keyboard.isDown("s") and not love.keyboard.isDown("w") then
+      args.velocity.y = args.speedImpulses.climb
+      args.animationClip:setAnimation("climbingDown")
+    else
+      args.velocity.y = 0
+      args.animationClip:setAnimation("climbingIdle")
+    end
+
+    if love.keyboard.isDown("k") then
+      local weights = args.state.weights or {}
+      weights[args.entity] = true
+      args.collisionBox.climbing = false
+      args.finiteStateMachine:setState("startingJump")
+      args.animationClip:setAnimation("climbingStartingJump")
+    end
   end
 }
 
@@ -155,7 +189,8 @@ function M.player(state)
         velocity = state.velocities[entity],
         speedImpulses = state.speedImpulses[entity],
         animationClip = clip,
-        living = livingEntity
+        living = livingEntity,
+        collisionBox = state.collisionBoxes[entity]
       }
     end
   end
