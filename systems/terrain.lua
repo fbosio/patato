@@ -82,7 +82,7 @@ end
 
 
 local function checkBoundaries(collisionBox, position, velocity, terrain, dt)
-  for i in pairs(terrain.boundaries) do
+  for i in pairs(terrain.boundaries or {}) do
     local boundaries = terrain.boundaries[i]
     local x1 = math.min(boundaries[1], boundaries[3])
     local y1 = math.min(boundaries[2], boundaries[4])
@@ -166,6 +166,7 @@ function M.collision(componentsTable, terrain, dt)
   -- solid depends on collisionBox, position and velocity
   -- components.assertDependency(componentsTable, "solids", "collisionBoxes",
   --                             "positions", "velocities")
+  terrain = terrain or {}
 
   for entity, solidComponent in pairs(componentsTable.solids or {}) do
     local collisionBox = componentsTable.collisionBoxes[entity]
