@@ -6,11 +6,13 @@ local M = {}
 
 
 function M.load(name, target, state)
+  local entitiesData = state.currentLevel.entitiesData or {}
+  local boundaries = entitiesData.cameraBoundaries or {}
   state.cameras = {
-    [name] = true
-  }  -- only one instance allowed, for now
-  state.cameraTargets = {
-    [name] = target
+    [name] = {
+      target = target,
+      boundaries = boundaries[1]
+    }
   }  -- only one instance allowed, for now
 
   state.positions = state.positions or {}
@@ -20,20 +22,38 @@ end
 
 --- Follow camera targets
 function M.update(state, dt)
-  for vcamEntity, isVcam in pairs(state.cameras or {}) do
-    if isVcam then
-      local targetEntity = state.cameraTargets[vcamEntity]
+  for vcamEntity, vcam in pairs(state.cameras or {}) do
+    if vcam then
+      local targetEntity = vcam.target
 
       local vcamPosition = state.positions[vcamEntity]
-      local targetPosition = state.positions[targetEntity]
-      -- components.assertExistence(vcamEntity, "camera",
-      --                            {vcamPosition, "vcamPosition"})
-      -- components.assertExistence(targetEntity, "cameraTarget",
-      --                            {targetPosition, "targetPosition"})
+      local previousTargetPosition = state.positions[targetEntity]
+      local targetPosition = {  -- copy table
+        x = previousTargetPosition.x,
+        y = previousTargetPosition.y
+      }
+
+      -- Boundaries
+      if vcam.boundaries then
+        local width, height = love.graphics.getDimensions()
+
+        if targetPosition.x < vcam.boundaries[1] + width/2 then
+          targetPosition.x = vcam.boundaries[1] + width/2
+        elseif targetPosition.x > vcam.boundaries[3] - width/2 then
+          targetPosition.x = vcam.boundaries[3] - width/2
+        end
+
+        if targetPosition.y < vcam.boundaries[2] + height/2 then
+          targetPosition.y = vcam.boundaries[2] + height/2
+        elseif targetPosition.y > vcam.boundaries[3] - height/2 then
+          targetPosition.y = vcam.boundaries[3] - height/2
+        end
+      end
 
       -- Movement constraints here
-      tweening.exp(vcamPosition, targetPosition, dt, 25)
-      -- tweening.linear(vcamPosition, targetPosition, dt)
+        tweening.exp(vcamPosition, targetPosition, dt, 25)
+  --       tweening.linear(vcamPosition, targetPosition, dt, {threshold=10,
+  --           multiplier=state.speedImpulses.patato.walk})
     end
   end
 end
@@ -41,9 +61,9 @@ end
 
 --- Return the results of applying coordinate translations
 function M.positions(state)
-  for vcamEntity, isVcam in pairs(state.cameras or {}) do
+  for vcamEntity, vcam in pairs(state.cameras or {}) do
 
-    if isVcam then
+    if vcam then
       local vcamPosition = state.positions[vcamEntity]
 
       local translated = {
