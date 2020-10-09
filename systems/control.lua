@@ -59,7 +59,6 @@ local statesLogic = {
         local weights = args.state.weights or {}
         weights[args.entity] = nil
         args.collisionBox.climbing = true
-        args.velocity.x = 0
         args.finiteStateMachine:setState("climbing")
         args.animationClip:setAnimation("climbingIdle")
         holdingUpKey = true

@@ -182,13 +182,27 @@ local function checkBottomLadder(collisionBox, position, velocity, y2, dt)
 end
 
 
+local function checkHorizontalBoundary(collisionBox, position, velocity, x1,
+                                       x2, dt)
+  local box = collisionBox:translated(position)
+
+  if box:right() + velocity.x*dt > x1 and box:left() + velocity.x*dt < x2 then
+    velocity.x = 0
+    position.x = (x1 + x2) / 2
+  end
+end
+
+
 local function checkLadders(collisionBox, position, velocity, terrain, dt)
   if collisionBox.climbing then
     local ladder = collisionBox.ladder
+    local x1 = math.min(ladder[1], ladder[3])
     local y1 = math.min(ladder[2], ladder[4])
+    local x2 = math.max(ladder[1], ladder[3])
     local y2 = math.max(ladder[2], ladder[4])
     checkTopLadder(collisionBox, position, velocity, y1, dt)
     checkBottomLadder(collisionBox, position, velocity, y2, dt)
+    checkHorizontalBoundary(collisionBox, position, velocity, x1, x2, dt)
   else
     collisionBox.ladder = nil
     for i in pairs(terrain.ladders or {}) do
