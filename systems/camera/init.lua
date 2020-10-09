@@ -40,6 +40,14 @@ function M.update(state, dt)
         local y1 = math.min(vcam.boundaries[2], vcam.boundaries[4])
         local y2 = math.max(vcam.boundaries[2], vcam.boundaries[4])
 
+        if x2 - x1 < width then
+          x2 = x1 + width
+        end
+
+        if y2 - y1 < height then
+          y2 = y1 + height
+        end
+
         if targetPosition.x < x1 + width/2 then
           targetPosition.x = x1 + width/2
         elseif targetPosition.x > x2 - width/2 then
