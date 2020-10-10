@@ -277,18 +277,18 @@ end
 
 
 -- move to animation module
-function M.playerAfterTerrainCollisionChecking(componentsTable)
-  -- components.assertDependency(componentsTable, "players", "velocities")
-  local velocities = componentsTable.velocities
-  local stateMachines = componentsTable.stateMachines
+function M.playerAfterTerrainCollisionChecking(state)
+  -- components.assertDependency(state, "players", "velocities")
+  local velocities = state.velocities
+  local stateMachines = state.stateMachines
 
   if velocities and stateMachines then
     -- This for loop could be avoided if there is only one entity with a "player"
     -- component.
-    for entity, player in pairs(componentsTable.players or {}) do
+    for entity, player in pairs(state.players or {}) do
       local velocity = velocities[entity]
-      local animationClips = componentsTable.animationClips or {}
-      local stateMachine = componentsTable.stateMachines[entity]
+      local animationClips = state.animationClips or {}
+      local stateMachine = state.stateMachines[entity]
       local animationClip = animationClips[entity] or
                             animation.DummyAnimationClip(stateMachine)
       -- components.assertExistence(entity, "player", {velocity, "velocity",

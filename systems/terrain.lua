@@ -240,9 +240,9 @@ local function checkLadders(collisionBox, position, velocity, ladders, dt)
 end
 
 
-function M.load(componentsTable)
+function M.load(state)
   local width = 40
-  local ladders = componentsTable.currentLevel.terrain.ladders or {}
+  local ladders = state.currentLevel.terrain.ladders or {}
   local loadedLadders = {}
   for _, ladder in ipairs(ladders) do
     loadedLadders[#loadedLadders + 1] = {
@@ -252,25 +252,25 @@ function M.load(componentsTable)
       ladder[3]
     }
   end
-  componentsTable.ladders = loadedLadders
+  state.ladders = loadedLadders
 end
 
 
-function M.collision(componentsTable, terrain, dt)
+function M.collision(state, terrain, dt)
   -- solid depends on collisionBox, position and velocity
-  -- components.assertDependency(componentsTable, "solids", "collisionBoxes",
+  -- components.assertDependency(state, "solids", "collisionBoxes",
   --                             "positions", "velocities")
   terrain = terrain or {}
 
-  local positions = componentsTable.positions
-  local velocities = componentsTable.velocities
+  local positions = state.positions
+  local velocities = state.velocities
   if positions and velocities then
-    for entity, solidComponent in pairs(componentsTable.solids or {}) do
-      local collisionBox = componentsTable.collisionBoxes[entity]
+    for entity, solidComponent in pairs(state.solids or {}) do
+      local collisionBox = state.collisionBoxes[entity]
       local position = positions[entity]
-      local velocity = componentsTable.velocities[entity]
-      local stateMachine = componentsTable.stateMachines[entity]
-      local ladders = componentsTable.ladders
+      local velocity = state.velocities[entity]
+      local stateMachine = state.stateMachines[entity]
+      local ladders = state.ladders
 
       checkBoundaries(collisionBox, position, velocity, stateMachine,
                       terrain, dt)

@@ -5,13 +5,13 @@ local levels = require "levels"
 local M = {}
 
 
-function M.load(componentsTable, currentLevel)
-  -- components.assertDependency(componentsTable, "goals", "positions")
+function M.load(state, currentLevel)
+  -- components.assertDependency(state, "goals", "positions")
 
   for goalIndex, goalData in pairs(currentLevel.entitiesData.goals or {}) do
     local id = "goal" .. tostring(goalIndex)
-    componentsTable.positions[id] = {x = goalData[1], y = goalData[2]}
-    componentsTable.goals[id] = box.GoalBox:new{
+    state.positions[id] = {x = goalData[1], y = goalData[2]}
+    state.goals[id] = box.GoalBox:new{
       width = 110,
       height = 110,
       nextLevel = goalData[3]
@@ -21,7 +21,7 @@ end
 
 
 local function loadNextLevel(levels, goalBox, position, velocity, items,
-                      componentsTable)
+                      state)
   local nextLevel = levels.level[goalBox.nextLevel]
 
   -- Player position loading and movement restore
@@ -31,45 +31,45 @@ local function loadNextLevel(levels, goalBox, position, velocity, items,
   velocity.y = 0
 
   -- Reload goals and items
-  items.reload(componentsTable, nextLevel)
+  items.reload(state, nextLevel)
 
-  for _id in pairs(componentsTable.goals) do
-    componentsTable.positions[_id] = nil
-    componentsTable.goals[_id] = nil
+  for _id in pairs(state.goals) do
+    state.positions[_id] = nil
+    state.goals[_id] = nil
   end
 
   if nextLevel.entitiesData.goals then
-    M.load(componentsTable, nextLevel)
+    M.load(state, nextLevel)
   end
 
   return nextLevel
 end
 
 
-function M.update(componentsTable, currentLevel)
+function M.update(state, currentLevel)
   local nextLevel = currentLevel
 
-  local positions = componentsTable.positions
-  local velocities = componentsTable.velocities
+  local positions = state.positions
+  local velocities = state.velocities
   if positions and velocities then
-    for entity, player in pairs(componentsTable.players or {}) do
-      local collector = componentsTable.collectors[entity]
+    for entity, player in pairs(state.players or {}) do
+      local collector = state.collectors[entity]
 
       if collector then
-        local position = componentsTable.positions[entity]
-        local velocity = componentsTable.velocities[entity]
-        local collisionBox = componentsTable.collisionBoxes[entity]
+        local position = state.positions[entity]
+        local velocity = state.velocities[entity]
+        local collisionBox = state.collisionBoxes[entity]
         -- components.assertExistence(entity, "player", {position, "position"},
         --                             {collisionBox, "collisionBox"}, {velocity, "velocity"})
 
         local box = collisionBox:translated(position)
 
-        for goalEntity, goalBox in pairs(componentsTable.goals or {}) do
-          local goalPosition = componentsTable.positions[goalEntity]
+        for goalEntity, goalBox in pairs(state.goals or {}) do
+          local goalPosition = state.positions[goalEntity]
 
           if goalBox:translated(goalPosition):intersects(box) then
             nextLevel = loadNextLevel(levels, goalBox, position, velocity,
-                                      items, componentsTable)
+                                      items, state)
             break
           end
         end -- for goalEntity

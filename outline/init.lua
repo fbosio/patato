@@ -8,8 +8,8 @@ local display = require "outline.display"
 local M = {}
 
 
-local function moveTerrain(componentsTable, positions)
-  local terrainPositions = positions or componentsTable.currentLevel
+local function moveTerrain(state, positions)
+  local terrainPositions = positions or state.currentLevel
   local position = terrainPositions.terrain or {}
   drawings.boundaries(position.boundaries)
   drawings.clouds(position.clouds)
@@ -18,25 +18,25 @@ local function moveTerrain(componentsTable, positions)
 end
 
 
-local function moveBoxes(componentsTable, positions)
+local function moveBoxes(state, positions)
   local position = positions and positions.components
-                   or componentsTable.positions
+                   or state.positions
 
   if position then
-    drawings.collisionBoxes(componentsTable.collisionBoxes, position)
-    -- drawings.attackBoxes(componentsTable.animationClips, position)
-    drawings.goals(componentsTable.goals, position)
-    drawings.medkits(componentsTable.healing, position)
-    drawings.pomodori(componentsTable.experienceEffect, position)
+    drawings.collisionBoxes(state.collisionBoxes, position)
+    -- drawings.attackBoxes(state.animationClips, position)
+    drawings.goals(state.goals, position)
+    drawings.medkits(state.healing, position)
+    drawings.pomodori(state.experienceEffect, position)
   end
 end
 
 
-function M.draw(componentsTable, positions)
+function M.draw(state, positions)
   local r, g, b = love.graphics.getColor()
 
-  moveTerrain(componentsTable, positions)
-  moveBoxes(componentsTable, positions)
+  moveTerrain(state, positions)
+  moveBoxes(state, positions)
 
   -- Reset drawing color
   love.graphics.setColor(r, g, b)

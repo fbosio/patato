@@ -5,8 +5,8 @@ local animation = require "components.animation"
 local M = {}
 
 
-function M.animator(componentsTable, dt)
-  for entity, animationClip in pairs(componentsTable.animationClips or {}) do
+function M.animator(state, dt)
+  for entity, animationClip in pairs(state.animationClips or {}) do
     local currentAnimation =
       animationClip.animations[animationClip.nameOfCurrentAnimation]
     local currentAnimationDuration = currentAnimation:duration()
@@ -26,10 +26,10 @@ function M.animator(componentsTable, dt)
 end
 
 
-function M.animationRenderer(componentsTable, spriteSheet, positions)
-  components.assertDependency(componentsTable, "animationClips", "positions")
+function M.animationRenderer(state, spriteSheet, positions)
+  components.assertDependency(state, "animationClips", "positions")
 
-  for entity, animationClip in pairs(componentsTable.animationClips or {}) do
+  for entity, animationClip in pairs(state.animationClips or {}) do
     local position = positions[entity]
     local scale = 0.5
     local currentAnimation =

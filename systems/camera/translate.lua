@@ -5,7 +5,7 @@ local M = {}
 
 --- Return a table with the translated positions of all components
 -- @param positions a table with the original positions of the components
--- @param vcamEntity key of the componentsTable that refers to a camera
+-- @param vcamEntity key of the state that refers to a camera
 -- @param vcamPosition a table that refers to the vcamEntity position
 function M.boxes(positions, vcamEntity, vcamPosition)
   local translatedPositions = {}
