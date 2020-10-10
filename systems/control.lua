@@ -55,8 +55,8 @@ local statesLogic = {
         args.animationClip:setAnimation("punching")
       end
 
-      if args.collisionBox.ladder and love.keyboard.isDown("w")
-          or love.keyboard.isDown("s") then
+      if args.collisionBox.ladder and (love.keyboard.isDown("w")
+          or love.keyboard.isDown("s")) then
         local weights = args.state.weights or {}
         weights[args.entity] = nil
         args.collisionBox.climbing = true
