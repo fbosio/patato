@@ -18,6 +18,7 @@ function M.load(state)
 
     for itemIndex, itemData in pairs(state.currentLevel.entitiesData[itemGroupName] or {}) do
       local id = itemGroupName .. tostring(itemIndex)
+      state.positions = state.positions or {}
       state.positions[id] = {x = itemData[1], y = itemData[2]}
       -- if type(componentGroup[itemGroupName]) == "table"  -- several effects
       group[id] = box.ItemBox:new{effectAmount = 1}  -- hard-coded

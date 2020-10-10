@@ -75,7 +75,9 @@ function M.collisionBoxes(boxes, positions)
 
   for entity, _ in pairs(boxes or {}) do
     local position = positions[entity]
-    love.graphics.circle("fill", position.x, position.y, 2)
+    if position then
+      love.graphics.circle("fill", position.x, position.y, 2)
+    end
   end
 end
 

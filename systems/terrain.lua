@@ -87,7 +87,7 @@ end
 
 
 local function checkBoundaries(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
-  for i in pairs(terrain.boundaries) do
+  for i in pairs(terrain.boundaries or {}) do
     local boundaries = terrain.boundaries[i]
     local x1 = math.min(boundaries[1], boundaries[3])
     local y1 = math.min(boundaries[2], boundaries[4])
@@ -251,20 +251,23 @@ function M.collision(componentsTable, terrain, dt)
   -- solid depends on collisionBox, position and velocity
   -- components.assertDependency(componentsTable, "solids", "collisionBoxes",
   --                             "positions", "velocities")
+  terrain = terrain or {}
 
-  for entity, solidComponent in pairs(componentsTable.solids or {}) do
-    local collisionBox = componentsTable.collisionBoxes[entity]
-    local position = componentsTable.positions[entity]
-    local velocity = componentsTable.velocities[entity]
-    local finiteStateMachine = componentsTable.finiteStateMachines[entity]
-    local ladders = componentsTable.ladders
-    -- components.assertExistence(entity, "solid", {collisionBox, "collisionBox"},
-    --                            {position, "position"}, {velocity, "velocity"})
+  local positions = componentsTable.positions
+  local velocities = componentsTable.velocities
+  if positions and velocities then
+    for entity, solidComponent in pairs(componentsTable.solids or {}) do
+      local collisionBox = componentsTable.collisionBoxes[entity]
+      local position = positions[entity]
+      local velocity = componentsTable.velocities[entity]
+      local finiteStateMachine = componentsTable.finiteStateMachines[entity]
+      local ladders = componentsTable.ladders
 
-    checkBoundaries(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
-    checkSlopes(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
-    checkClouds(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
-    checkLadders(collisionBox, position, velocity, ladders, dt)
+      checkBoundaries(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
+      checkSlopes(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
+      checkClouds(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
+      checkLadders(collisionBox, position, velocity, ladders, dt)
+    end
   end
 end
 

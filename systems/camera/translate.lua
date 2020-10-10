@@ -35,25 +35,27 @@ function M.terrain(positions, ladders, vcamPosition)
     ladders = {}
   }
 
-  for _, boundary in ipairs(positions.boundaries or {}) do
-    table.insert(translatedPositions.boundaries, {
-      boundary[1] - vcamPosition.x, boundary[2] + vcamPosition.y,
-      boundary[3] - vcamPosition.x, boundary[4] + vcamPosition.y
-    })
-  end
+  if positions then
+    for _, boundary in ipairs(positions.boundaries or {}) do
+      table.insert(translatedPositions.boundaries, {
+        boundary[1] - vcamPosition.x, boundary[2] + vcamPosition.y,
+        boundary[3] - vcamPosition.x, boundary[4] + vcamPosition.y
+      })
+    end
 
-  for _, cloud in ipairs(positions.clouds or {}) do
-    table.insert(translatedPositions.clouds, {
-      cloud[1] - vcamPosition.x, cloud[2] + vcamPosition.y,
-      cloud[3] - vcamPosition.x
-    })
-  end
+    for _, cloud in ipairs(positions.clouds or {}) do
+      table.insert(translatedPositions.clouds, {
+        cloud[1] - vcamPosition.x, cloud[2] + vcamPosition.y,
+        cloud[3] - vcamPosition.x
+      })
+    end
 
-  for _, slope in ipairs(positions.slopes or {}) do
-    table.insert(translatedPositions.slopes, {
-      slope[1] - vcamPosition.x, slope[2] + vcamPosition.y,
-      slope[3] - vcamPosition.x, slope[4] + vcamPosition.y
-    })
+    for _, slope in ipairs(positions.slopes or {}) do
+      table.insert(translatedPositions.slopes, {
+        slope[1] - vcamPosition.x, slope[2] + vcamPosition.y,
+        slope[3] - vcamPosition.x, slope[4] + vcamPosition.y
+      })
+    end
   end
 
   for _, ladder in ipairs(ladders or {}) do

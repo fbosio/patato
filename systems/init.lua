@@ -19,7 +19,7 @@ function M.update(state, dt)
 
   control.player(state)
   attack.collision(state)
-  currentLevel = goals.update(state, currentLevel)
+  currentLevel = goals.update(state, state.currentLevel)
 
   mruv.gravity(state, dt)
   terrain.collision(state, state.currentLevel.terrain, dt)

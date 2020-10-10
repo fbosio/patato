@@ -25,16 +25,15 @@ function M.update(state, dt)
   for vcamEntity, vcam in pairs(state.cameras or {}) do
     if vcam then
       local targetEntity = vcam.target
-
-      local vcamPosition = state.positions[vcamEntity]
+      local width, height = love.graphics.getDimensions()
       local _targetPosition = state.positions[targetEntity]
+        or {x=width/2, y=height/2}
       local targetPosition = {  -- copy table
         x = _targetPosition.x,
         y = _targetPosition.y
       }
 
       if vcam.boundaries then
-        local width, height = love.graphics.getDimensions()
         local x1 = math.min(vcam.boundaries[1], vcam.boundaries[3])
         local x2 = math.max(vcam.boundaries[1], vcam.boundaries[3])
         local y1 = math.min(vcam.boundaries[2], vcam.boundaries[4])
@@ -61,6 +60,7 @@ function M.update(state, dt)
         end
       end
 
+      local vcamPosition = state.positions[vcamEntity]
       -- Movement constraints here
         tweening.exp(vcamPosition, targetPosition, dt, 25)
   --       tweening.linear(vcamPosition, targetPosition, dt, {threshold=10,
