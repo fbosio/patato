@@ -3,7 +3,7 @@ local animation = require "components.animation"
 local M = {}
 
 
-local holdingJumpKey, holdingUpKey
+local holdingJumpKey
 
 local statesLogic = {
   idle = function (args)
@@ -54,16 +54,13 @@ local statesLogic = {
         args.animationClip:setAnimation("punching")
       end
 
-      if love.keyboard.isDown("w") and args.collisionBox.ladder
-          and not holdingUpKey then
+      if args.collisionBox.ladder and love.keyboard.isDown("w")
+          or love.keyboard.isDown("s") then
         local weights = args.state.weights or {}
         weights[args.entity] = nil
         args.collisionBox.climbing = true
         args.finiteStateMachine:setState("climbing")
         args.animationClip:setAnimation("climbingIdle")
-        holdingUpKey = true
-      elseif not love.keyboard.isDown("w") and holdingUpKey then
-        holdingUpKey = false
       end
   end,
 
