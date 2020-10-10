@@ -27,7 +27,7 @@ end
 --- Return a table with the translated positions of all the terrain elements
 -- @param positions a table with the original positions of the elements
 -- @param vcamPosition a table that refers to a vcamEntity position
-function M.terrain(positions, vcamPosition)
+function M.terrain(positions, ladders, vcamPosition)
   local translatedPositions = {
     boundaries = {},
     clouds = {},
@@ -56,7 +56,7 @@ function M.terrain(positions, vcamPosition)
     })
   end
 
-  for _, ladder in ipairs(positions.ladders or {}) do
+  for _, ladder in ipairs(ladders or {}) do
     table.insert(translatedPositions.ladders, {
       ladder[1] - vcamPosition.x, ladder[2] + vcamPosition.y,
       ladder[3] - vcamPosition.x, ladder[4] + vcamPosition.y

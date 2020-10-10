@@ -54,6 +54,7 @@ function M.positions(state)
       translated.components = translate.boxes(state.positions,
                                               vcamEntity, vcamPosition)
       translated.terrain = translate.terrain(state.currentLevel.terrain,
+                                             state.ladders,
                                              vcamPosition)
 
       -- Done, now return a table with all the moved positions

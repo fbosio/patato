@@ -193,7 +193,7 @@ local function checkHorizontalBoundary(collisionBox, position, velocity, x1,
 end
 
 
-local function checkLadders(collisionBox, position, velocity, terrain, dt)
+local function checkLadders(collisionBox, position, velocity, ladders, dt)
   if collisionBox.climbing then
     local ladder = collisionBox.ladder
     local x1 = math.min(ladder[1], ladder[3])
@@ -205,8 +205,8 @@ local function checkLadders(collisionBox, position, velocity, terrain, dt)
     checkHorizontalBoundary(collisionBox, position, velocity, x1, x2, dt)
   else
     collisionBox.ladder = nil
-    for i in pairs(terrain.ladders or {}) do
-      local ladder = terrain.ladders[i]
+    for i in pairs(ladders or {}) do
+      local ladder = ladders[i]
       local x1 = math.min(ladder[1], ladder[3])
       local y1 = math.min(ladder[2], ladder[4])
       local x2 = math.max(ladder[1], ladder[3])
@@ -225,9 +225,16 @@ end
 
 function M.load(componentsTable)
   local width = 40
+  local loadedLadders = {}
   for __, ladder in ipairs(componentsTable.currentLevel.terrain.ladders or {}) do
-    ladder[3], ladder[4] = ladder[1] + width, ladder[3]
+    loadedLadders[#loadedLadders + 1] = {
+      ladder[1],
+      ladder[2],
+      ladder[1] + width,
+      ladder[3]
+    }
   end
+  componentsTable.ladders = loadedLadders
 end
 
 
@@ -240,13 +247,14 @@ function M.collision(componentsTable, terrain, dt)
     local collisionBox = componentsTable.collisionBoxes[entity]
     local position = componentsTable.positions[entity]
     local velocity = componentsTable.velocities[entity]
+    local ladders = componentsTable.ladders
     -- components.assertExistence(entity, "solid", {collisionBox, "collisionBox"},
     --                            {position, "position"}, {velocity, "velocity"})
 
     checkBoundaries(collisionBox, position, velocity, terrain, dt)
     checkSlopes(collisionBox, position, velocity, terrain, dt)
     checkClouds(collisionBox, position, velocity, terrain, dt)
-    checkLadders(collisionBox, position, velocity, terrain, dt)
+    checkLadders(collisionBox, position, velocity, ladders, dt)
   end
 end
 
