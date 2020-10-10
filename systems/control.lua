@@ -67,7 +67,12 @@ local statesLogic = {
   hurt = function (args)
     args.living.health = args.living.health - 1
     args.living.stamina = args.living.stamina and math.max(0, args.living.stamina - 25)
-    if args.living.health == 0 or (args.living.stamina and args.living.stamina == 0) then
+    if args.state.collisionBoxes[args.entity].hurtFallHeight then
+      args.living.health = 0
+      args.velocity.x = 0
+      args.finiteStateMachine:setState("lyingDown", 1.5)
+      args.animationClip:setAnimation("lyingDown")
+    elseif args.living.health == 0 or (args.living.stamina and args.living.stamina == 0) then
       args.finiteStateMachine:setState("flyingHurt")
       local collectors = args.state.collectors or {}
       collectors[args.entity] = false

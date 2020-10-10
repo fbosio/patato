@@ -89,6 +89,14 @@ function love.draw()
     0.498039, 0.498039, 0.498039
   )
   outline.debug(
+    "hurtFallHeight",
+    function (hurtFallHeight)
+      return tostring(hurtFallHeight)
+    end,
+    components.state.collisionBoxes.patato.hurtFallHeight,
+    0.8, 0.3, 0.3
+  )
+  outline.debug(
     "camera",
     function (position)
       return string.format("%.2f, %.2f", position.x, position.y)

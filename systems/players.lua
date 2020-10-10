@@ -25,6 +25,7 @@ function M.load(name, state)
         [name] = {health = 1}
       }
     end
+
     local speedImpulses = state.speedImpulses or {}
     speedImpulses[name] = speedImpulses[name] or {}
     speedImpulses[name].walk = speedImpulses[name].walk or 0

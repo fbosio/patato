@@ -84,6 +84,8 @@ M.GoalBox = M.Box:new{
 M.CollisionBox = M.Box:new{
   -- set by main load function
   maxFallSpeed = nil,
+  -- set by control and terrain systems
+  hurtFallHeight = false,
   -- set by terrain system
   slopeId = nil,
   reactingWithClouds = true

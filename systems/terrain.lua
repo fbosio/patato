@@ -8,6 +8,7 @@ local function checkBottomBoundary(collisionBox, position, velocity, finiteState
   if box:right() > x1 and box:left() < x2 and box:bottom() + velocity.y*dt > y1
       and box:center() < y2 then
     if box.maxFallSpeed and velocity.y > box.maxFallSpeed then
+      collisionBox.hurtFallHeight = true
       finiteStateMachine:setState("hurt")
     end
     velocity.y = 0
@@ -126,9 +127,10 @@ local function checkSlopes(collisionBox, position, velocity, finiteStateMachine,
       -- if pointing up
       if y1 > y2 then
         if box.maxFallSpeed and velocity.y > box.maxFallSpeed then
+          collisionBox.hurtFallHeight = true
           finiteStateMachine:setState("hurt")
         end
-        
+
         if box:bottom() + velocity.y*dt >= ySlope then
           position.y = ySlope
           velocity.y = 0
@@ -160,6 +162,7 @@ local function checkClouds(collisionBox, position, velocity, finiteStateMachine,
       if box:right() > x1 and box:left() < x2 and box:bottom() <= y1
           and box:bottom() + velocity.y*dt > y1 and velocity.y > 0 then
         if box.maxFallSpeed and velocity.y > box.maxFallSpeed then
+          collisionBox.hurtFallHeight = true
           finiteStateMachine:setState("hurt")
         end
         velocity.y = 0
