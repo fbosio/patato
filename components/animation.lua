@@ -103,15 +103,15 @@ function M.AnimationClip(animationsData, nameOfCurrentAnimation, spriteSheet)
 end
 
 
-function M.DummyAnimationClip(finiteStateMachine)
+function M.DummyAnimationClip(stateMachine)
   local newComponent = {
-    finiteStateMachine = finiteStateMachine
+    stateMachine = stateMachine
   }
 
   function newComponent:setAnimation() end
 
   function newComponent:done()
-    return self.finiteStateMachine.stateTime == 0
+    return self.stateMachine.stateTime == 0
   end
 
   return newComponent

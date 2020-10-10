@@ -3,14 +3,14 @@ local M = {}
 
 
 local function checkBottomBoundary(collisionBox, position, velocity,
-                                   finiteStateMachine, x1, y1, x2, y2, dt)
+                                   stateMachine, x1, y1, x2, y2, dt)
   local box = collisionBox:translated(position)
 
   if box:right() > x1 and box:left() < x2 and box:bottom() + velocity.y*dt > y1
       and box:center() < y2 then
     if box.maxFallSpeed and velocity.y > box.maxFallSpeed then
       collisionBox.hurtFallHeight = true
-      finiteStateMachine:setState("hurt")
+      stateMachine:setState("hurt")
     end
     velocity.y = 0
     position.y = y1
@@ -91,7 +91,7 @@ end
 
 
 local function checkBoundaries(collisionBox, position, velocity,
-                               finiteStateMachine, terrain, dt)
+                               stateMachine, terrain, dt)
   for i in pairs(terrain.boundaries or {}) do
     local boundaries = terrain.boundaries[i]
     local x1 = math.min(boundaries[1], boundaries[3])
@@ -99,7 +99,7 @@ local function checkBoundaries(collisionBox, position, velocity,
     local x2 = math.max(boundaries[1], boundaries[3])
     local y2 = math.max(boundaries[2], boundaries[4])
 
-    checkBottomBoundary(collisionBox, position, velocity, finiteStateMachine,
+    checkBottomBoundary(collisionBox, position, velocity, stateMachine,
                         x1, y1, x2, y2, dt)
     checkTopBoundary(collisionBox, position, velocity, x1, y1, x2, y2, dt)
 
@@ -119,7 +119,7 @@ end
 
 
 local function checkSlopes(collisionBox, position, velocity,
-                           finiteStateMachine, terrain, dt)
+                           stateMachine, terrain, dt)
   for i in pairs(terrain.slopes or {}) do
     local x1, y1, x2, y2 = unpack(terrain.slopes[i])
     local xLeft, xRight = math.min(x1, x2), math.max(x1, x2)
@@ -136,7 +136,7 @@ local function checkSlopes(collisionBox, position, velocity,
       if y1 > y2 then
         if box.maxFallSpeed and velocity.y > box.maxFallSpeed then
           collisionBox.hurtFallHeight = true
-          finiteStateMachine:setState("hurt")
+          stateMachine:setState("hurt")
         end
 
         if box:bottom() + velocity.y*dt >= ySlope then
@@ -158,7 +158,7 @@ end
 
 
 local function checkClouds(collisionBox, position, velocity,
-                           finiteStateMachine, terrain, dt)
+                           stateMachine, terrain, dt)
   if collisionBox.reactingWithClouds then
     for i in pairs(terrain.clouds or {}) do
       local clouds = terrain.clouds[i]
@@ -172,7 +172,7 @@ local function checkClouds(collisionBox, position, velocity,
           and box:bottom() + velocity.y*dt > y1 and velocity.y > 0 then
         if box.maxFallSpeed and velocity.y > box.maxFallSpeed then
           collisionBox.hurtFallHeight = true
-          finiteStateMachine:setState("hurt")
+          stateMachine:setState("hurt")
         end
         velocity.y = 0
         position.y = y1
@@ -269,14 +269,14 @@ function M.collision(componentsTable, terrain, dt)
       local collisionBox = componentsTable.collisionBoxes[entity]
       local position = positions[entity]
       local velocity = componentsTable.velocities[entity]
-      local finiteStateMachine = componentsTable.finiteStateMachines[entity]
+      local stateMachine = componentsTable.stateMachines[entity]
       local ladders = componentsTable.ladders
 
-      checkBoundaries(collisionBox, position, velocity, finiteStateMachine,
+      checkBoundaries(collisionBox, position, velocity, stateMachine,
                       terrain, dt)
-      checkSlopes(collisionBox, position, velocity, finiteStateMachine,
+      checkSlopes(collisionBox, position, velocity, stateMachine,
                   terrain, dt)
-      checkClouds(collisionBox, position, velocity, finiteStateMachine,
+      checkClouds(collisionBox, position, velocity, stateMachine,
                   terrain, dt)
       checkLadders(collisionBox, position, velocity, ladders, dt)
     end

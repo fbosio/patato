@@ -90,7 +90,7 @@ function love.draw()
     function (state)
       return tostring(state)
     end,
-    components.state.finiteStateMachines.patato.currentState,
+    components.state.stateMachines.patato.currentState,
     0.498039, 0.498039, 0.498039
   )
   outline.debug(

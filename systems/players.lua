@@ -1,4 +1,4 @@
-local fsm = require "components.fsm"
+local statemachine = require "components.statemachine"
 
 
 local M = {}
@@ -15,8 +15,8 @@ function M.load(name, state)
     }
     state.velocities = state.velocities or {}
     state.velocities[name] = {x=0, y=0}
-    state.finiteStateMachines = state.finiteStateMachines or {}
-    state.finiteStateMachines[name] = fsm.FiniteStateMachine("idle")
+    state.stateMachines = state.stateMachines or {}
+    state.stateMachines[name] = statemachine.StateMachine("idle")
 
     -- This might be removed when enemies are created
     local players = state.players or {}

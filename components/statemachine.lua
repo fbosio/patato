@@ -1,7 +1,7 @@
 local M = {}
 
 
-function M.FiniteStateMachine(currentState)
+function M.StateMachine(currentState)
   local newComponent = {
     currentState = currentState,
     stateTime = 0

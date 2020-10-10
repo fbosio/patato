@@ -5,7 +5,7 @@ local mruv = require "systems.mruv"
 local control = require "systems.control"
 local items = require "systems.items"
 local goals = require "systems.goals"
-local fsm = require "systems.fsm"
+local statemachine = require "systems.statemachine"
 local living = require "systems.living"
 local attack = require "systems.attack"
 
@@ -28,7 +28,7 @@ function M.update(state, dt)
   mruv.movement(state, dt)
   living.staminaSupply(state, dt)
   animation.animator(state, dt)
-  fsm.finiteStateMachineRunner(state, dt)
+  statemachine.stateMachineRunner(state, dt)
 
   return currentLevel
 end
