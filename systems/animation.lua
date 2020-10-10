@@ -17,7 +17,8 @@ function M.animator(state, dt)
                                     - currentAnimationDuration
       else
         animationClip.currentTime = currentAnimationDuration - dt
-        animationClip.done = true
+        -- sacrilegious
+        animationClip._done = true
       end
     else
       animationClip.currentTime = animationClip.currentTime + dt

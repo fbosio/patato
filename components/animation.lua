@@ -68,7 +68,7 @@ M.AnimationClip = {
   currentTime = 0,
   facingRight = true,
   playing = true,
-  done = false
+  _done = false
 }
 
 function M.AnimationClip:new(o)
@@ -100,12 +100,12 @@ function M.AnimationClip:setAnimation(animationName)
     self.nameOfCurrentAnimation = animationName
     self.currentTime = 0
     self.playing = true
-    self.done = false
+    self._done = false
   end
 end
 
 function M.AnimationClip:done()
-  return self.done
+  return self._done
 end
 
 
