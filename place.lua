@@ -2,6 +2,7 @@
 -- @module place
 local M = {}
 
+
 local moveBy = {
   ["center"] = function (x, y, w, h) return x - w/2, y - h/2 end,
   ["north"] = function (x, y, w, h) return x - w/2, y end,
@@ -13,6 +14,7 @@ local moveBy = {
   ["south west"] = function (x, y, w, h) return x, y - h end,
   ["south east"] = function (x, y, w, h) return x - w, y - h end
 }
+
 
 -- Check if the given anchor is defined in the moveBy table.
 local function check(anchor)
@@ -46,6 +48,7 @@ function M.textByAnchor(text, x, y, anchor, font)
   love.graphics.print(text, newX, newY)
 end
 
+
 --[[--
  Places texture according to the given inputs.
     Inputs:
@@ -75,6 +78,7 @@ function M.quadByAnchor(texture, quad, transform, anchor)
   love.graphics.draw(texture, quad, transform)
 end
 
+
 --- Table of coordinate transformations
 -- Each one of its entries is a different translation.
 -- A translation calculates and returns a position based on
@@ -102,5 +106,6 @@ for anchor, aliases in pairs{
     moveBy[alias] = moveBy[anchor]
   end
 end
+
 
 return M

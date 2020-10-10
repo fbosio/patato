@@ -3,6 +3,7 @@ local fsm = require "components.fsm"
 
 local M = {}
 
+
 function M.load(name, state)
   local entitiesData = state.currentLevel.entitiesData or {}
   local player = entitiesData.player

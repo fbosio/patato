@@ -20,6 +20,32 @@ function M.load(componentsTable, currentLevel)
 end
 
 
+local function loadNextLevel(levels, goalBox, position, velocity, items,
+                      componentsTable)
+  local nextLevel = levels.level[goalBox.nextLevel]
+
+  -- Player position loading and movement restore
+  position.x = nextLevel.entitiesData.player[1][1]
+  position.y = nextLevel.entitiesData.player[1][2]
+  velocity.x = 0
+  velocity.y = 0
+
+  -- Reload goals and items
+  items.reload(componentsTable, nextLevel)
+
+  for _id in pairs(componentsTable.goals) do
+    componentsTable.positions[_id] = nil
+    componentsTable.goals[_id] = nil
+  end
+
+  if nextLevel.entitiesData.goals then
+    M.load(componentsTable, nextLevel)
+  end
+
+  return nextLevel
+end
+
+
 function M.update(componentsTable, currentLevel)
   local nextLevel = currentLevel
 
@@ -42,35 +68,17 @@ function M.update(componentsTable, currentLevel)
           local goalPosition = componentsTable.positions[goalEntity]
 
           if goalBox:translated(goalPosition):intersects(box) then
-            nextLevel = levels.level[goalBox.nextLevel]
-
-            -- Player position loading and movement restore
-            position.x = nextLevel.entitiesData.player[1][1]
-            position.y = nextLevel.entitiesData.player[1][2]
-            velocity.x = 0
-            velocity.y = 0
-
-            -- Reload goals and items
-            items.reload(componentsTable, nextLevel)
-
-            for _id in pairs(componentsTable.goals) do
-              componentsTable.positions[_id] = nil
-              componentsTable.goals[_id] = nil
-            end
-
-            if nextLevel.entitiesData.goals then
-              M.load(componentsTable, nextLevel)
-            end
-
+            nextLevel = loadNextLevel(levels, goalBox, position, velocity,
+                                      items, componentsTable)
             break
           end
         end -- for goalEntity
       end
-
     end -- for entity, player
   end
 
   return nextLevel
 end
+
 
 return M

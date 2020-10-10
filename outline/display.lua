@@ -6,6 +6,7 @@ local M = {}
 local addedCount = 0
 local textList = {}
 
+
 --- Add text to display on screen
 -- @param id a string that should not be repeated
 -- @param textFunction it must return a string from args
@@ -25,5 +26,6 @@ function M.add(id, textFunction, args, red, green, blue)
     addedCount = addedCount + 1
   end
 end
+
 
 return M

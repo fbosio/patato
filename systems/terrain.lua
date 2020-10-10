@@ -2,7 +2,8 @@ local components = require "components"
 local M = {}
 
 
-local function checkBottomBoundary(collisionBox, position, velocity, finiteStateMachine, x1, y1, x2, y2, dt)
+local function checkBottomBoundary(collisionBox, position, velocity,
+                                   finiteStateMachine, x1, y1, x2, y2, dt)
   local box = collisionBox:translated(position)
 
   if box:right() > x1 and box:left() < x2 and box:bottom() + velocity.y*dt > y1
@@ -18,7 +19,8 @@ local function checkBottomBoundary(collisionBox, position, velocity, finiteState
 end
 
 
-local function checkTopBoundary(collisionBox, position, velocity, x1, y1, x2, y2, dt)
+local function checkTopBoundary(collisionBox, position, velocity,
+                                x1, y1, x2, y2, dt)
   local box = collisionBox:translated(position)
 
   if box:right() + velocity.x*dt > x1 and box:left() + velocity.x*dt< x2
@@ -31,7 +33,8 @@ local function checkTopBoundary(collisionBox, position, velocity, x1, y1, x2, y2
 end
 
 
-local function checkLeftBoundary(collisionBox, position, velocity, x1, y1, x2, y2, dt)
+local function checkLeftBoundary(collisionBox, position, velocity,
+                                 x1, y1, x2, y2, dt)
   local box = collisionBox:translated(position)
 
   if box:right() <= x1 and box:right() + velocity.x*dt > x1 and box:top() < y2
@@ -42,7 +45,8 @@ local function checkLeftBoundary(collisionBox, position, velocity, x1, y1, x2, y
 end
 
 
-local function checkRightBoundary(collisionBox, position, velocity, x1, y1, x2, y2, dt)
+local function checkRightBoundary(collisionBox, position, velocity,
+                                  x1, y1, x2, y2, dt)
   local box = collisionBox:translated(position)
 
   if box:left() >= x2 and box:left() + velocity.x*dt < x2 and box:top() < y2
@@ -86,7 +90,8 @@ local function mustCheckSides(collisionBox, position, terrain, x1, y1, x2, y2)
 end
 
 
-local function checkBoundaries(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
+local function checkBoundaries(collisionBox, position, velocity,
+                               finiteStateMachine, terrain, dt)
   for i in pairs(terrain.boundaries or {}) do
     local boundaries = terrain.boundaries[i]
     local x1 = math.min(boundaries[1], boundaries[3])
@@ -94,7 +99,8 @@ local function checkBoundaries(collisionBox, position, velocity, finiteStateMach
     local x2 = math.max(boundaries[1], boundaries[3])
     local y2 = math.max(boundaries[2], boundaries[4])
 
-    checkBottomBoundary(collisionBox, position, velocity, finiteStateMachine, x1, y1, x2, y2, dt)
+    checkBottomBoundary(collisionBox, position, velocity, finiteStateMachine,
+                        x1, y1, x2, y2, dt)
     checkTopBoundary(collisionBox, position, velocity, x1, y1, x2, y2, dt)
 
     local mustCheckLeft, mustCheckRight = mustCheckSides(collisionBox,
@@ -112,7 +118,8 @@ local function checkBoundaries(collisionBox, position, velocity, finiteStateMach
 end
 
 
-local function checkSlopes(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
+local function checkSlopes(collisionBox, position, velocity,
+                           finiteStateMachine, terrain, dt)
   for i in pairs(terrain.slopes or {}) do
     local x1, y1, x2, y2 = unpack(terrain.slopes[i])
     local xLeft, xRight = math.min(x1, x2), math.max(x1, x2)
@@ -150,7 +157,8 @@ local function checkSlopes(collisionBox, position, velocity, finiteStateMachine,
 end
 
 
-local function checkClouds(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
+local function checkClouds(collisionBox, position, velocity,
+                           finiteStateMachine, terrain, dt)
   if collisionBox.reactingWithClouds then
     for i in pairs(terrain.clouds or {}) do
       local clouds = terrain.clouds[i]
@@ -234,8 +242,9 @@ end
 
 function M.load(componentsTable)
   local width = 40
+  local ladders = componentsTable.currentLevel.terrain.ladders or {}
   local loadedLadders = {}
-  for _, ladder in ipairs(componentsTable.currentLevel.terrain.ladders or {}) do
+  for _, ladder in ipairs(ladders) do
     loadedLadders[#loadedLadders + 1] = {
       ladder[1],
       ladder[2],
@@ -263,12 +272,16 @@ function M.collision(componentsTable, terrain, dt)
       local finiteStateMachine = componentsTable.finiteStateMachines[entity]
       local ladders = componentsTable.ladders
 
-      checkBoundaries(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
-      checkSlopes(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
-      checkClouds(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
+      checkBoundaries(collisionBox, position, velocity, finiteStateMachine,
+                      terrain, dt)
+      checkSlopes(collisionBox, position, velocity, finiteStateMachine,
+                  terrain, dt)
+      checkClouds(collisionBox, position, velocity, finiteStateMachine,
+                  terrain, dt)
       checkLadders(collisionBox, position, velocity, ladders, dt)
     end
   end
 end
+
 
 return M

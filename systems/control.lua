@@ -5,64 +5,83 @@ local M = {}
 
 local holdingJumpKey
 
+
+local function checkWalkInput(args)
+  if love.keyboard.isDown("a") and not love.keyboard.isDown("d") then
+    args.velocity.x = -args.speedImpulses.walk
+    args.animationClip.facingRight = false
+
+    if args.velocity.y == 0 then
+      args.animationClip:setAnimation("walking")
+    end
+  elseif not love.keyboard.isDown("a") and love.keyboard.isDown("d") then
+    args.velocity.x = args.speedImpulses.walk
+    args.animationClip.facingRight = true
+
+    if args.velocity.y == 0 then
+      args.animationClip:setAnimation("walking")
+    end
+  elseif args.velocity.y == 0 then
+    args.velocity.x = 0
+    args.animationClip:setAnimation("standing")
+  end
+end
+
+
+local function checkJumpInput(args)
+  if love.keyboard.isDown("k") and args.velocity.y == 0 and not holdingJumpKey then
+    args.finiteStateMachine:setState("startingJump")
+    args.animationClip:setAnimation("startingJump")
+    holdingJumpKey = true
+  elseif not love.keyboard.isDown("k") and holdingJumpKey then
+    holdingJumpKey = false
+  end
+end
+
+
+local function checkCrouchInput(args)
+  if not love.keyboard.isDown("k") and love.keyboard.isDown("s")
+      and args.velocity.y == 0 then
+    args.finiteStateMachine:setState("crouching")
+  end
+end
+
+
+local function checkClimbInput(args)
+  if args.collisionBox.ladder and (love.keyboard.isDown("w")
+      or love.keyboard.isDown("s")) then
+    local weights = args.state.weights or {}
+    weights[args.entity] = nil
+    args.collisionBox.climbing = true
+    args.finiteStateMachine:setState("climbing")
+    args.animationClip:setAnimation("climbingIdle")
+  end
+end
+
+
 local statesLogic = {
   idle = function (args)
-    -- X Movement Input
-      if love.keyboard.isDown("a") and not love.keyboard.isDown("d") then
-        args.velocity.x = -args.speedImpulses.walk
-        args.animationClip.facingRight = false
+    checkWalkInput(args)  
 
-        if args.velocity.y == 0 then
-          args.animationClip:setAnimation("walking")
-        end
-      elseif not love.keyboard.isDown("a") and love.keyboard.isDown("d") then
-        args.velocity.x = args.speedImpulses.walk
-        args.animationClip.facingRight = true
+    if args.velocity.y ~= 0 then
+      args.animationClip:setAnimation("jumping")
+    end
 
-        if args.velocity.y == 0 then
-          args.animationClip:setAnimation("walking")
-        end
-      elseif args.velocity.y == 0 then
-        args.velocity.x = 0
-        args.animationClip:setAnimation("standing")
-      end
+    checkJumpInput(args)
 
-      if args.velocity.y ~= 0 then
-        args.animationClip:setAnimation("jumping")
-      end
+    if love.keyboard.isDown("j") then
+      args.finiteStateMachine:setState("hurt")
+    end
 
-      -- Y Movement Input
-      if love.keyboard.isDown("k") and args.velocity.y == 0 and not holdingJumpKey then
-        args.finiteStateMachine:setState("startingJump")
-        args.animationClip:setAnimation("startingJump")
-        holdingJumpKey = true
-      elseif not love.keyboard.isDown("k") and holdingJumpKey then
-        holdingJumpKey = false
-      end
+    checkCrouchInput(args)
 
-      if love.keyboard.isDown("j") then
-        args.finiteStateMachine:setState("hurt")
-      end
+    if love.keyboard.isDown("l") then
+      args.velocity.x = 0
+      args.finiteStateMachine:setState("punching")
+      args.animationClip:setAnimation("punching")
+    end
 
-      if not love.keyboard.isDown("k") and love.keyboard.isDown("s")
-          and args.velocity.y == 0 then
-        args.finiteStateMachine:setState("crouching")
-      end
-
-      if love.keyboard.isDown("l") then
-        args.velocity.x = 0
-        args.finiteStateMachine:setState("punching")
-        args.animationClip:setAnimation("punching")
-      end
-
-      if args.collisionBox.ladder and (love.keyboard.isDown("w")
-          or love.keyboard.isDown("s")) then
-        local weights = args.state.weights or {}
-        weights[args.entity] = nil
-        args.collisionBox.climbing = true
-        args.finiteStateMachine:setState("climbing")
-        args.animationClip:setAnimation("climbingIdle")
-      end
+    checkClimbInput(args)
   end,
 
   startingJump = function (args)
@@ -87,18 +106,22 @@ local statesLogic = {
 
   hurt = function (args)
     args.living.health = args.living.health - 1
-    args.living.stamina = args.living.stamina and math.max(0, args.living.stamina - 25)
-    if args.state.collisionBoxes[args.entity].hurtFallHeight then
+    args.living.stamina = args.living.stamina
+                          and math.max(0, args.living.stamina - 25)
+    
+    if args.collisionBox.hurtFallHeight then
       args.living.health = 0
       args.velocity.x = 0
       args.finiteStateMachine:setState("lyingDown", 1.5)
       args.animationClip:setAnimation("lyingDown")
-    elseif args.living.health == 0 or (args.living.stamina and args.living.stamina == 0) then
+    elseif args.living.health == 0
+        or (args.living.stamina and args.living.stamina == 0) then
       args.finiteStateMachine:setState("flyingHurt")
       local collectors = args.state.collectors or {}
       collectors[args.entity] = false
       args.animationClip:setAnimation("flyingHurt")
-      args.velocity.x = (args.animationClip.facingRight and -1 or 1) * args.speedImpulses.walk
+      args.velocity.x = (args.animationClip.facingRight and -1 or 1)
+                        * args.speedImpulses.walk
       args.velocity.y = -args.speedImpulses.jump
     else
       args.finiteStateMachine:setState("hit", 0.5)
@@ -108,18 +131,20 @@ local statesLogic = {
 
   hit = function (args)
     --velocity.x must be set to a property value from another component
-    args.velocity.x = (args.animationClip.facingRight and -1 or 1) * args.speedImpulses.walk / 3
+    args.velocity.x = (args.animationClip.facingRight and -1 or 1)
+                      * args.speedImpulses.walk / 3
     if args.animationClip:done() then
       args.finiteStateMachine:setState("idle")
     end
   end,
 
   flyingHurt = function (args)
+    local maxFallSpeed = args.collisionBox.maxFallSpeed or 5000
     if args.velocity.y == 0 then
       args.velocity.x = 0
       args.finiteStateMachine:setState("lyingDown", 1)
       args.animationClip:setAnimation("lyingDown")
-    elseif args.velocity.y > 5000 then
+    elseif args.velocity.y > maxFallSpeed then
       love.load()
     end
   end,
@@ -199,6 +224,7 @@ local statesLogic = {
         args.finiteStateMachine:setState("startingJump")
         args.animationClip:setAnimation("climbingStartingJump")
       end
+    
     else
       weights[args.entity] = true
       args.finiteStateMachine:setState("idle")
@@ -225,7 +251,8 @@ function M.player(state)
       if type(player) == "table" and player.control or player then
         local animationClips = state.animationClips or {}
         local finiteStateMachine = finiteStateMachines[entity]
-        local clip = animationClips[entity] or animation.DummyAnimationClip(finiteStateMachine)
+        local clip = animationClips[entity] or
+                     animation.DummyAnimationClip(finiteStateMachine)
         local livingEntities = state.living or {}
         local livingEntity = livingEntities[entity] or {health=0,stamina=0}
         -- components.assertExistence(entity, "player", {velocity, "velocity",
@@ -249,6 +276,7 @@ function M.player(state)
 end
 
 
+-- move to animation module
 function M.playerAfterTerrainCollisionChecking(componentsTable)
   -- components.assertDependency(componentsTable, "players", "velocities")
   local velocities = componentsTable.velocities
@@ -261,7 +289,8 @@ function M.playerAfterTerrainCollisionChecking(componentsTable)
       local velocity = velocities[entity]
       local animationClips = componentsTable.animationClips or {}
       local finiteStateMachine = componentsTable.finiteStateMachines[entity]
-      local animationClip = animationClips[entity] or animation.DummyAnimationClip(finiteStateMachine)
+      local animationClip = animationClips[entity] or
+                            animation.DummyAnimationClip(finiteStateMachine)
       -- components.assertExistence(entity, "player", {velocity, "velocity",
       --                            {animationClip, "animationClip"},
       --                            {finiteStateMachine, "finiteStateMachine"}})
@@ -271,7 +300,7 @@ function M.playerAfterTerrainCollisionChecking(componentsTable)
       end
     end
   end
-
 end
+
 
 return M

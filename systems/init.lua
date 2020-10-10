@@ -12,6 +12,7 @@ local attack = require "systems.attack"
 
 local M = {}
 
+
 function M.update(state, dt)
   camera.update(state, dt)
 
@@ -31,5 +32,6 @@ function M.update(state, dt)
 
   return currentLevel
 end
+
 
 return M

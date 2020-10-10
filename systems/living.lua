@@ -1,5 +1,6 @@
 local M = {}
 
+
 function M.staminaSupply(componentsTable, dt)
   for entity, living in pairs(componentsTable.living or {}) do
     local stamina = living.stamina
@@ -8,5 +9,6 @@ function M.staminaSupply(componentsTable, dt)
     end
   end
 end
+
 
 return M

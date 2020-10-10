@@ -1,33 +1,27 @@
 local drawings = require "outline.drawings"
 local display = require "outline.display"
 
+
 --- Debug module
 -- I could not name this module "debug" because there is already a library
 -- named "debug" in lua.
 local M = {}
 
 
-function M.draw(componentsTable, positions)
-  local r, g, b = love.graphics.getColor()
-
+local function moveTerrain(componentsTable, positions)
   local terrainPositions = positions or componentsTable.currentLevel
-
-  -- Pasar a subrutinas
-  local position
-
-  -- Move terrain
-  position = terrainPositions.terrain or {}
+  local position = terrainPositions.terrain or {}
   drawings.boundaries(position.boundaries)
   drawings.clouds(position.clouds)
   drawings.slopes(position.slopes)
   drawings.ladders(position.ladders)
+end
 
-  -- Move boxes
-  if positions then
-    position = positions.components
-  else
-    position = componentsTable.positions
-  end
+
+local function moveBoxes(componentsTable, positions)
+  local position = positions and positions.components
+                   or componentsTable.positions
+
   if position then
     drawings.collisionBoxes(componentsTable.collisionBoxes, position)
     -- drawings.attackBoxes(componentsTable.animationClips, position)
@@ -35,6 +29,14 @@ function M.draw(componentsTable, positions)
     drawings.medkits(componentsTable.healing, position)
     drawings.pomodori(componentsTable.experienceEffect, position)
   end
+end
+
+
+function M.draw(componentsTable, positions)
+  local r, g, b = love.graphics.getColor()
+
+  moveTerrain(componentsTable, positions)
+  moveBoxes(componentsTable, positions)
 
   -- Reset drawing color
   love.graphics.setColor(r, g, b)
@@ -48,5 +50,6 @@ function M.debug(id, textFunction, args, red, green, blue)
   -- Reset drawing color
   love.graphics.setColor(r, g, b)
 end
+
 
 return M

@@ -19,32 +19,36 @@ M.scale = scale  -- export
 
 
 -- Animation Clip
-local function createAnimationsTable(animations, spriteSheet)
-  local animationsTable = {}
-
-  for animationName, animation in pairs(animations) do
-    animationsTable[animationName] = {
-      frames = {},
-      looping = animation[2]
-    }
-    local newAnimation = animationsTable[animationName]
-
-    for _, frame in ipairs(animation[1]) do
-      local x, y, width, height, originX, originY = unpack(sprites[frame[1]])
-      local attackBox = frame[3]
-
-      newAnimation.frames[#newAnimation.frames + 1] = {
-        quad = love.graphics.newQuad(x, y, width, height, spriteSheet:getDimensions()),
-        origin = {x = -originX*scale, y = -originY*scale},
-        duration = frame[2],
-        attackBox = attackBox and box.AttackBox:new{
-          x = attackBox[1]*scale,
-          y = attackBox[2]*scale,
-          width = attackBox[3]*scale,
-          height = attackBox[4]*scale
-        }
+local function createAnimationFrames(animationData, sprites, spriteSheet)
+  local frames = {}
+  for _, frame in ipairs(animationData[1]) do
+    local x, y, width, height, originX, originY = unpack(sprites[frame[1]])
+    local attackBox = frame[3]
+    frames[#frames + 1] = {
+      quad = love.graphics.newQuad(x, y, width, height,
+                                   spriteSheet:getDimensions()),
+      origin = {x = -originX*scale, y = -originY*scale},
+      duration = frame[2],
+      attackBox = attackBox and box.AttackBox:new{
+        x = attackBox[1]*scale,
+        y = attackBox[2]*scale,
+        width = attackBox[3]*scale,
+        height = attackBox[4]*scale
       }
-    end
+    }
+  end
+  return frames
+end
+
+
+local function createAnimations(animationsData, spriteSheet)
+  local animations = {}
+
+  for animationName, animationData in pairs(animationsData) do
+    animations[animationName] = {
+      frames = createAnimationFrames(animationData, sprites, spriteSheet),
+      looping = animationData[2]
+    }
 
     function newAnimation:duration()
       local result = 0
@@ -55,12 +59,13 @@ local function createAnimationsTable(animations, spriteSheet)
     end
   end
 
-  return animationsTable
+  return animations
 end
 
-function M.AnimationClip(animations, nameOfCurrentAnimation, spriteSheet)
+
+function M.AnimationClip(animationsData, nameOfCurrentAnimation, spriteSheet)
   local newComponent = {
-    animations = createAnimationsTable(animations, spriteSheet),
+    animations = createAnimations(animationsData, spriteSheet),
     nameOfCurrentAnimation = nameOfCurrentAnimation,
     currentTime = 0,
     facingRight = true,
@@ -97,10 +102,12 @@ function M.AnimationClip(animations, nameOfCurrentAnimation, spriteSheet)
   return newComponent
 end
 
+
 function M.DummyAnimationClip(finiteStateMachine)
   local newComponent = {
     finiteStateMachine = finiteStateMachine
   }
+
   function newComponent:setAnimation() end
 
   function newComponent:done()
@@ -109,5 +116,6 @@ function M.DummyAnimationClip(finiteStateMachine)
 
   return newComponent
 end
+
 
 return M

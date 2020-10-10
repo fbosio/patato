@@ -24,6 +24,7 @@ function M.boxes(positions, vcamEntity, vcamPosition)
   return translatedPositions
 end
 
+
 --- Return a table with the translated positions of all the terrain elements
 -- @param positions a table with the original positions of the elements
 -- @param vcamPosition a table that refers to a vcamEntity position
@@ -67,5 +68,6 @@ function M.terrain(positions, ladders, vcamPosition)
 
   return translatedPositions
 end
+
 
 return M

@@ -20,51 +20,57 @@ function M.load(name, target, state)
 end
 
 
+local function updatePositionWithinBoundaries(targetPosition, boundaries,
+                                              width, height)
+  local x1 = math.min(boundaries[1], boundaries[3])
+  local x2 = math.max(boundaries[1], boundaries[3])
+  local y1 = math.min(boundaries[2], boundaries[4])
+  local y2 = math.max(boundaries[2], boundaries[4])
+
+  if x2 - x1 < width then
+    x2 = x1 + width
+  end
+
+  if y2 - y1 < height then
+    y2 = y1 + height
+  end
+
+  if targetPosition.x < x1 + width/2 then
+    targetPosition.x = x1 + width/2
+  elseif targetPosition.x > x2 - width/2 then
+    targetPosition.x = x2 - width/2
+  end
+
+  if targetPosition.y < y1 + height/2 then
+    targetPosition.y = y1 + height/2
+  elseif targetPosition.y > y2 - height/2 then
+    targetPosition.y = y2 - height/2
+  end
+end
+
+
 --- Follow camera targets
 function M.update(state, dt)
   for vcamEntity, vcam in pairs(state.cameras or {}) do
     if vcam then
       local targetEntity = vcam.target
       local width, height = love.graphics.getDimensions()
-      local _targetPosition = state.positions[targetEntity]
+      local targetPosition = state.positions[targetEntity]
         or {x=width/2, y=height/2}
-      local targetPosition = {  -- copy table
-        x = _targetPosition.x,
-        y = _targetPosition.y
+      local newTargetPosition = {
+        x = targetPosition.x,
+        y = targetPosition.y
       }
 
       if vcam.boundaries then
-        local x1 = math.min(vcam.boundaries[1], vcam.boundaries[3])
-        local x2 = math.max(vcam.boundaries[1], vcam.boundaries[3])
-        local y1 = math.min(vcam.boundaries[2], vcam.boundaries[4])
-        local y2 = math.max(vcam.boundaries[2], vcam.boundaries[4])
-
-        if x2 - x1 < width then
-          x2 = x1 + width
-        end
-
-        if y2 - y1 < height then
-          y2 = y1 + height
-        end
-
-        if targetPosition.x < x1 + width/2 then
-          targetPosition.x = x1 + width/2
-        elseif targetPosition.x > x2 - width/2 then
-          targetPosition.x = x2 - width/2
-        end
-
-        if targetPosition.y < y1 + height/2 then
-          targetPosition.y = y1 + height/2
-        elseif targetPosition.y > y2 - height/2 then
-          targetPosition.y = y2 - height/2
-        end
+        updatePositionWithinBoundaries(newTargetPosition, vcam.boundaries,
+                                       width, height)
       end
 
       local vcamPosition = state.positions[vcamEntity]
-      -- Movement constraints here
-        tweening.exp(vcamPosition, targetPosition, dt, 25)
-  --       tweening.linear(vcamPosition, targetPosition, dt, {threshold=10,
-  --           multiplier=state.speedImpulses.patato.walk})
+      tweening.exp(vcamPosition, newTargetPosition, dt, 25)
+      -- tweening.linear(vcamPosition, newTargetPosition, dt, {threshold=10,
+      --                 multiplier=state.speedImpulses.patato.walk})
     end
   end
 end
@@ -73,7 +79,6 @@ end
 --- Return the results of applying coordinate translations
 function M.positions(state)
   for vcamEntity, vcam in pairs(state.cameras or {}) do
-
     if vcam then
       local vcamPosition = state.positions[vcamEntity]
 
@@ -91,8 +96,8 @@ function M.positions(state)
       -- Done, now return a table with all the moved positions
       return translated
     end
-
   end
 end
+
 
 return M

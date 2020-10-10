@@ -8,6 +8,7 @@ local systems = require "systems"
 local items = require "systems.items"
 local terrain = require "systems.terrain"
 
+
 function love.load()
   local currentLevel = levels.level[levels.first]
   local playerName = "patato"
@@ -41,9 +42,11 @@ function love.load()
   camera.load("my camera", playerName, components.state)
 end
 
+
 function love.update(dt)
   systems.update(components.state, dt)
 end
+
 
 function love.draw()
   outline.draw(components.state, camera.positions(components.state))

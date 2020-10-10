@@ -11,12 +11,14 @@ local componentGroup = {
   -- ["my item"] = {"healing", "experienceEffect"}  -- several effects
 }
 
+
 function M.load(state)
   for itemGroupName, entity in pairs(componentGroup) do
     state[componentGroup[itemGroupName]] = {}
     local group = state[entity]
+    local itemsData = state.currentLevel.entitiesData[itemGroupName] or {}
 
-    for itemIndex, itemData in pairs(state.currentLevel.entitiesData[itemGroupName] or {}) do
+    for itemIndex, itemData in pairs(itemsData) do
       local id = itemGroupName .. tostring(itemIndex)
       state.positions = state.positions or {}
       state.positions[id] = {x = itemData[1], y = itemData[2]}
@@ -79,7 +81,6 @@ local function healthSupply(state)
 end
 
 
-
 local function experienceSupply(state)
   -- experienceEffect depends on player and position
   -- components.assertDependency(state, "experienceEffect", "players",
@@ -117,5 +118,6 @@ function M.update(state)
   healthSupply(state)
   -- experienceSupply(state)
 end
+
 
 return M

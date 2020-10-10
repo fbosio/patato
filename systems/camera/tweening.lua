@@ -10,6 +10,7 @@ local function difference(vcamPosition, targetPosition)
   }
 end
 
+
 --- Move camera to target with infinite speed
 -- @param vcamPosition a table reference to the camera position
 -- @param targetPosition a table reference to the target position
@@ -20,6 +21,7 @@ function M.none(vcamPosition, targetPosition)
   vcamPosition.x = vcamPosition.x - diff.x
   vcamPosition.y = vcamPosition.y - diff.y
 end
+
 
 --- Move camera to target with constant finite speed
 -- @param vcamPosition a table reference to the camera position
@@ -49,6 +51,7 @@ function M.linear(vcamPosition, targetPosition, dt, parameters)
   vcamPosition.y = vcamPosition.y + slope.y*dt
 end
 
+
 --- Move camera to target with exponential speed
 -- @param vcamPosition a table reference to the camera position
 -- @param targetPosition a table reference to the target position
@@ -64,5 +67,6 @@ function M.exp(vcamPosition, targetPosition, dt, ratio)
   vcamPosition.x = vcamPosition.x - diff.x + diff.x/(ratio^dt)
   vcamPosition.y = vcamPosition.y - diff.y + diff.y/(ratio^dt)
 end
+
 
 return M

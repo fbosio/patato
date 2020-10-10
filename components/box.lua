@@ -40,7 +40,6 @@ M.Box = {
       and self:top() <= box:bottom() and self:bottom() >= box:top()
   end,
 
-
   -- Static method
   translated = function (o, position)
     if position then
@@ -69,6 +68,7 @@ M.ItemBox = M.Box:new{
   effectAmount = 0,
 }
 
+
 M.GoalBox = M.Box:new{
   nextLevel = nil,  -- constructor argument
 
@@ -80,6 +80,7 @@ M.GoalBox = M.Box:new{
     return M.Box.translated(self, position)
   end,
 }
+
 
 M.CollisionBox = M.Box:new{
   -- set by main load function
@@ -94,19 +95,23 @@ M.CollisionBox = M.Box:new{
   ladder = nil
 }
 
+
 M.AttackBox = M.Box:new{
   -- Extended method
   translated = function (self, position, animationClip)
-    local currentAnimation = animationClip.animations[animationClip.nameOfCurrentAnimation]
-    local currentFrame = currentAnimation.frames[animationClip:currentFrameNumber()]
+    local currentAnimation =
+      animationClip.animations[animationClip.nameOfCurrentAnimation]
+    local currentFrame =
+      currentAnimation.frames[animationClip:currentFrameNumber()]
     local frameAttackBox = currentFrame.attackBox
-    local offsetX = (animationClip.facingRight and 1 or -1)* frameAttackBox.x
+    local offsetX = (animationClip.facingRight and 1 or -1) * frameAttackBox.x
+
     local box = M.Box.translated(self, position)
     box.x = box.x + offsetX
     box.y = box.y + frameAttackBox.y
-
     return box
   end,
 }
+
 
 return M
