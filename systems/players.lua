@@ -16,7 +16,9 @@ function M.load(name, state)
     state.velocities = state.velocities or {}
     state.velocities[name] = {x=0, y=0}
     state.stateMachines = state.stateMachines or {}
-    state.stateMachines[name] = statemachine.StateMachine("idle")
+    state.stateMachines[name] = statemachine.StateMachine:new{
+      currentState = "idle"
+    }
 
     -- This might be removed when enemies are created
     local players = state.players or {}

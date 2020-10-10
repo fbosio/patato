@@ -252,7 +252,9 @@ function M.player(state)
         local animationClips = state.animationClips or {}
         local stateMachine = stateMachines[entity]
         local clip = animationClips[entity] or
-                     animation.DummyAnimationClip(stateMachine)
+                     animation.DummyAnimationClip:new{
+                       stateMachine = stateMachine
+                     }
         local livingEntities = state.living or {}
         local livingEntity = livingEntities[entity] or {health=0,stamina=0}
         -- components.assertExistence(entity, "player", {velocity, "velocity",
@@ -290,7 +292,9 @@ function M.playerAfterTerrainCollisionChecking(state)
       local animationClips = state.animationClips or {}
       local stateMachine = state.stateMachines[entity]
       local animationClip = animationClips[entity] or
-                            animation.DummyAnimationClip(stateMachine)
+                            animation.DummyAnimationClip:new{
+                              stateMachine = stateMachine
+                            }
       -- components.assertExistence(entity, "player", {velocity, "velocity",
       --                            {animationClip, "animationClip"},
       --                            {stateMachine, "stateMachine"}})

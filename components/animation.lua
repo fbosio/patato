@@ -63,58 +63,78 @@ local function createAnimations(animationsData, spriteSheet)
 end
 
 
-function M.AnimationClip(animationsData, nameOfCurrentAnimation, spriteSheet)
-  local newComponent = {
-    animations = createAnimations(animationsData, spriteSheet),
-    nameOfCurrentAnimation = nameOfCurrentAnimation,
-    currentTime = 0,
-    facingRight = true,
-    playing = true,
-    done = false
-  }
+M.AnimationClip = {
+  animations = nil,
+  currentTime = 0,
+  facingRight = true,
+  playing = true,
+  done = false
+}
 
-  function newComponent:currentFrameNumber()
-    local timeSpent = 0
-    local currentAnimation = self.animations[self.nameOfCurrentAnimation]
-    for frameNumber, frame in ipairs(currentAnimation.frames) do
-      timeSpent = timeSpent + frame.duration
-      if timeSpent > self.currentTime then
-        return frameNumber
-      end
-    end
-    return #currentAnimation.frames
-  end
+function M.AnimationClip:new(o)
+  o = o or {}
+  setmetatable(o, self)
+  o.animations = createAnimations(o.animationsData, o.spriteSheet)
+  o.animationsData = nil
+  o.spriteSheet = nil
+  self.__index = self
 
-  function newComponent:setAnimation(animationName)
-    if self.animations[animationName]
-        and self.nameOfCurrentAnimation ~= animationName then
-      self.nameOfCurrentAnimation = animationName
-      self.currentTime = 0
-      self.playing = true
-      self.done = false
+  return o
+end
+
+function M.AnimationClip:currentFrameNumber()
+  local timeSpent = 0
+  local currentAnimation = self.animations[self.nameOfCurrentAnimation]
+  for frameNumber, frame in ipairs(currentAnimation.frames) do
+    timeSpent = timeSpent + frame.duration
+    if timeSpent > self.currentTime then
+      return frameNumber
     end
   end
+  return #currentAnimation.frames
+end
 
-  function newComponent:done()
-    return self.done
+function M.AnimationClip:setAnimation(animationName)
+  if self.animations[animationName]
+      and self.nameOfCurrentAnimation ~= animationName then
+    self.nameOfCurrentAnimation = animationName
+    self.currentTime = 0
+    self.playing = true
+    self.done = false
   end
+end
 
-  return newComponent
+function M.AnimationClip:setAnimation(animationName)
+  if self.animations[animationName]
+      and self.nameOfCurrentAnimation ~= animationName then
+    self.nameOfCurrentAnimation = animationName
+    self.currentTime = 0
+    self.playing = true
+    self.done = false
+  end
+end
+
+function M.AnimationClip:done()
+  return self.done
 end
 
 
-function M.DummyAnimationClip(stateMachine)
-  local newComponent = {
-    stateMachine = stateMachine
-  }
+M.DummyAnimationClip = {
+  stateMachine = nil
+}
 
-  function newComponent:setAnimation() end
+function M.DummyAnimationClip:new(o)
+  o = o or {}
+  setmetatable(o, self)
+  self.__index = self
 
-  function newComponent:done()
-    return self.stateMachine.stateTime == 0
-  end
+  return o
+end
 
-  return newComponent
+function M.DummyAnimationClip:setAnimation() end
+
+function M.DummyAnimationClip:done()
+  return self.stateMachine.stateTime == 0
 end
 
 
