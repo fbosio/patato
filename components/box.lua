@@ -86,9 +86,12 @@ M.CollisionBox = M.Box:new{
   maxFallSpeed = nil,
   -- set by control and terrain systems
   hurtFallHeight = false,
+  -- set by control system
+  climbing = false,
   -- set by terrain system
   slopeId = nil,
-  reactingWithClouds = true
+  reactingWithClouds = true,
+  ladder = nil
 }
 
 M.AttackBox = M.Box:new{

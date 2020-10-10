@@ -56,7 +56,7 @@ end
 
   Possible anchor values = "north", "east", "south west", "n", "e", "sw", etc.
 
-  local __, __, width, height = quad:getViewport()
+  local _, _, width, height = quad:getViewport()
 
   @see moveBy
 --]]

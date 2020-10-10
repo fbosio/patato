@@ -235,7 +235,7 @@ end
 function M.load(componentsTable)
   local width = 40
   local loadedLadders = {}
-  for __, ladder in ipairs(componentsTable.currentLevel.terrain.ladders or {}) do
+  for _, ladder in ipairs(componentsTable.currentLevel.terrain.ladders or {}) do
     loadedLadders[#loadedLadders + 1] = {
       ladder[1],
       ladder[2],
