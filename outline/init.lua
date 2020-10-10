@@ -20,6 +20,7 @@ function M.draw(componentsTable, positions)
   drawings.boundaries(position.boundaries)
   drawings.clouds(position.clouds)
   drawings.slopes(position.slopes)
+  drawings.ladders(position.ladders)
 
   -- Move boxes
   if positions then

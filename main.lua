@@ -6,13 +6,14 @@ local outline = require "outline"
 local camera = require "systems.camera"
 local systems = require "systems"
 local items = require "systems.items"
+local terrain = require "systems.terrain"
 
 function love.load()
   local currentLevel = levels.level[levels.first]
   local playerName = "patato"
   components.state = {
     collisionBoxes = {
-      [playerName] = box.CollisionBox:new{width=50, height=100}
+      [playerName] = box.CollisionBox:new{width=50, height=100, maxFallSpeed=2500}
     },
     weights = {
       [playerName] = true
@@ -24,7 +25,7 @@ function love.load()
       [playerName] = {control=true},
     },
     speedImpulses = {
-      [playerName] = {walk=400, crouchWalk=200, jump=1200},
+      [playerName] = {walk=400, crouchWalk=200, jump=1200, climb=400},
     },
     collectors = {
       [playerName] = true
@@ -34,6 +35,7 @@ function love.load()
   -- Move to init.load
   components.state.currentLevel = currentLevel
 
+  terrain.load(components.state)
   players.load(playerName, components.state)
   items.load(components.state)
   camera.load("my camera", playerName, components.state)
@@ -87,6 +89,14 @@ function love.draw()
     end,
     components.state.finiteStateMachines.patato.currentState,
     0.498039, 0.498039, 0.498039
+  )
+  outline.debug(
+    "hurtFallHeight",
+    function (hurtFallHeight)
+      return tostring(hurtFallHeight)
+    end,
+    components.state.collisionBoxes.patato.hurtFallHeight,
+    0.8, 0.3, 0.3
   )
   outline.debug(
     "camera",
