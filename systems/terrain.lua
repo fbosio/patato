@@ -9,6 +9,7 @@ local function checkBottomBoundary(collisionBox, position, velocity, x1, y1, x2,
       and box:center() < y2 then
     velocity.y = 0
     position.y = y1
+    collisionBox.climbing = false
   end
 end
 
@@ -154,6 +155,7 @@ local function checkClouds(collisionBox, position, velocity, terrain, dt)
           and box:bottom() + velocity.y*dt > y1 and velocity.y > 0 then
         velocity.y = 0
         position.y = y1
+        collisionBox.climbing = false
       end
     end
   else
@@ -176,8 +178,7 @@ local function checkBottomLadder(collisionBox, position, velocity, y2, dt)
   local box = collisionBox:translated(position)
 
   if box:center() + velocity.y*dt > y2 then
-    velocity.y = 0
-    position.y = y2 - collisionBox:center()
+    collisionBox.climbing = false
   end
 end
 

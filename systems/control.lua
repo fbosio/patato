@@ -153,22 +153,28 @@ local statesLogic = {
   end,
 
   climbing = function (args)
-    if love.keyboard.isDown("w") and not love.keyboard.isDown("s") then
-      args.velocity.y = -args.speedImpulses.climb
-      args.animationClip:setAnimation("climbingUp")
-    elseif love.keyboard.isDown("s") and not love.keyboard.isDown("w") then
-      args.velocity.y = args.speedImpulses.climb
-      args.animationClip:setAnimation("climbingDown")
-    else
-      args.velocity.y = 0
-      args.animationClip:setAnimation("climbingIdle")
-    end
+    local weights = args.state.weights or {}
 
-    if love.keyboard.isDown("k") then
-      local weights = args.state.weights or {}
+    if args.collisionBox.climbing then
+      if love.keyboard.isDown("w") and not love.keyboard.isDown("s") then
+        args.velocity.y = -args.speedImpulses.climb
+        args.animationClip:setAnimation("climbingUp")
+      elseif love.keyboard.isDown("s") and not love.keyboard.isDown("w") then
+        args.velocity.y = args.speedImpulses.climb
+        args.animationClip:setAnimation("climbingDown")
+      else
+        args.velocity.y = 0
+        args.animationClip:setAnimation("climbingIdle")
+      end
+
+      if love.keyboard.isDown("k") then
+        weights[args.entity] = true
+        args.finiteStateMachine:setState("startingJump")
+        args.animationClip:setAnimation("climbingStartingJump")
+      end
+    else
       weights[args.entity] = true
-      args.finiteStateMachine:setState("startingJump")
-      args.animationClip:setAnimation("climbingStartingJump")
+      args.finiteStateMachine:setState("idle")
     end
   end,
 
