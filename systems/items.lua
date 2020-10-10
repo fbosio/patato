@@ -42,10 +42,7 @@ function M.reload(state, nextLevel)
 end
 
 
-local function healthSupply(state)
-  -- healing depends on living, player and position
-  -- components.assertDependency(state, "healing", "living",
-  --                                       "players", "positions")
+local function supply(state, itemName, livingField)
   local collisionBoxes = state.collisionBoxes
   local positions = state.positions
 
@@ -56,24 +53,18 @@ local function healthSupply(state)
       local collector = state.collectors[entity]
 
       if collisionBox and position and collector then
-        local livingEntities = state.living or {}
-        local livingEntity = livingEntities[entity] or {}
-        -- components.assertExistence(entity, "player", {position, "position"},
-        --                            {collisionBox, "collisionBox"},
-        --                            {livingEntity, "living"})
+        local livingComponents = state.living or {}
+        local livingComponent = livingComponents[entity] or {}
         local box = collisionBox:translated(position)
-        local parameter = livingEntity.health or 0
-        -- components.assertExistence(entity, "player", {parameter, "health"})
+        local parameter = livingComponent[livingField] or 0
 
-        for itemEntity, itemBox in pairs(state.healing or {}) do
+        for itemEntity, itemBox in pairs(state[itemName] or {}) do
           local itemPosition = state.positions[itemEntity]
-
           if itemBox:translated(itemPosition):intersects(box) then
-            livingEntity.health = parameter + itemBox.effectAmount
+            livingComponent[livingField] = parameter + itemBox.effectAmount
             state.positions[itemEntity] = nil
-            state.healing[itemEntity] = nil
+            state[itemName][itemEntity] = nil
           end
-
         end
       end
     end
@@ -81,42 +72,19 @@ local function healthSupply(state)
 end
 
 
+local function healthSupply(state)
+  supply(state, "healing", "health")
+end
+
+
 local function experienceSupply(state)
-  -- experienceEffect depends on player and position
-  -- components.assertDependency(state, "experienceEffect", "players",
-  --                             "positions")
-
-  for entity, player in pairs(state.players) do
-    local collector = state.collectors[entity]
-
-    if collector then
-      local position = state.positions[entity]
-      local collisionBox = state.collisionBoxes[entity]
-      -- components.assertExistence(entity, "player", {position, "position"},
-      --                            {collisionBox, "collisionBox"})
-      local box = collisionBox:translated(position)
-
-      local parameter = player.experience
-
-      for itemEntity, itemBox in pairs(state.experienceEffect or {})
-          do
-        local itemPosition = state.positions[itemEntity]
-
-        if itemBox:translated(itemPosition):intersects(box) then
-          player.experience = parameter + itemBox.effectAmount
-          positions = nil
-          state.experienceEffect[itemEntity] = nil
-        end
-
-      end
-    end
-  end
+  supply(state, "experienceEffect", "experience")
 end
 
 
 function M.update(state)
   healthSupply(state)
-  -- experienceSupply(state)
+  experienceSupply(state)
 end
 
 
