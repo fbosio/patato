@@ -13,7 +13,7 @@ function love.load()
   local playerName = "patato"
   components.state = {
     collisionBoxes = {
-      [playerName] = box.CollisionBox:new{width=50, height=100}
+      [playerName] = box.CollisionBox:new{width=50, height=100, maxFallSpeed=2500}
     },
     weights = {
       [playerName] = true
@@ -89,6 +89,14 @@ function love.draw()
     end,
     components.state.finiteStateMachines.patato.currentState,
     0.498039, 0.498039, 0.498039
+  )
+  outline.debug(
+    "hurtFallHeight",
+    function (hurtFallHeight)
+      return tostring(hurtFallHeight)
+    end,
+    components.state.collisionBoxes.patato.hurtFallHeight,
+    0.8, 0.3, 0.3
   )
   outline.debug(
     "camera",
