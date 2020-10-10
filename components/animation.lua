@@ -104,16 +104,6 @@ function M.AnimationClip:setAnimation(animationName)
   end
 end
 
-function M.AnimationClip:setAnimation(animationName)
-  if self.animations[animationName]
-      and self.nameOfCurrentAnimation ~= animationName then
-    self.nameOfCurrentAnimation = animationName
-    self.currentTime = 0
-    self.playing = true
-    self.done = false
-  end
-end
-
 function M.AnimationClip:done()
   return self.done
 end
