@@ -7,6 +7,10 @@ M.level = {
       boundaries = {
         {33, 385, 754, 600},
       },
+      ladders = {
+        {610, 100, 385},
+        {110, -80, 205}
+      }
     },
     entitiesData = {
       cameraBoundaries = {
