@@ -54,11 +54,32 @@ local statesLogic = {
         args.finiteStateMachine:setState("punching")
         args.animationClip:setAnimation("punching")
       end
+
+      if args.collisionBox.ladder and (love.keyboard.isDown("w")
+          or love.keyboard.isDown("s")) then
+        local weights = args.state.weights or {}
+        weights[args.entity] = nil
+        args.collisionBox.climbing = true
+        args.finiteStateMachine:setState("climbing")
+        args.animationClip:setAnimation("climbingIdle")
+      end
   end,
 
   startingJump = function (args)
     if args.animationClip:done() then
-      args.finiteStateMachine:setState("idle")
+      if args.collisionBox.climbing then
+        if love.keyboard.isDown("a") and not love.keyboard.isDown("d") then
+          args.velocity.x = -args.speedImpulses.walk
+          args.animationClip.facingRight = false
+        elseif not love.keyboard.isDown("a") and love.keyboard.isDown("d") then
+          args.velocity.x = args.speedImpulses.walk
+          args.animationClip.facingRight = true
+        end
+        args.collisionBox.climbing = false
+        args.finiteStateMachine:setState("outOfLadder", 0.3)
+      else
+        args.finiteStateMachine:setState("idle")
+      end
       args.animationClip:setAnimation("jumping")
       args.velocity.y = -args.speedImpulses.jump
     end
@@ -156,6 +177,38 @@ local statesLogic = {
     if args.animationClip:done() then
       args.finiteStateMachine:setState("idle")
     end
+  end,
+
+  climbing = function (args)
+    local weights = args.state.weights or {}
+
+    if args.collisionBox.climbing then
+      if love.keyboard.isDown("w") and not love.keyboard.isDown("s") then
+        args.velocity.y = -args.speedImpulses.climb
+        args.animationClip:setAnimation("climbingUp")
+      elseif love.keyboard.isDown("s") and not love.keyboard.isDown("w") then
+        args.velocity.y = args.speedImpulses.climb
+        args.animationClip:setAnimation("climbingDown")
+      else
+        args.velocity.y = 0
+        args.animationClip:setAnimation("climbingIdle")
+      end
+
+      if love.keyboard.isDown("k") then
+        weights[args.entity] = true
+        args.finiteStateMachine:setState("startingJump")
+        args.animationClip:setAnimation("climbingStartingJump")
+      end
+    else
+      weights[args.entity] = true
+      args.finiteStateMachine:setState("idle")
+    end
+  end,
+
+  outOfLadder = function (args)
+    if args.finiteStateMachine.stateTime == 0 then
+      args.finiteStateMachine:setState("idle")
+    end
   end
 }
 
@@ -185,7 +238,8 @@ function M.player(state)
         velocity = state.velocities[entity],
         speedImpulses = state.speedImpulses[entity],
         animationClip = clip,
-        living = livingEntity
+        living = livingEntity,
+        collisionBox = state.collisionBoxes[entity]
       }
     end
   end

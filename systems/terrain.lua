@@ -13,6 +13,7 @@ local function checkBottomBoundary(collisionBox, position, velocity, finiteState
     end
     velocity.y = 0
     position.y = y1
+    collisionBox.climbing = false
   end
 end
 
@@ -167,11 +168,82 @@ local function checkClouds(collisionBox, position, velocity, finiteStateMachine,
         end
         velocity.y = 0
         position.y = y1
+        collisionBox.climbing = false
       end
     end
   else
     collisionBox.reactingWithClouds = true
   end
+end
+
+
+local function checkTopLadder(collisionBox, position, velocity, y1, dt)
+  local box = collisionBox:translated(position)
+
+  if box:top() + velocity.y*dt < y1 then
+    velocity.y = 0
+    position.y = y1 - collisionBox:top()
+  end
+end
+
+
+local function checkBottomLadder(collisionBox, position, velocity, y2, dt)
+  local box = collisionBox:translated(position)
+
+  if box:center() + velocity.y*dt > y2 then
+    collisionBox.climbing = false
+  end
+end
+
+
+local function snapToLadder(position, velocity, x1, x2, dt)
+  velocity.x = 0
+  position.x = (x1 + x2) / 2
+end
+
+
+local function checkLadders(collisionBox, position, velocity, ladders, dt)
+  if collisionBox.climbing then
+    local ladder = collisionBox.ladder
+    local x1 = math.min(ladder[1], ladder[3])
+    local y1 = math.min(ladder[2], ladder[4])
+    local x2 = math.max(ladder[1], ladder[3])
+    local y2 = math.max(ladder[2], ladder[4])
+    checkTopLadder(collisionBox, position, velocity, y1, dt)
+    checkBottomLadder(collisionBox, position, velocity, y2, dt)
+    snapToLadder(position, velocity, x1, x2, dt)
+  else
+    collisionBox.ladder = nil
+    for i in pairs(ladders or {}) do
+      local ladder = ladders[i]
+      local x1 = math.min(ladder[1], ladder[3])
+      local y1 = math.min(ladder[2], ladder[4])
+      local x2 = math.max(ladder[1], ladder[3])
+      local y2 = math.max(ladder[2], ladder[4])
+
+      local box = collisionBox:translated(position)
+
+      if box:right() > x1 and box:left() < x2 and box:top() > y1
+          and box:center() < y2 then
+        collisionBox.ladder = ladder
+      end
+    end
+  end
+end
+
+
+function M.load(componentsTable)
+  local width = 40
+  local loadedLadders = {}
+  for __, ladder in ipairs(componentsTable.currentLevel.terrain.ladders or {}) do
+    loadedLadders[#loadedLadders + 1] = {
+      ladder[1],
+      ladder[2],
+      ladder[1] + width,
+      ladder[3]
+    }
+  end
+  componentsTable.ladders = loadedLadders
 end
 
 
@@ -185,12 +257,14 @@ function M.collision(componentsTable, terrain, dt)
     local position = componentsTable.positions[entity]
     local velocity = componentsTable.velocities[entity]
     local finiteStateMachine = componentsTable.finiteStateMachines[entity]
+    local ladders = componentsTable.ladders
     -- components.assertExistence(entity, "solid", {collisionBox, "collisionBox"},
     --                            {position, "position"}, {velocity, "velocity"})
 
     checkBoundaries(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
     checkSlopes(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
     checkClouds(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
+    checkLadders(collisionBox, position, velocity, ladders, dt)
   end
 end
 
