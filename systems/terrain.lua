@@ -2,11 +2,14 @@ local components = require "components"
 local M = {}
 
 
-local function checkBottomBoundary(collisionBox, position, velocity, x1, y1, x2, y2, dt)
+local function checkBottomBoundary(collisionBox, position, velocity, finiteStateMachine, x1, y1, x2, y2, dt)
   local box = collisionBox:translated(position)
 
   if box:right() > x1 and box:left() < x2 and box:bottom() + velocity.y*dt > y1
       and box:center() < y2 then
+    if box.maxFallSpeed and velocity.y > box.maxFallSpeed then
+      finiteStateMachine:setState("hurt")
+    end
     velocity.y = 0
     position.y = y1
   end
@@ -81,7 +84,7 @@ local function mustCheckSides(collisionBox, position, terrain, x1, y1, x2, y2)
 end
 
 
-local function checkBoundaries(collisionBox, position, velocity, terrain, dt)
+local function checkBoundaries(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
   for i in pairs(terrain.boundaries) do
     local boundaries = terrain.boundaries[i]
     local x1 = math.min(boundaries[1], boundaries[3])
@@ -89,7 +92,7 @@ local function checkBoundaries(collisionBox, position, velocity, terrain, dt)
     local x2 = math.max(boundaries[1], boundaries[3])
     local y2 = math.max(boundaries[2], boundaries[4])
 
-    checkBottomBoundary(collisionBox, position, velocity, x1, y1, x2, y2, dt)
+    checkBottomBoundary(collisionBox, position, velocity, finiteStateMachine, x1, y1, x2, y2, dt)
     checkTopBoundary(collisionBox, position, velocity, x1, y1, x2, y2, dt)
 
     local mustCheckLeft, mustCheckRight = mustCheckSides(collisionBox,
@@ -107,7 +110,7 @@ local function checkBoundaries(collisionBox, position, velocity, terrain, dt)
 end
 
 
-local function checkSlopes(collisionBox, position, velocity, terrain, dt)
+local function checkSlopes(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
   for i in pairs(terrain.slopes or {}) do
     local x1, y1, x2, y2 = unpack(terrain.slopes[i])
     local xLeft, xRight = math.min(x1, x2), math.max(x1, x2)
@@ -122,6 +125,10 @@ local function checkSlopes(collisionBox, position, velocity, terrain, dt)
 
       -- if pointing up
       if y1 > y2 then
+        if box.maxFallSpeed and velocity.y > box.maxFallSpeed then
+          finiteStateMachine:setState("hurt")
+        end
+        
         if box:bottom() + velocity.y*dt >= ySlope then
           position.y = ySlope
           velocity.y = 0
@@ -140,7 +147,7 @@ local function checkSlopes(collisionBox, position, velocity, terrain, dt)
 end
 
 
-local function checkClouds(collisionBox, position, velocity, terrain, dt)
+local function checkClouds(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
   if collisionBox.reactingWithClouds then
     for i in pairs(terrain.clouds or {}) do
       local clouds = terrain.clouds[i]
@@ -152,6 +159,9 @@ local function checkClouds(collisionBox, position, velocity, terrain, dt)
 
       if box:right() > x1 and box:left() < x2 and box:bottom() <= y1
           and box:bottom() + velocity.y*dt > y1 and velocity.y > 0 then
+        if box.maxFallSpeed and velocity.y > box.maxFallSpeed then
+          finiteStateMachine:setState("hurt")
+        end
         velocity.y = 0
         position.y = y1
       end
@@ -171,12 +181,13 @@ function M.collision(componentsTable, terrain, dt)
     local collisionBox = componentsTable.collisionBoxes[entity]
     local position = componentsTable.positions[entity]
     local velocity = componentsTable.velocities[entity]
+    local finiteStateMachine = componentsTable.finiteStateMachines[entity]
     -- components.assertExistence(entity, "solid", {collisionBox, "collisionBox"},
     --                            {position, "position"}, {velocity, "velocity"})
 
-    checkBoundaries(collisionBox, position, velocity, terrain, dt)
-    checkSlopes(collisionBox, position, velocity, terrain, dt)
-    checkClouds(collisionBox, position, velocity, terrain, dt)
+    checkBoundaries(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
+    checkSlopes(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
+    checkClouds(collisionBox, position, velocity, finiteStateMachine, terrain, dt)
   end
 end
 

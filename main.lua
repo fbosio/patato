@@ -12,7 +12,7 @@ function love.load()
   local playerName = "patato"
   components.state = {
     collisionBoxes = {
-      [playerName] = box.CollisionBox:new{width=50, height=100}
+      [playerName] = box.CollisionBox:new{width=50, height=100, maxFallSpeed=2500}
     },
     weights = {
       [playerName] = true
