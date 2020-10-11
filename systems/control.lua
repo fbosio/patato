@@ -105,25 +105,31 @@ local statesLogic = {
   end,
 
   hurt = function (args)
-    args.living.health = args.living.health - 1
+    args.living.health = args.living.health and (args.living.health - 1)
     args.living.stamina = args.living.stamina
                           and math.max(0, args.living.stamina - 25)
+    local mustFly = args.living.health == 0
+                    or (args.living.stamina and args.living.stamina == 0)
     
-    if args.collisionBox.hurtFallHeight then
-      args.living.health = 0
-      args.velocity.x = 0
-      args.stateMachine:setState("lyingDown", 1.5)
-      args.animationClip:setAnimation("lyingDown")
-    elseif args.living.health == 0
-        or (args.living.stamina and args.living.stamina == 0) then
-      args.stateMachine:setState("flyingHurt")
-      local collectors = args.state.collectors or {}
-      collectors[args.entity] = false
-      args.animationClip:setAnimation("flyingHurt")
-      args.velocity.x = (args.animationClip.facingRight and -1 or 1)
-                        * args.speedImpulses.walk
-      args.velocity.y = -args.speedImpulses.jump
-    else
+    if args.living.health then
+      if args.collisionBox.hurtFallHeight then
+        args.living.health = 0
+        args.velocity.x = 0
+        args.stateMachine:setState("lyingDown", 1.5)
+        args.animationClip:setAnimation("lyingDown")
+      elseif mustFly then
+        args.stateMachine:setState("flyingHurt")
+        local collectors = args.state.collectors or {}
+        collectors[args.entity] = false
+        args.animationClip:setAnimation("flyingHurt")
+        args.velocity.x = (args.animationClip.facingRight and -1 or 1)
+                          * args.speedImpulses.walk
+        args.velocity.y = -args.speedImpulses.jump
+      end
+    end
+
+    if not (args.living.health and args.collisionBox.hurtFallHeight
+        and mustFly) then 
       args.stateMachine:setState("hit", 0.5)
       args.animationClip:setAnimation("hitByHighPunch")
     end
@@ -256,7 +262,7 @@ function M.player(state)
                        stateMachine = stateMachine
                      }
         local livingEntities = state.living or {}
-        local livingEntity = livingEntities[entity] or {health=0,stamina=0}
+        local livingEntity = livingEntities[entity] or {}
         -- components.assertExistence(entity, "player", {velocity, "velocity",
         --                            {animationClip, "animationClip"},
         --                            {stateMachine, "stateMachine"},

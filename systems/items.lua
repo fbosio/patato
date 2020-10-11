@@ -56,12 +56,14 @@ local function supply(state, itemName, livingField)
         local livingComponents = state.living or {}
         local livingComponent = livingComponents[entity] or {}
         local box = collisionBox:translated(position)
-        local parameter = livingComponent[livingField] or 0
 
         for itemEntity, itemBox in pairs(state[itemName] or {}) do
           local itemPosition = state.positions[itemEntity]
           if itemBox:translated(itemPosition):intersects(box) then
-            livingComponent[livingField] = parameter + itemBox.effectAmount
+            if livingComponent[livingField] then
+              livingComponent[livingField] = livingComponent[livingField]
+                                             + itemBox.effectAmount
+            end
             state.positions[itemEntity] = nil
             state[itemName][itemEntity] = nil
           end

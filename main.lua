@@ -80,9 +80,9 @@ function love.draw()
   outline.debug(
     "health",
     function (health)
-      return health
+      return tostring(health)
     end,
-    components.state.living.patato.health,
+    (components.state.living.patato or {}).health,
     1, 0, 0
   )
   outline.debug(
