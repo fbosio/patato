@@ -1,8 +1,9 @@
 local statemachine = require "components.statemachine"
 
-local spritesModule = "resources.sprites"
-local spritesPath = package.searchpath(spritesModule, "?.lua")
-local sprites = spritesPath and require(spritesModule) or {}
+local sprites = {}
+pcall(function()
+  sprites = require "resources.sprites"
+end)
 
 
 local M = {}
