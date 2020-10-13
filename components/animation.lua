@@ -2,17 +2,6 @@ local box = require "components.box"
 local M = {}
 
 
--- Replace dofile with AnimationClip parameter
-local spritesPath = "resources/sprites.lua"
-local spritesFile = io.open(spritesPath)
-if spritesFile then
-  spritesFile:close()
-  dofile(spritesPath)
-else
-  sprites = {}
-end
-
-
 -- Constants
 local scale = 0.5
 M.scale = scale  -- export
@@ -41,7 +30,7 @@ local function createAnimationFrames(animationData, sprites, spriteSheet)
 end
 
 
-local function createAnimations(animationsData, spriteSheet)
+local function createAnimations(animationsData, sprites, spriteSheet)
   local animations = {}
 
   for animationName, animationData in pairs(animationsData) do
@@ -65,6 +54,7 @@ end
 
 M.AnimationClip = {
   animations = nil,
+  currentAnimationName = nil,
   currentTime = 0,
   facingRight = true,
   playing = true,
@@ -74,8 +64,9 @@ M.AnimationClip = {
 function M.AnimationClip:new(o)
   o = o or {}
   setmetatable(o, self)
-  o.animations = createAnimations(o.animationsData, o.spriteSheet)
+  o.animations = createAnimations(o.animationsData, o.spriteData, o.spriteSheet)
   o.animationsData = nil
+  o.spriteData = nil
   o.spriteSheet = nil
   self.__index = self
 
@@ -84,7 +75,7 @@ end
 
 function M.AnimationClip:currentFrameNumber()
   local timeSpent = 0
-  local currentAnimation = self.animations[self.nameOfCurrentAnimation]
+  local currentAnimation = self.animations[self.currentAnimationName]
   for frameNumber, frame in ipairs(currentAnimation.frames) do
     timeSpent = timeSpent + frame.duration
     if timeSpent > self.currentTime then
@@ -96,8 +87,8 @@ end
 
 function M.AnimationClip:setAnimation(animationName)
   if self.animations[animationName]
-      and self.nameOfCurrentAnimation ~= animationName then
-    self.nameOfCurrentAnimation = animationName
+      and self.currentAnimationName ~= animationName then
+    self.currentAnimationName = animationName
     self.currentTime = 0
     self.playing = true
     self._done = false

@@ -105,7 +105,7 @@ M.AttackBox = M.Box:new()
 -- Extended method
 function M.AttackBox:translated(position, animationClip)
   local currentAnimation =
-    animationClip.animations[animationClip.nameOfCurrentAnimation]
+    animationClip.animations[animationClip.currentAnimationName]
   local currentFrame =
     currentAnimation.frames[animationClip:currentFrameNumber()]
   local frameAttackBox = currentFrame.attackBox

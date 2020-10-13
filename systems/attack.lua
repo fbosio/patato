@@ -12,7 +12,7 @@ function M.collision(state)
     -- components.assertExistence(attacker, "animationClip",
     --                            {attackerPosition, "position"})
     local currentAnimation =
-      animationClip.animations[animationClip.nameOfCurrentAnimation]
+      animationClip.animations[animationClip.currentAnimationName]
     local attackBox =
       currentAnimation.frames[animationClip:currentFrameNumber()].attackBox
 
