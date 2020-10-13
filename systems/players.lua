@@ -1,7 +1,11 @@
 local statemachine = require "components.statemachine"
 
+local spritesModule = "resources.sprites"
+local spritesPath = package.searchpath(spritesModule, "?.lua")
+local sprites = spritesPath and require(spritesModule) or {}
+
+
 local M = {}
-M.sprites = package.searchpath("sprites", "resources/?.lua")
 
 function M.load(name, state)
   local entitiesData = state.currentLevel.entitiesData or {}

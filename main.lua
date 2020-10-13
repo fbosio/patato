@@ -108,13 +108,5 @@ function love.draw()
     end,
     components.state.positions["my camera"],
     0.8, 0.4, 0.8
-    )
-  outline.debug(
-    "sprites",
-    function (t)
-      return tostring(t[1]) .. ", " .. tostring(t[2])
-    end,
-    {players.sprites, players.e},
-    0, 0.7, 0
   )
 end
