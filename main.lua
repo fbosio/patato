@@ -1,12 +1,13 @@
+local levels = require "levels"
 local components = require "components"
 local box = require "components.box"
-local levels = require "levels"
-local players = require "systems.players"
-local outline = require "outline"
-local camera = require "systems.camera"
 local systems = require "systems"
+local camera = require "systems.camera"
 local items = require "systems.items"
+local players = require "systems.players"
 local terrain = require "systems.terrain"
+local outline = require "outline"
+local spawner = require "outline.spawner"
 
 
 function love.load()
@@ -36,15 +37,16 @@ function love.load()
   -- Move to init.load
   components.state.currentLevel = currentLevel
 
-  terrain.load(components.state)
-  players.load(playerName, components.state)
-  items.load(components.state)
   camera.load("my camera", playerName, components.state)
+  items.load(components.state)
+  players.load(playerName, components.state)
+  terrain.load(components.state)
 end
 
 
 function love.update(dt)
   systems.update(components.state, dt)
+  spawner.update(components.state)
 end
 
 
@@ -91,7 +93,7 @@ function love.draw()
       return tostring(state)
     end,
     components.state.stateMachines.patato.currentState,
-    0.498039, 0.498039, 0.498039
+    0.5, 0.5, 0.5
   )
   outline.debug(
     "hurtFallHeight",
@@ -108,5 +110,25 @@ function love.draw()
     end,
     components.state.positions["my camera"],
     0.8, 0.4, 0.8
+  )
+  outline.debug(
+    "spawn bee",
+    function (s)
+      return s.direction .. ", " .. s.x .. ", " .. s.y
+    end,
+    spawner,
+    1, 0.7, 0
+  )
+  outline.debug(
+    "positions state table size",
+    function (t)
+      local s = {}
+      for k, v in pairs(t) do
+        s[#s + 1] = k
+      end
+      return tostring(#s)
+    end,
+    components.state.positions,
+    0.5, 0.5, 0.5
   )
 end
