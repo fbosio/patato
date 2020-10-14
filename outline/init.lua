@@ -24,7 +24,7 @@ local function moveBoxes(state, positions)
 
   if position then
     drawings.collisionBoxes(state.collisionBoxes, position)
-    -- drawings.attackBoxes(state.animationClips, position)
+    drawings.attackBoxes(state.animationClips, position)
     drawings.goals(state.goals, position)
     drawings.medkits(state.healing, position)
     drawings.pomodori(state.experienceEffect, position)

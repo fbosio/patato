@@ -84,10 +84,10 @@ end
 
 function M.attackBoxes(animationClips, positions)
 
-  for entity, animationClip in pairs(animationClips) do
-    local currentAnimation = 
+  for entity, animationClip in pairs(animationClips or {}) do
+    local currentAnimation =
       animationClip.animations[animationClip.currentAnimationName]
-    local attackBox = 
+    local attackBox =
       currentAnimation.frames[animationClip:currentFrameNumber()].attackBox
 
     if attackBox ~= nil then

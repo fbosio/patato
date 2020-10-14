@@ -29,8 +29,6 @@ function M.update(state, dt)
   living.staminaSupply(state, dt)
   animation.animator(state, dt)
   statemachine.stateMachineRunner(state, dt)
-
-  return currentLevel
 end
 
 

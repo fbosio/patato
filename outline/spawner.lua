@@ -1,30 +1,40 @@
 local box = require "components.box"
+local outline = require "outline"
 
 
-local spawnKey = "i"
-local holdingKey = false
-local beeFlightSpeed = 1000
+local M = {}
+
+
+local function getCameraPosition(state)
+  local position = {x=0, y=0}
+
+  for entity, isCamera in pairs(state.cameras or {}) do
+    if isCamera then
+      position = state.positions[entity]
+      break  -- get only the first camera entity
+    end
+  end
+
+  return position
+end
+
+
+local beeEntityPrefix = "bee"
 local spawnCount = 0
+local beeFlightSpeed = 1000
 
-
-local M = {direction=1, x=0, y=0}
-
-
-function spawnBee(state, cameraEntity)
+local function spawnBee(state)
+  spawnCount = spawnCount + 1
+  local entity = beeEntityPrefix .. spawnCount;
   state.positions = state.positions or {}
-  translation = state.positions[cameraEntity] or {x=0, y=0}
-
+  local cameraPosition = getCameraPosition(state)
   local n = love.math.random(0, 1)
-  direction = 1 - 2*n
-  x = n * love.graphics.getWidth() + translation.x
-  y = love.math.random(0, love.graphics.getHeight()) - translation.y
-
-  local entity = "bee" .. spawnCount;
   state.positions[entity] = {
-    x = x,
-    y = y
+    x = n*love.graphics.getWidth() + cameraPosition.x,
+    y = love.math.random(0, love.graphics.getHeight()) - cameraPosition.y
   }
   state.velocities = state.velocities or {}
+  local direction = 1 - 2*n
   state.velocities[entity] = {
     x = direction * beeFlightSpeed,
     y = 0
@@ -34,21 +44,43 @@ function spawnBee(state, cameraEntity)
   state.collisionBoxes = state.collisionBoxes or {}
   state.collisionBoxes[entity] = box.CollisionBox:new{width=20, height=20}
 
-  spawnCount = spawnCount + 1
-
-  M.direction = direction
-  M.x = x
-  M.y = y
+  state.spawned = state.spawned or {}
+  state.spawned[entity] = true
 end
 
 
-function M.update(state, cameraEntity)
+local function destroyBees(state)
+  for entity, isSpawn in pairs(state.spawned or {}) do
+    if isSpawn then
+      state.positions = state.positions or {}
+      local position = state.positions[entity]
+      local cameraPosition = getCameraPosition(state)
+      if position and (position.x < cameraPosition.x
+                       or position.x > cameraPosition.x
+                                       + love.graphics.getWidth()) then
+        state.positions[entity] = nil
+        state.velocities[entity] = nil
+        state.speedImpulses[entity] = nil
+        state.collisionBoxes[entity] = nil
+        state.spawned[entity] = nil
+      end
+    end  -- if isSpawn
+  end  -- for
+end
+
+
+local spawnKey = "i"
+local holdingKey = false
+
+function M.update(state)
   if love.keyboard.isDown(spawnKey) and not holdingKey then
     holdingKey = true
-    spawnBee(state, cameraEntity)
+    spawnBee(state)
   elseif not love.keyboard.isDown(spawnKey) then
     holdingKey = false
   end
+
+  destroyBees(state)
 end
 
 

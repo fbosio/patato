@@ -10,8 +10,6 @@ local outline = require "outline"
 local spawner = require "outline.spawner"
 
 
-local cameraEntity = "my camera"  -- shared with spawner.update
-
 function love.load()
   local currentLevel = levels.level[levels.first]
   local playerName = "patato"
@@ -39,7 +37,7 @@ function love.load()
   -- Move to init.load
   components.state.currentLevel = currentLevel
 
-  camera.load(cameraEntity, playerName, components.state)
+  camera.load("my camera", playerName, components.state)
   items.load(components.state)
   players.load(playerName, components.state)
   terrain.load(components.state)
@@ -48,7 +46,7 @@ end
 
 function love.update(dt)
   systems.update(components.state, dt)
-  spawner.update(components.state, cameraEntity)
+  spawner.update(components.state)
 end
 
 
@@ -76,7 +74,7 @@ function love.draw()
   outline.debug(
     "player",
     function (position)
-      return math.floor(position.x) .. ", " .. math.floor(position.y)
+      return string.format("%.2f, %.2f", position.x, position.y)
     end,
     components.state.positions.patato,
     1, 1, 0
@@ -114,23 +112,15 @@ function love.draw()
     0.8, 0.4, 0.8
   )
   outline.debug(
-    "spawn bee",
-    function (s)
-      return string.format("%d, %.2f, %.2f", s.direction, s.x, s.y)
-    end,
-    spawner,
-    1, 0.7, 0
-  )
-  outline.debug(
-    "positions state table size",
+    "spawned",
     function (t)
       local s = {}
-      for k, v in pairs(t) do
+      for k, v in pairs(t or {}) do
         s[#s + 1] = k
       end
       return tostring(#s)
     end,
-    components.state.positions,
+    components.state.spawned,
     0.5, 0.5, 0.5
   )
 end
