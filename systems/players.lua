@@ -9,7 +9,7 @@ end)
 local M = {}
 
 
-local function loadPositions(name, state)
+local function loadPosition(name, state)
   state.positions = state.positions or {}
   state.positions[name] = {
     x = player[1][1],
@@ -18,13 +18,13 @@ local function loadPositions(name, state)
 end
 
 
-local function loadVelocities(name, state)
+local function loadVelocity(name, state)
   state.velocities = state.velocities or {}
   state.velocities[name] = {x=0, y=0}
 end
 
 
-local function loadStateMachines(name, state)
+local function loadStateMachine(name, state)
   state.stateMachines = state.stateMachines or {}
   state.stateMachines[name] = statemachine.StateMachine:new{
     currentState = "idle"
@@ -46,9 +46,9 @@ function M.load(name, state)
   local entitiesData = state.currentLevel.entitiesData or {}
   local player = entitiesData.player
   if player then
-    loadPositions(name, state)
-    loadVelocities(name, state)
-    loadStateMachines(name, state)
+    loadPosition(name, state)
+    loadVelocity(name, state)
+    loadStateMachine(name, state)
 
     -- This might be removed when enemies are created
     local players = state.players or {}
