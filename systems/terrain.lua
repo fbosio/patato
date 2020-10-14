@@ -210,7 +210,7 @@ local function snapToLadder(position, velocity, x1, x2, dt)
 end
 
 
-local function checkLadders(collisionBox, position, velocity, ladders, dt)
+local function checkLadders(collisionBox, position, velocity, terrain, dt)
   if collisionBox.climbing then
     local ladder = collisionBox.ladder
     local x1 = math.min(ladder[1], ladder[3])
@@ -222,8 +222,8 @@ local function checkLadders(collisionBox, position, velocity, ladders, dt)
     snapToLadder(position, velocity, x1, x2, dt)
   else
     collisionBox.ladder = nil
-    for i in pairs(ladders or {}) do
-      local ladder = ladders[i]
+    for i in pairs(terrain.loadedLadders or {}) do
+      local ladder = terrain.loadedLadders[i]
       local x1 = math.min(ladder[1], ladder[3])
       local y1 = math.min(ladder[2], ladder[4])
       local x2 = math.max(ladder[1], ladder[3])
@@ -252,7 +252,7 @@ function M.load(state)
       ladder[3]
     }
   end
-  state.ladders = loadedLadders
+  state.currentLevel.terrain.loadedLadders = loadedLadders
 end
 
 
@@ -270,7 +270,6 @@ function M.collision(state, terrain, dt)
       local position = positions[entity]
       local velocity = state.velocities[entity]
       local stateMachine = state.stateMachines[entity]
-      local ladders = state.ladders
 
       checkBoundaries(collisionBox, position, velocity, stateMachine,
                       terrain, dt)
@@ -278,7 +277,7 @@ function M.collision(state, terrain, dt)
                   terrain, dt)
       checkClouds(collisionBox, position, velocity, stateMachine,
                   terrain, dt)
-      checkLadders(collisionBox, position, velocity, ladders, dt)
+      checkLadders(collisionBox, position, velocity, terrain, dt)
     end
   end
 end
