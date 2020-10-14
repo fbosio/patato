@@ -128,7 +128,7 @@ local statesLogic = {
     elseif not ((args.collisionBox.hurtFallHeight or mustFly)
         and args.living.health) then
       args.stateMachine:setState("hit", 0.5)
-      args.animationClip:setAnimation("hitByHighPunch")
+      args.animationClip:setAnimation("hit")
     end
   end,
 
