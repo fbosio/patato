@@ -28,7 +28,8 @@ end
 
 
 function M.animationRenderer(state, spriteSheet, positions)
-  components.assertDependency(state, "animationClips", "positions")
+  local positions = positions and positions.components
+                    or state.positions
 
   for entity, animationClip in pairs(state.animationClips or {}) do
     local position = positions[entity]

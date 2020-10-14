@@ -1,15 +1,20 @@
+local animation = require "components.animation"
 local statemachine = require "components.statemachine"
 
 local sprites = {}
+local animations = {}
 pcall(function()
   sprites = require "resources.sprites"
+end)
+pcall(function()
+  animations = require "resources.animations"
 end)
 
 
 local M = {}
 
 
-local function loadPosition(name, state)
+local function loadPosition(name, state, player)
   state.positions = state.positions or {}
   state.positions[name] = {
     x = player[1][1],
@@ -42,11 +47,22 @@ local function loadSpeedImpulses(name, state)
 end
 
 
-function M.load(name, state)
+local function loadAnimationClip(name, state, spriteSheet)
+  state.animationClips = state.animationClips or {}
+  state.animationClips[name] = animation.AnimationClip:new{
+    spritesData = sprites,
+    animationsData = animations[name],
+    spriteSheet = spriteSheet,
+    currentAnimationName = "standing"
+  }
+end
+
+
+function M.load(name, state, spriteSheet)
   local entitiesData = state.currentLevel.entitiesData or {}
   local player = entitiesData.player
   if player then
-    loadPosition(name, state)
+    loadPosition(name, state, player)
     loadVelocity(name, state)
     loadStateMachine(name, state)
 
@@ -59,7 +75,8 @@ function M.load(name, state)
       }
     end
 
-    loadSpeedImpulses(name, state)    
+    loadSpeedImpulses(name, state)
+    loadAnimationClip(name, state, spriteSheet)
   end
 end
 

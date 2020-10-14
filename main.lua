@@ -9,9 +9,13 @@ local items = require "systems.items"
 local terrain = require "systems.terrain"
 
 
+local spriteSheet
+
+
 function love.load()
   local currentLevel = levels.level[levels.first]
   local playerName = "patato"
+  spriteSheet = love.graphics.newImage("resources/sprites/patato.png")
   components.state = {
     collisionBoxes = {
       [playerName] = box.CollisionBox:new{width=50, height=100, maxFallSpeed=2500}
@@ -37,7 +41,7 @@ function love.load()
   components.state.currentLevel = currentLevel
 
   terrain.load(components.state)
-  players.load(playerName, components.state)
+  players.load(playerName, components.state, spriteSheet)
   items.load(components.state)
   camera.load("my camera", playerName, components.state)
 end
@@ -50,6 +54,7 @@ end
 
 function love.draw()
   outline.draw(components.state, camera.positions(components.state))
+  systems.draw(components.state, spriteSheet, camera.positions(components.state))
 
   outline.debug(
     "mouse screen",
