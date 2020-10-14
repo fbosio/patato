@@ -108,5 +108,5 @@ function love.draw()
     end,
     components.state.positions["my camera"],
     0.8, 0.4, 0.8
-    )
+  )
 end

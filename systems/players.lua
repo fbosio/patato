@@ -1,8 +1,12 @@
 local statemachine = require "components.statemachine"
 
+local sprites = {}
+pcall(function()
+  sprites = require "resources.sprites"
+end)
+
 
 local M = {}
-
 
 function M.load(name, state)
   local entitiesData = state.currentLevel.entitiesData or {}

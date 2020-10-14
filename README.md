@@ -7,7 +7,7 @@ A platform adventure video game, ported with Löve2D.
 - Items
 
 ## What we need to make
-1. [ ] Development stage 1
+1. [x] Development stage 1
 1. [ ] Development stage 2
 1. [ ] Development stage 3
 1. [ ] Development stage 4

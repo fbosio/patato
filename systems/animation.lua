@@ -8,7 +8,7 @@ local M = {}
 function M.animator(state, dt)
   for entity, animationClip in pairs(state.animationClips or {}) do
     local currentAnimation =
-      animationClip.animations[animationClip.nameOfCurrentAnimation]
+      animationClip.animations[animationClip.currentAnimationName]
     local currentAnimationDuration = currentAnimation:duration()
 
     if animationClip.currentTime >= currentAnimationDuration then
@@ -34,7 +34,7 @@ function M.animationRenderer(state, spriteSheet, positions)
     local position = positions[entity]
     local scale = 0.5
     local currentAnimation =
-      animationClip.animations[animationClip.nameOfCurrentAnimation]
+      animationClip.animations[animationClip.currentAnimationName]
     local currentFrame =
       currentAnimation.frames[animationClip:currentFrameNumber()]
     local _, _, width, height = currentFrame.quad:getViewport()

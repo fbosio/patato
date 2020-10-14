@@ -86,7 +86,7 @@ function M.attackBoxes(animationClips, positions)
 
   for entity, animationClip in pairs(animationClips) do
     local currentAnimation = 
-      animationClip.animations[animationClip.nameOfCurrentAnimation]
+      animationClip.animations[animationClip.currentAnimationName]
     local attackBox = 
       currentAnimation.frames[animationClip:currentFrameNumber()].attackBox
 
