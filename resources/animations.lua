@@ -15,6 +15,7 @@ return {
     climbingIdle = {{{17, 1}}, false},
     climbingUp = {{{18, 0.1}, {17, 0.1}, {16, 0.1}, {17, 0.1}}, true},
     climbingDown = {{{16, 0.1}, {17, 0.1}, {18, 0.1}, {17, 0.1}}, true},
+    climbingStartingJump = {{{17, 0.04}}, false},
     climbingAttackingFlySwat = {{{19, 0.1}, {20, 0.1}, {19, 0.1}}, false},
     flyingHurt = {{{14, 1}}, false},
     lyingDown = {{{15, 1}}, false},

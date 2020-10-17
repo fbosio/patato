@@ -49,7 +49,7 @@ end
 
 local function checkClimbInput(args)
   if args.collisionBox.ladder and (love.keyboard.isDown("w")
-      or love.keyboard.isDown("s")) then
+      or (love.keyboard.isDown("s") and args.velocity.y ~= 0)) then
     local weights = args.state.weights or {}
     weights[args.entity] = nil
     args.collisionBox.climbing = true
@@ -94,6 +94,7 @@ local statesLogic = {
           args.velocity.x = args.speedImpulses.walk
           args.animationClip.facingRight = true
         end
+        (args.state.weights or {})[args.entity] = true
         args.collisionBox.climbing = false
         args.stateMachine:setState("outOfLadder", 0.3)
       else
@@ -208,8 +209,6 @@ local statesLogic = {
   end,
 
   climbing = function (args)
-    local weights = args.state.weights or {}
-
     if args.collisionBox.climbing then
       if love.keyboard.isDown("w") and not love.keyboard.isDown("s") then
         args.velocity.y = -args.speedImpulses.climb
@@ -223,13 +222,12 @@ local statesLogic = {
       end
 
       if love.keyboard.isDown("k") then
-        weights[args.entity] = true
         args.stateMachine:setState("startingJump")
         args.animationClip:setAnimation("climbingStartingJump")
       end
     
     else
-      weights[args.entity] = true
+      (args.state.weights or {})[args.entity] = true
       args.stateMachine:setState("idle")
     end
   end,
