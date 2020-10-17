@@ -50,7 +50,6 @@ local function supply(state, itemName, livingField)
     for entity, collector in pairs(state.collectors or {}) do
       local collisionBox = collisionBoxes[entity]
       local position = positions[entity]
-      local collector = state.collectors[entity]
 
       if collisionBox and position and collector then
         local livingComponents = state.living or {}

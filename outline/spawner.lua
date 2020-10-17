@@ -1,5 +1,4 @@
 local box = require "components.box"
-local outline = require "outline"
 
 
 local M = {}
@@ -43,9 +42,40 @@ local function spawnBee(state)
   speedImpulse.flightSpeed = beeFlightSpeed
   state.collisionBoxes = state.collisionBoxes or {}
   state.collisionBoxes[entity] = box.CollisionBox:new{width=20, height=20}
+  local living = state.living or {}
+  living[entity] = {health=1}
 
   state.spawned = state.spawned or {}
   state.spawned[entity] = true
+end
+
+
+local function attackPlayers(state)
+  for spawnEntity, isSpawn in pairs(state.spawned or {}) do
+    if isSpawn then
+      local positions = state.positions or {}
+      local collisionBoxes = state.collisionBoxes or {}
+
+      local spawnPosition = positions[spawnEntity]
+      local spawnBox = collisionBoxes[spawnEntity]
+      if spawnBox then
+        local referenceSpawnBox = spawnBox:translated(spawnPosition)
+        for playerEntity, player in pairs(state.players or {}) do
+          local isPlayerAlive = ((state.living or {})[playerEntity] or {}).health > 0
+          local stateMachine = (state.stateMachines or {})[playerEntity] or {}
+          local playerPosition = positions[playerEntity]
+          local playerBox = collisionBoxes[playerEntity]
+          local referencePlayerBox = playerBox:translated(playerPosition)
+          if isPlayerAlive and stateMachine.currentState ~= "hurt"
+              and referenceSpawnBox:intersects(referencePlayerBox) then
+            stateMachine:setState("hurt")
+            break
+          end
+        end
+      end
+
+    end
+  end
 end
 
 
@@ -80,6 +110,7 @@ function M.update(state)
     holdingKey = false
   end
 
+  attackPlayers(state)
   destroyBees(state)
 end
 
