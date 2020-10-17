@@ -14,7 +14,7 @@ local function moveTerrain(state, positions)
   drawings.boundaries(position.boundaries)
   drawings.clouds(position.clouds)
   drawings.slopes(position.slopes)
-  drawings.ladders(position.ladders)
+  drawings.ladders(position.loadedLadders)
 end
 
 

@@ -34,4 +34,9 @@ function M.update(state, dt)
 end
 
 
+function M.draw(state, spriteSheet, positions)
+  animation.animationRenderer(state, spriteSheet, positions)
+end
+
+
 return M
