@@ -59,9 +59,12 @@ local function checkClimbInput(args)
 end
 
 
-local function checkAttackInput(args, stateName, animName)
+local function checkAttackInput(args, stateName, animName, stopYVelocity)
   if love.keyboard.isDown("l") and not holdingAttackKey then
     args.velocity.x = 0
+    if stopYVelocity then
+      args.velocity.y = 0
+    end
     args.stateMachine:setState(stateName)
     args.animationClip:setAnimation(animName)
     holdingAttackKey = true
@@ -222,8 +225,20 @@ local statesLogic = {
     end
   end,
 
+  climbAttacking = function (args)
+    if args.animationClip:done() then
+      args.stateMachine:setState("climbing")
+    end
+  end,
+
   climbing = function (args)
     if args.collisionBox.climbing then
+      if love.keyboard.isDown("a") and not love.keyboard.isDown("d") then
+        args.animationClip.facingRight = false
+      elseif not love.keyboard.isDown("a") and love.keyboard.isDown("d") then
+        args.animationClip.facingRight = true
+      end
+
       if love.keyboard.isDown("w") and not love.keyboard.isDown("s") then
         args.velocity.y = -args.speedImpulses.climb
         args.animationClip:setAnimation("climbingUp")
@@ -234,6 +249,8 @@ local statesLogic = {
         args.velocity.y = 0
         args.animationClip:setAnimation("climbingIdle")
       end
+
+      checkAttackInput(args, "climbAttacking", "climbAttackingFlySwat", true)
 
       if love.keyboard.isDown("k") then
         args.stateMachine:setState("startingJump")
