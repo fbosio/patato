@@ -27,10 +27,12 @@ local function spawnBee(state)
   local entity = beeEntityPrefix .. spawnCount;
   state.positions = state.positions or {}
   local cameraPosition = getCameraPosition(state)
+  local playerPosition = state.positions.patato
+  local playerCollisionBox = state.collisionBoxes.patato
   local n = love.math.random(0, 1)
   state.positions[entity] = {
     x = n*love.graphics.getWidth() + cameraPosition.x,
-    y = love.math.random(0, love.graphics.getHeight()) - cameraPosition.y
+    y = playerPosition.y - playerCollisionBox.height - cameraPosition.y
   }
   state.velocities = state.velocities or {}
   local direction = 1 - 2*n
