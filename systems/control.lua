@@ -3,7 +3,7 @@ local animation = require "components.animation"
 local M = {}
 
 
-local holdingJumpKey
+local holdingJumpKey, holdingAttackKey
 
 
 local function checkWalkInput(args)
@@ -75,10 +75,13 @@ local statesLogic = {
 
     checkCrouchInput(args)
 
-    if love.keyboard.isDown("l") then
+    if love.keyboard.isDown("l") and not holdingAttackKey then
       args.velocity.x = 0
-      args.stateMachine:setState("punching")
-      args.animationClip:setAnimation("punching")
+      args.stateMachine:setState("standingAttackingFlySwat")
+      args.animationClip:setAnimation("standingAttackingFlySwat")
+      holdingAttackKey = true
+    elseif not love.keyboard.isDown("l") and holdingAttackKey then
+      holdingAttackKey = false
     end
 
     checkClimbInput(args)
@@ -202,7 +205,7 @@ local statesLogic = {
     args.stateMachine:setState("idle")
   end,
 
-  punching = function (args)
+  standingAttackingFlySwat = function (args)
     if args.animationClip:done() then
       args.stateMachine:setState("idle")
     end

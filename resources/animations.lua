@@ -10,7 +10,7 @@ return {
     jumping = {{{4, 1}}, false},
     crouching = {{{5, 1}}, false},
     crouchWalking = {{{6, 0.1}, {7, 0.1}, {8, 0.1}, {7, 0.1}}, true},
-    standingAttackingFlySwat = {{{9, 0.1}, {10, 0.1}, {9, 0.1}}, false},
+    standingAttackingFlySwat = {{{9, 0.03}, {10, 0.1}, {9, 0.05}}, false},
     crouchingingAttackingFlySwat = {{{11, 0.1}, {12, 0.1}, {11, 0.1}}, false},
     climbingIdle = {{{17, 1}}, false},
     climbingUp = {{{18, 0.1}, {17, 0.1}, {16, 0.1}, {17, 0.1}}, true},
