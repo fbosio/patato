@@ -59,6 +59,18 @@ local function checkClimbInput(args)
 end
 
 
+local function checkAttackInput(args, stateName, animName)
+  if love.keyboard.isDown("l") and not holdingAttackKey then
+    args.velocity.x = 0
+    args.stateMachine:setState(stateName)
+    args.animationClip:setAnimation(animName)
+    holdingAttackKey = true
+  elseif not love.keyboard.isDown("l") and holdingAttackKey then
+    holdingAttackKey = false
+  end
+end
+
+
 local statesLogic = {
   idle = function (args)
     checkWalkInput(args)  
@@ -74,17 +86,8 @@ local statesLogic = {
     end
 
     checkCrouchInput(args)
-
-    if love.keyboard.isDown("l") and not holdingAttackKey then
-      args.velocity.x = 0
-      args.stateMachine:setState("standingAttackingFlySwat")
-      args.animationClip:setAnimation("standingAttackingFlySwat")
-      holdingAttackKey = true
-    elseif not love.keyboard.isDown("l") and holdingAttackKey then
-      holdingAttackKey = false
-    end
-
     checkClimbInput(args)
+    checkAttackInput(args, "standAttacking", "standAttackingFlySwat")
   end,
 
   startingJump = function (args)
@@ -190,6 +193,8 @@ local statesLogic = {
       args.animationClip:setAnimation("crouching")
     end
 
+    checkAttackInput(args, "crouchAttacking", "crouchAttackingFlySwat")
+
     -- "descend" state should be considered here
 
     -- Hardcoded height values should be changed in the future
@@ -205,9 +210,15 @@ local statesLogic = {
     args.stateMachine:setState("idle")
   end,
 
-  standingAttackingFlySwat = function (args)
+  standAttacking = function (args)
     if args.animationClip:done() then
       args.stateMachine:setState("idle")
+    end
+  end,
+
+  crouchAttacking = function (args)
+    if args.animationClip:done() then
+      args.stateMachine:setState("crouching")
     end
   end,
 
