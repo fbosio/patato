@@ -141,20 +141,20 @@ local statesLogic = {
     local mustFly = args.living.health == 0
                     or (args.living.stamina and args.living.stamina == 0)
     
-    
     if args.collisionBox.hurtFallHeight then
       args.living.health = args.living.health and 0
       args.velocity.x = 0
       args.stateMachine:setState("lyingDown", 1.5)
       args.animationClip:setAnimation("lyingDown")
     elseif mustFly and args.living.health then
+      (args.state.collectors or {})[args.entity] = false
       args.stateMachine:setState("flyingHurt")
-      local collectors = args.state.collectors or {}
-      collectors[args.entity] = false
       args.animationClip:setAnimation("flyingHurt")
       args.velocity.x = (args.animationClip.facingRight and -1 or 1)
                         * args.speedImpulses.walk
       args.velocity.y = -args.speedImpulses.jump
+      args.collisionBox.climbing = false
+      (args.state.weights or {})[args.entity] = true
     elseif not ((args.collisionBox.hurtFallHeight or mustFly)
         and args.living.health) then
       args.stateMachine:setState("hit", 0.5)
