@@ -3,7 +3,7 @@ local animation = require "components.animation"
 local M = {}
 
 
-local holdingJumpKey
+local holdingJumpKey, holdingAttackKey
 
 
 local function checkWalkInput(args)
@@ -49,12 +49,47 @@ end
 
 local function checkClimbInput(args)
   if args.collisionBox.ladder and (love.keyboard.isDown("w")
-      or love.keyboard.isDown("s")) then
+      or (love.keyboard.isDown("s") and args.velocity.y ~= 0)) then
     local weights = args.state.weights or {}
     weights[args.entity] = nil
     args.collisionBox.climbing = true
     args.stateMachine:setState("climbing")
     args.animationClip:setAnimation("climbingIdle")
+  end
+end
+
+
+local function checkClimbingMovementInput(args)
+  if love.keyboard.isDown("a") and not love.keyboard.isDown("d") then
+    args.animationClip.facingRight = false
+  elseif not love.keyboard.isDown("a") and love.keyboard.isDown("d") then
+    args.animationClip.facingRight = true
+  end
+
+  if love.keyboard.isDown("w") and not love.keyboard.isDown("s") then
+    args.velocity.y = -args.speedImpulses.climb
+    args.animationClip:setAnimation("climbingUp")
+  elseif love.keyboard.isDown("s") and not love.keyboard.isDown("w") then
+    args.velocity.y = args.speedImpulses.climb
+    args.animationClip:setAnimation("climbingDown")
+  else
+    args.velocity.y = 0
+    args.animationClip:setAnimation("climbingIdle")
+  end
+end
+
+
+local function checkAttackInput(args, stateName, animName, stopYVelocity)
+  if love.keyboard.isDown("l") and not holdingAttackKey then
+    args.velocity.x = 0
+    if stopYVelocity then
+      args.velocity.y = 0
+    end
+    args.stateMachine:setState(stateName)
+    args.animationClip:setAnimation(animName)
+    holdingAttackKey = true
+  elseif not love.keyboard.isDown("l") and holdingAttackKey then
+    holdingAttackKey = false
   end
 end
 
@@ -74,14 +109,8 @@ local statesLogic = {
     end
 
     checkCrouchInput(args)
-
-    if love.keyboard.isDown("l") then
-      args.velocity.x = 0
-      args.stateMachine:setState("punching")
-      args.animationClip:setAnimation("punching")
-    end
-
     checkClimbInput(args)
+    checkAttackInput(args, "standAttacking", "standAttackingFlySwat")
   end,
 
   startingJump = function (args)
@@ -94,6 +123,7 @@ local statesLogic = {
           args.velocity.x = args.speedImpulses.walk
           args.animationClip.facingRight = true
         end
+        (args.state.weights or {})[args.entity] = true
         args.collisionBox.climbing = false
         args.stateMachine:setState("outOfLadder", 0.3)
       else
@@ -128,7 +158,7 @@ local statesLogic = {
     elseif not ((args.collisionBox.hurtFallHeight or mustFly)
         and args.living.health) then
       args.stateMachine:setState("hit", 0.5)
-      args.animationClip:setAnimation("hitByHighPunch")
+      args.animationClip:setAnimation("hit")
     end
   end,
 
@@ -186,6 +216,8 @@ local statesLogic = {
       args.animationClip:setAnimation("crouching")
     end
 
+    checkAttackInput(args, "crouchAttacking", "crouchAttackingFlySwat")
+
     -- "descend" state should be considered here
 
     -- Hardcoded height values should be changed in the future
@@ -201,35 +233,36 @@ local statesLogic = {
     args.stateMachine:setState("idle")
   end,
 
-  punching = function (args)
+  standAttacking = function (args)
     if args.animationClip:done() then
       args.stateMachine:setState("idle")
     end
   end,
 
-  climbing = function (args)
-    local weights = args.state.weights or {}
+  crouchAttacking = function (args)
+    if args.animationClip:done() then
+      args.stateMachine:setState("crouching")
+    end
+  end,
 
+  climbAttacking = function (args)
+    if args.animationClip:done() then
+      args.stateMachine:setState("climbing")
+    end
+  end,
+
+  climbing = function (args)
     if args.collisionBox.climbing then
-      if love.keyboard.isDown("w") and not love.keyboard.isDown("s") then
-        args.velocity.y = -args.speedImpulses.climb
-        args.animationClip:setAnimation("climbingUp")
-      elseif love.keyboard.isDown("s") and not love.keyboard.isDown("w") then
-        args.velocity.y = args.speedImpulses.climb
-        args.animationClip:setAnimation("climbingDown")
-      else
-        args.velocity.y = 0
-        args.animationClip:setAnimation("climbingIdle")
-      end
+      checkClimbingMovementInput(args)
+      checkAttackInput(args, "climbAttacking", "climbAttackingFlySwat", true)
 
       if love.keyboard.isDown("k") then
-        weights[args.entity] = true
         args.stateMachine:setState("startingJump")
         args.animationClip:setAnimation("climbingStartingJump")
       end
     
     else
-      weights[args.entity] = true
+      (args.state.weights or {})[args.entity] = true
       args.stateMachine:setState("idle")
     end
   end,
