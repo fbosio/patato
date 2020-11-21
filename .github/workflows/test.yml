@@ -17,4 +17,5 @@ jobs:
       run: luarocks install busted
       
     - name: test
-      run: busted engine
+      run: |
+        busted ../../engine
