@@ -1,6 +1,8 @@
 # Patato Man
 A platform adventure video game, ported with Löve2D.
 
+![test](https://github.com/fbosio/patato/workflows/test/badge.svg)
+
 | Game | Engine  |
 |------|---------|
 | Specific | General |
