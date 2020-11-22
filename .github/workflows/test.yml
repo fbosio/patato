@@ -21,4 +21,4 @@ jobs:
       run: luarocks install busted
 
     - name: test
-      run: busted engine -m ./?.lua;./?/?.lua;./?/init.lua
+      run: busted engine -m "./?.lua;./?/?.lua;./?/init.lua"
