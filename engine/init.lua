@@ -17,6 +17,22 @@ function M.load (configYaml)
   M.keys.right = M.keys.right or "d"
   M.keys.up = M.keys.up or "w"
   M.keys.down = M.keys.down or "s"
+
+  if not isNull(config.entities) then
+    M.gameState = {}
+    for entityName, entity in pairs(config.entities) do
+      for componentName, component in pairs(entity) do
+        M.gameState[componentName] = M.gameState[componentName] or {}
+        M.gameState[componentName][entityName] =
+          isNull(component) and {
+            left = "left",
+            right = "right",
+            up = "up",
+            down = "down"
+          } or component
+      end
+    end
+  end
 end
 
 return M

@@ -9,7 +9,7 @@ describe("Load an empty config", function ()
     assert.are.same(0, engine.world.gravity)
   end)
 
-  it("should load a world with ASWD keys", function ()
+  it("should map ASWD keys", function ()
     config = ""
 
     engine.load(config)
@@ -58,6 +58,8 @@ describe("Load an empty keys structure", function ()
 end)
 
 describe("Load all movement keys", function ()
+  local config
+
   it("should copy the defined keys", function ()
     config = [[
       keys:
@@ -90,5 +92,23 @@ describe("Load some movement keys", function ()
     assert.are.same("d", engine.keys.right)
     assert.are.same("w", engine.keys.up)
     assert.are.same("k", engine.keys.down)
+  end)
+end)
+
+describe("Load an entity with an empty input", function ()
+  it("should create game state with input as default keys", function ()
+    config = [[
+      entities:
+        player:
+          input:
+    ]]
+
+    engine.load(config)
+
+    local playerInput = engine.gameState.input.player
+    assert.are.same("left", playerInput.left)
+    assert.are.same("right", playerInput.right)
+    assert.are.same("up", playerInput.up)
+    assert.are.same("down", playerInput.down)
   end)
 end)

@@ -7,11 +7,6 @@ keys:
   down: s
   up: w
 sprites: resources/sprites/patato.png
-levels:
-  test level:
-    patato:
-    - 0
-    - 0
 entities:
   patato:
     animations:
@@ -127,4 +122,9 @@ entities:
       walk: 400
       climb: 400
       crouchWalk: 200
+levels:
+  test level:
+    patato:
+    - 0
+    - 0
 ...
