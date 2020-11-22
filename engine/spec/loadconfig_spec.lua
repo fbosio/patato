@@ -172,3 +172,29 @@ describe("Load an entity with movement input and keys", function ()
     assert.are.same("down2", playerInput.down)
   end)
 end)
+
+describe("Load an entity with movement input and lacking keys", function ()
+  it("should copy the defined keys and ignore the rest", function ()
+    config = [[
+      keys:
+        left2: j
+        right2: l
+        down2: k
+      entities:
+        player:
+          input:
+            left: left2
+            right: right2
+            up: up2
+            down: down2
+    ]]
+
+    engine.load(config)
+
+    local playerInput = engine.gameState.input.player
+    assert.are.same("left2", playerInput.left)
+    assert.are.same("right2", playerInput.right)
+    assert.is.falsy(playerInput.up)
+    assert.are.same("down2", playerInput.down)
+  end)
+end)
