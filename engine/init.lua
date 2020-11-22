@@ -9,8 +9,8 @@ end
 function M.load (configYaml)
   local config = #configYaml > 0 and tinyyaml.parse(configYaml) or {}
 
-  M.world = config.world or {}
-  M.world.gravity = isNull(config.world) and 0 or config.world.gravity
+  M.world = isNull(config.world) and {} or config.world
+  M.world.gravity = M.world.gravity or 0
 
   M.keys = isNull(config.keys) and {} or config.keys
   M.keys.left = M.keys.left or "a"
