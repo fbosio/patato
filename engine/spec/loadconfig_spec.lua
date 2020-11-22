@@ -32,7 +32,7 @@ describe("Load an empty world", function ()
 end)
 
 describe("Load world with gravity", function ()
-  it("should copy the loaded world", function ()
+  it("should copy the defined world", function ()
     config = [[
       world:
         gravity: 500
@@ -45,7 +45,7 @@ describe("Load world with gravity", function ()
 end)
 
 describe("Load an empty keys structure", function ()
-  it("should load a world with ASWD keys", function ()
+  it("should load a world with default movement keys", function ()
     config = "keys:"
 
     engine.load(config)
@@ -54,5 +54,41 @@ describe("Load an empty keys structure", function ()
     assert.are.same("d", engine.keys.right)
     assert.are.same("w", engine.keys.up)
     assert.are.same("s", engine.keys.down)
+  end)
+end)
+
+describe("Load all movement keys", function ()
+  it("should copy the defined keys", function ()
+    config = [[
+      keys:
+        left: j
+        right: l
+        up: i
+        down: k
+    ]]
+
+    engine.load(config)
+
+    assert.are.same("j", engine.keys.left)
+    assert.are.same("l", engine.keys.right)
+    assert.are.same("i", engine.keys.up)
+    assert.are.same("k", engine.keys.down)
+  end)
+end)
+
+describe("Load some movement keys", function ()
+  it("should fill lacking keys with default values", function ()
+    config = [[
+      keys:
+        left: j
+        down: k
+    ]]
+
+    engine.load(config)
+
+    assert.are.same("j", engine.keys.left)
+    assert.are.same("d", engine.keys.right)
+    assert.are.same("w", engine.keys.up)
+    assert.are.same("k", engine.keys.down)
   end)
 end)
