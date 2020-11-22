@@ -1,6 +1,6 @@
 local engine = require "engine"
 
-describe("Load with empty config", function ()
+describe("Load an empty config", function ()
   it("should load a world with zero gravity", function ()
     config = ""
 
@@ -10,7 +10,7 @@ describe("Load with empty config", function ()
   end)
 end)
 
-describe("Load with empty world", function ()
+describe("Load an empty world", function ()
   it("should load a world with zero gravity", function ()
     config = "world:"
 
@@ -20,7 +20,7 @@ describe("Load with empty world", function ()
   end)
 end)
 
-describe("Load with world with gravity", function ()
+describe("Load world with gravity", function ()
   it("should copy the loaded world", function ()
     config = [[
       world:
