@@ -1,8 +1,16 @@
-local engine = require "engine"
+local engine
+
+before_each(function ()
+  engine = require "engine"
+end)
+
+after_each(function ()
+  package.loaded.engine = nil
+end)
 
 describe("Load an empty config", function ()
   it("should load a world with zero gravity", function ()
-    config = ""
+    local config = ""
 
     engine.load(config)
 
@@ -10,7 +18,7 @@ describe("Load an empty config", function ()
   end)
 
   it("should map ASWD keys", function ()
-    config = ""
+    local config = ""
 
     engine.load(config)
 
@@ -23,7 +31,7 @@ end)
 
 describe("Load an empty world", function ()
   it("should load a world with zero gravity", function ()
-    config = "world:"
+    local config = "world:"
 
     engine.load(config)
 
@@ -33,7 +41,7 @@ end)
 
 describe("Load world with gravity", function ()
   it("should copy the defined world", function ()
-    config = [[
+    local config = [[
       world:
         gravity: 500
     ]]
@@ -46,7 +54,7 @@ end)
 
 describe("Load an empty keys structure", function ()
   it("should load a world with default movement keys", function ()
-    config = "keys:"
+    local config = "keys:"
 
     engine.load(config)
 
@@ -61,7 +69,7 @@ describe("Load all movement keys", function ()
   local config
 
   it("should copy the defined keys", function ()
-    config = [[
+    local config = [[
       keys:
         left: j
         right: l
@@ -80,7 +88,7 @@ end)
 
 describe("Load some movement keys", function ()
   it("should fill lacking keys with default values", function ()
-    config = [[
+    local config = [[
       keys:
         left: j
         down: k
@@ -97,7 +105,7 @@ end)
 
 describe("Load some non movement keys", function ()
   it("should copy the defined keys to engine", function ()
-    config = [[
+    local config = [[
       keys:
         super cool action 1: j
         super cool action 2: k
@@ -110,9 +118,22 @@ describe("Load some non movement keys", function ()
   end)
 end)
 
+describe("Load an entity without components", function ()
+  it("should not create game state", function ()
+    local config = [[
+      entities:
+        player:
+    ]]
+
+    engine.load(config)
+
+    assert.is.falsy(engine.gameState)
+  end)
+end)
+
 describe("Load an entity with an empty input", function ()
   it("should create game state with input as default keys", function ()
-    config = [[
+    local config = [[
       entities:
         player:
           input:
@@ -128,9 +149,13 @@ describe("Load an entity with an empty input", function ()
   end)
 end)
 
-describe("Load an entity with movement input and no keys", function ()
-  it("should ignore the input", function ()
-    config = [[
+describe("Load an entity with movement input and lacking keys", function ()
+  it("should copy the defined keys and ignore the rest", function ()
+    local config = [[
+      keys:
+        left2: j
+        right2: l
+        down2: k
       entities:
         player:
           input:
@@ -142,13 +167,17 @@ describe("Load an entity with movement input and no keys", function ()
 
     engine.load(config)
 
-    assert.is.falsy(engine.gameState.input)
+    local playerInput = engine.gameState.input.player
+    assert.are.same("left2", playerInput.left)
+    assert.are.same("right2", playerInput.right)
+    assert.is.falsy(playerInput.up)
+    assert.are.same("down2", playerInput.down)
   end)
 end)
 
 describe("Load an entity with movement input and keys", function ()
   it("should copy the defined keys to the component", function ()
-    config = [[
+    local config = [[
       keys:
         left2: j
         right2: l
@@ -169,32 +198,6 @@ describe("Load an entity with movement input and keys", function ()
     assert.are.same("left2", playerInput.left)
     assert.are.same("right2", playerInput.right)
     assert.are.same("up2", playerInput.up)
-    assert.are.same("down2", playerInput.down)
-  end)
-end)
-
-describe("Load an entity with movement input and lacking keys", function ()
-  it("should copy the defined keys and ignore the rest", function ()
-    config = [[
-      keys:
-        left2: j
-        right2: l
-        down2: k
-      entities:
-        player:
-          input:
-            left: left2
-            right: right2
-            up: up2
-            down: down2
-    ]]
-
-    engine.load(config)
-
-    local playerInput = engine.gameState.input.player
-    assert.are.same("left2", playerInput.left)
-    assert.are.same("right2", playerInput.right)
-    assert.is.falsy(playerInput.up)
     assert.are.same("down2", playerInput.down)
   end)
 end)

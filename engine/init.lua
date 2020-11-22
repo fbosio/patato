@@ -19,22 +19,24 @@ function M.load (configYaml)
   M.keys.down = M.keys.down or "s"
 
   if not isNull(config.entities) then
-    M.gameState = {}
     for entityName, entity in pairs(config.entities) do
       for componentName, component in pairs(entity) do
-        local defaultComponent = {
-          left = "left",
-          right = "right",
-          up = "up",
-          down = "down"
-        }
-        component = isNull(component) and defaultComponent or component
-        for action, key in pairs(component) do
-          if M.keys[key] then
-            M.gameState[componentName] = M.gameState[componentName] or {}
-            M.gameState[componentName][entityName] =
-              M.gameState[componentName][entityName] or {}
-            M.gameState[componentName][entityName][action] = key
+        if componentName and componentName == "input" then
+          local defaultInput = {
+            left = "left",
+            right = "right",
+            up = "up",
+            down = "down"
+          }
+          component = isNull(component) and defaultInput or component
+          for action, key in pairs(component) do
+            if M.keys[key] then
+              M.gameState = M.gameState or {}
+              M.gameState[componentName] = M.gameState[componentName] or {}
+              M.gameState[componentName][entityName] =
+                M.gameState[componentName][entityName] or {}
+              M.gameState[componentName][entityName][action] = key
+            end
           end
         end
       end
