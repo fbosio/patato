@@ -2,11 +2,14 @@ local tinyyaml = require "tinyyaml"
 
 local M = {}
 
-function M.load (config_yaml)
-  local config = #config_yaml > 0 and tinyyaml.parse(config_yaml) or {}
+local function isNull (parsedYaml)
+  return not parsedYaml or parsedYaml.isnull and parsedYaml.isnull()
+end
+
+function M.load (configYaml)
+  local config = #configYaml > 0 and tinyyaml.parse(configYaml) or {}
   M.world = config.world or {}
-  M.world.gravity = (not config.world or config.world.isnull()) and 0
-                    or config.world.gravity
+  M.world.gravity = isNull(config.world) and 0 or config.world.gravity
 end
 
 return M
