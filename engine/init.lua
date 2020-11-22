@@ -6,6 +6,25 @@ local function isNull (parsedYaml)
   return not parsedYaml or parsedYaml.isnull and parsedYaml.isnull()
 end
 
+local function copyInputToState (component, componentName, entityName)
+  local defaultInput = {
+    left = "left",
+    right = "right",
+    up = "up",
+    down = "down"
+  }
+  component = isNull(component) and defaultInput or component
+  for action, key in pairs(component) do
+    if M.keys[key] then
+      M.gameState = M.gameState or {}
+      M.gameState[componentName] = M.gameState[componentName] or {}
+      M.gameState[componentName][entityName] =
+        M.gameState[componentName][entityName] or {}
+      M.gameState[componentName][entityName][action] = key
+    end
+  end
+end
+
 function M.load (configYaml)
   local config = #configYaml > 0 and tinyyaml.parse(configYaml) or {}
 
@@ -22,22 +41,7 @@ function M.load (configYaml)
     for entityName, entity in pairs(config.entities) do
       for componentName, component in pairs(entity) do
         if componentName and componentName == "input" then
-          local defaultInput = {
-            left = "left",
-            right = "right",
-            up = "up",
-            down = "down"
-          }
-          component = isNull(component) and defaultInput or component
-          for action, key in pairs(component) do
-            if M.keys[key] then
-              M.gameState = M.gameState or {}
-              M.gameState[componentName] = M.gameState[componentName] or {}
-              M.gameState[componentName][entityName] =
-                M.gameState[componentName][entityName] or {}
-              M.gameState[componentName][entityName][action] = key
-            end
-          end
+          copyInputToState(component, componentName, entityName)
         end
       end
     end
