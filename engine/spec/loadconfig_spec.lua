@@ -1,13 +1,12 @@
-describe("Load with empty config", function ()
-  local engine = require "engine"
+local engine = require "engine"
 
-  it("should work without crashing", function ()
-    config = {}
+describe("Load with empty config", function ()
+  it("should load an empty world", function ()
+    config = ""
     config_mock = mock(config)
 
-    local status = engine.load(config_mock)
+    engine.load(config_mock)
 
-    local codeOk = 0
-    assert.are.equals(codeOk, status)
+    assert.are.same({}, engine.world)
   end)
 end)
