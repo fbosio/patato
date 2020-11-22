@@ -1,12 +1,12 @@
 local engine = require "engine"
 
 describe("Load with empty config", function ()
-  it("should load an empty world", function ()
+  it("should load a world with zero gravity", function ()
     config = ""
     config_mock = mock(config)
 
     engine.load(config_mock)
 
-    assert.are.same({}, engine.world)
+    assert.are.same(0, engine.world.gravity)
   end)
 end)

@@ -7,7 +7,9 @@ function M.load (config_yaml)
   if #config_yaml > 0 then
     config = tinyyaml.parse(config_yaml)
   else
-    config = {world = {}}
+    config = {
+      world = {gravity = 0}
+    }
   end
   M.world = config.world
 end
