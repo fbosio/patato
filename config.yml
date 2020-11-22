@@ -4,6 +4,8 @@ world:
 keys:
   right: d
   left: a
+  down: s
+  up: w
 sprites: resources/sprites/patato.png
 levels:
   test level:

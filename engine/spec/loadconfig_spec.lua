@@ -8,6 +8,17 @@ describe("Load an empty config", function ()
 
     assert.are.same(0, engine.world.gravity)
   end)
+
+  it("should load a world with ASWD keys", function ()
+    config = ""
+
+    engine.load(config)
+
+    assert.are.same("a", engine.keys.left)
+    assert.are.same("d", engine.keys.right)
+    assert.are.same("w", engine.keys.up)
+    assert.are.same("s", engine.keys.down)
+  end)
 end)
 
 describe("Load an empty world", function ()
