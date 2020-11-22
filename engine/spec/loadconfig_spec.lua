@@ -118,6 +118,18 @@ describe("Load some non movement keys", function ()
   end)
 end)
 
+describe("Load an empty entities list", function ()
+  it("should not create game state", function ()
+    local config = [[
+      entities:
+    ]]
+
+    engine.load(config)
+
+    assert.is.falsy(engine.gameState)
+  end)
+end)
+
 describe("Load an entity without components", function ()
   it("should not create game state", function ()
     local config = [[
