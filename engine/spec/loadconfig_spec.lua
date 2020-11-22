@@ -213,3 +213,25 @@ describe("Load an entity with movement input and keys", function ()
     assert.are.same("down2", playerInput.down)
   end)
 end)
+
+describe("Load an entity with impulse speeds", function ()
+  it("should copy the define speeds to the component", function ()
+    local config = [[
+      entities:
+        player:
+          impulseSpeed:
+            walk: 400
+            crouchWalk: 200
+            jump: 1200
+            climb: 400
+    ]]
+
+    engine.load(config)
+
+    local playerSpeed = engine.gameState.impulseSpeed.player
+    assert.are.same(400, playerSpeed.walk)
+    assert.are.same(200, playerSpeed.crouchWalk)
+    assert.are.same(1200, playerSpeed.jump)
+    assert.are.same(400, playerSpeed.climb)
+  end)
+end)

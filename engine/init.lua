@@ -2,11 +2,11 @@ local tinyyaml = require "tinyyaml"
 
 local M = {}
 
-local function isNull (parsedYaml)
+local function isNull(parsedYaml)
   return not parsedYaml or parsedYaml.isnull and parsedYaml.isnull()
 end
 
-local function copyInputToState (component, componentName, entityName)
+local function copyInputToState(component, componentName, entityName)
   local defaultInput = {
     left = "left",
     right = "right",
@@ -25,7 +25,17 @@ local function copyInputToState (component, componentName, entityName)
   end
 end
 
-function M.load (configYaml)
+local function copyImpulseSpeedToState(component, componentName, entityName)
+  for impulseName, speed in pairs(component) do
+    M.gameState = M.gameState or {}
+    M.gameState[componentName] = M.gameState[componentName] or {}
+    M.gameState[componentName][entityName] =
+      M.gameState[componentName][entityName] or {}
+    M.gameState[componentName][entityName][impulseName] = speed
+  end
+end
+
+function M.load(configYaml)
   local config = #configYaml > 0 and tinyyaml.parse(configYaml) or {}
 
   M.world = isNull(config.world) and {} or config.world
@@ -40,8 +50,10 @@ function M.load (configYaml)
   if not isNull(config.entities) then
     for entityName, entity in pairs(config.entities) do
       for componentName, component in pairs(entity) do
-        if componentName and componentName == "input" then
+        if componentName == "input" then
           copyInputToState(component, componentName, entityName)
+        elseif componentName == "impulseSpeed" then
+          copyImpulseSpeedToState(component, componentName, entityName)
         end
       end
     end
