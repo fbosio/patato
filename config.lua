@@ -10,6 +10,9 @@ keys = {
 sprites = "resources/sprites/patato.png"
 
 entities = {
+  ["frasco"] = {
+    efecto = function () end,
+  }
   ["patato"] = {
     impulseSpeed = {
       walk = 400,
@@ -70,5 +73,9 @@ entities = {
 levels = {
   ["test level"] = {
     ["patato"] = {0, 0},
+    ["frasco"] = {
+      {20, 30},
+      {-10, 200}
+    },
   },
 }

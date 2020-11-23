@@ -144,13 +144,16 @@ describe("Load an entity without components", function ()
 end)
 
 describe("Load an entity with an empty input", function ()
-  it("should create game state with input as default keys", function ()
-    local config = [[
+  local config
+  before_each(function ()
+    config = [[
       entities:
         player:
           input:
     ]]
+  end)
 
+  it("should create game state with input as default keys", function ()
     engine.loadFromString(config)
 
     local playerInput = engine.gameState.input.player
@@ -158,6 +161,11 @@ describe("Load an entity with an empty input", function ()
     assert.are.same("right", playerInput.right)
     assert.are.same("up", playerInput.up)
     assert.are.same("down", playerInput.down)
+  end)
+
+  it("should create game state with default walk speed", function ()
+    engine.loadFromString(config)
+    assert.are.same(400, engine.gameState.impulseSpeed.player.walk)
   end)
 end)
 

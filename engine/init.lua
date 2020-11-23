@@ -25,6 +25,13 @@ local function copyInputToState(component, componentName, entityName)
   end
 end
 
+local function createDefaultImpulseSpeed(componentName, entityName)
+  M.gameState[componentName] = M.gameState[componentName] or {}
+  M.gameState[componentName][entityName] =
+    M.gameState[componentName][entityName] or {}
+  M.gameState[componentName][entityName].walk = 400
+end
+
 local function copyImpulseSpeedToState(component, componentName, entityName)
   for impulseName, speed in pairs(component) do
     M.gameState = M.gameState or {}
@@ -52,6 +59,7 @@ function M.loadFromString(configYaml)
       for componentName, component in pairs(entity) do
         if componentName == "input" then
           copyInputToState(component, componentName, entityName)
+          createDefaultImpulseSpeed("impulseSpeed", entityName)
         elseif componentName == "impulseSpeed" then
           copyImpulseSpeedToState(component, componentName, entityName)
         end
