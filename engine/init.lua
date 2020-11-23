@@ -52,20 +52,6 @@ local function copyImpulseSpeedToState(component, entityName)
   end
 end
 
-function M.load(path)
-  local paths = {path, "config.yaml", "config.yml"}
-  local read = ""
-  for _, p in ipairs(paths) do
-    local file, msg = io.open(p, "r")
-    if file then
-      read = file:read("*a")
-      file:close()
-      break
-    end
-  end
-  M.loadFromString(read)
-end
-
 function M.loadFromString(configYaml)
   local config = #configYaml > 0 and tinyyaml.parse(configYaml) or {}
 
@@ -90,6 +76,25 @@ function M.loadFromString(configYaml)
       end
     end
   end
+end
+
+function M.load(path)
+  local paths = {path, "config.yaml", "config.yml"}
+  local read = ""
+  for _, p in ipairs(paths) do
+    local file, msg = io.open(p, "r")
+    if file then
+      read = file:read("*a")
+      file:close()
+      break
+    end
+  end
+  M.loadFromString(read)
+end
+
+function M.draw()
+  width, height = love.graphics.getDimensions()
+  love.graphics.points({width/2, height/2})
 end
 
 return M
