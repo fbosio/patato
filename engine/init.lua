@@ -37,16 +37,10 @@ local function copyInputToState(component, entityName)
   end
 end
 
-local function createDefaultImpulseSpeed(entityName)
+local function createDefaults(entityName)
   setComponentAttribute(componentNames.impulseSpeed, entityName, "walk", 400)
-end
-
-local function createDefaultPosition(entityName)
   setComponentAttribute(componentNames.position, entityName, "x", 0)
   setComponentAttribute(componentNames.position, entityName, "y", 0)
-end
-
-local function createDefaultVelocity(entityName)
   setComponentAttribute(componentNames.velocity, entityName, "x", 0)
   setComponentAttribute(componentNames.velocity, entityName, "y", 0)
 end
@@ -75,9 +69,7 @@ function M.loadFromString(configYaml)
       for componentName, component in pairs(entity) do
         if componentName == componentNames.input then
           copyInputToState(component, entityName)
-          createDefaultImpulseSpeed(entityName)
-          createDefaultPosition(entityName)
-          createDefaultVelocity(entityName)
+          createDefaults(entityName)
         elseif componentName == componentNames.impulseSpeed then
           copyImpulseSpeedToState(component, entityName)
         end
