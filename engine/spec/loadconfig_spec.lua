@@ -176,6 +176,14 @@ describe("Load an entity with an empty input", function ()
     assert.are.same(0, playerPosition.x)
     assert.are.same(0, playerPosition.y)
   end)
+
+  it("should create game state with default velocity", function ()
+    engine.loadFromString(config)
+
+    local playerVelocity = engine.gameState.velocity.player
+    assert.are.same(0, playerVelocity.x)
+    assert.are.same(0, playerVelocity.y)
+  end)
 end)
 
 describe("Load an entity with movement input and lacking keys", function ()

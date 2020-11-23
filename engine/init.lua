@@ -5,7 +5,8 @@ local M = {}
 local componentNames = {
   input = "input",
   impulseSpeed = "impulseSpeed",
-  position = "position"
+  position = "position",
+  velocity = "velocity"
 }
 
 local function isNull(parsedYaml)
@@ -45,6 +46,11 @@ local function createDefaultPosition(entityName)
   setComponentAttribute(componentNames.position, entityName, "y", 0)
 end
 
+local function createDefaultVelocity(entityName)
+  setComponentAttribute(componentNames.velocity, entityName, "x", 0)
+  setComponentAttribute(componentNames.velocity, entityName, "y", 0)
+end
+
 local function copyImpulseSpeedToState(component, entityName)
   for impulseName, speed in pairs(component) do
     setComponentAttribute(componentNames.impulseSpeed, entityName, impulseName,
@@ -71,6 +77,7 @@ function M.loadFromString(configYaml)
           copyInputToState(component, entityName)
           createDefaultImpulseSpeed(entityName)
           createDefaultPosition(entityName)
+          createDefaultVelocity(entityName)
         elseif componentName == componentNames.impulseSpeed then
           copyImpulseSpeedToState(component, entityName)
         end
