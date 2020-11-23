@@ -94,7 +94,8 @@ end
 
 function M.draw()
   width, height = love.graphics.getDimensions()
-  love.graphics.points({width/2, height/2})
+  position = (M.gameState or {}).position or {x=0, y=0}
+  love.graphics.points({position.x+width/2, position.y+height/2})
 end
 
 return M
