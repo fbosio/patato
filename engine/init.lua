@@ -2,8 +2,22 @@ local tinyyaml = require "tinyyaml"
 
 local M = {}
 
+local componentNames = {
+  input = "input",
+  impulseSpeed = "impulseSpeed"
+}
+
 local function isNull(parsedYaml)
   return not parsedYaml or parsedYaml.isnull and parsedYaml.isnull()
+end
+
+local function setComponentAttribute(componentName, entityName, attribute,
+                                     value)
+  M.gameState = M.gameState or {}
+  M.gameState[componentName] = M.gameState[componentName] or {}
+  M.gameState[componentName][entityName] =
+   M.gameState[componentName][entityName] or {}
+  M.gameState[componentName][entityName][attribute] = value
 end
 
 local function copyInputToState(component, componentName, entityName)
@@ -16,29 +30,18 @@ local function copyInputToState(component, componentName, entityName)
   component = isNull(component) and defaultInput or component
   for action, key in pairs(component) do
     if M.keys[key] then
-      M.gameState = M.gameState or {}
-      M.gameState[componentName] = M.gameState[componentName] or {}
-      M.gameState[componentName][entityName] =
-        M.gameState[componentName][entityName] or {}
-      M.gameState[componentName][entityName][action] = key
+      setComponentAttribute(componentName, entityName, action, key)
     end
   end
 end
 
 local function createDefaultImpulseSpeed(componentName, entityName)
-  M.gameState[componentName] = M.gameState[componentName] or {}
-  M.gameState[componentName][entityName] =
-    M.gameState[componentName][entityName] or {}
-  M.gameState[componentName][entityName].walk = 400
+  setComponentAttribute(componentName, entityName, "walk", 400)
 end
 
 local function copyImpulseSpeedToState(component, componentName, entityName)
   for impulseName, speed in pairs(component) do
-    M.gameState = M.gameState or {}
-    M.gameState[componentName] = M.gameState[componentName] or {}
-    M.gameState[componentName][entityName] =
-      M.gameState[componentName][entityName] or {}
-    M.gameState[componentName][entityName][impulseName] = speed
+    setComponentAttribute(componentName, entityName, impulseName, speed)
   end
 end
 
@@ -57,10 +60,10 @@ function M.loadFromString(configYaml)
   if not isNull(config.entities) then
     for entityName, entity in pairs(config.entities) do
       for componentName, component in pairs(entity) do
-        if componentName == "input" then
+        if componentName == componentNames.input then
           copyInputToState(component, componentName, entityName)
-          createDefaultImpulseSpeed("impulseSpeed", entityName)
-        elseif componentName == "impulseSpeed" then
+          createDefaultImpulseSpeed(componentNames.impulseSpeed, entityName)
+        elseif componentName == componentNames.impulseSpeed then
           copyImpulseSpeedToState(component, componentName, entityName)
         end
       end
