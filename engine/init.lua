@@ -53,11 +53,15 @@ local function copyImpulseSpeedToState(component, entityName)
 end
 
 function M.load(path)
-  local file, msg = io.open(path or "config.yaml", "r")
+  local paths = {path, "config.yaml", "config.yml"}
   local read = ""
-  if file then
-    read = file:read("*a")
-    file:close()
+  for _, p in ipairs(paths) do
+    local file, msg = io.open(p, "r")
+    if file then
+      read = file:read("*a")
+      file:close()
+      break
+    end
   end
   M.loadFromString(read)
 end

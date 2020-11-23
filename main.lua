@@ -1,5 +1,5 @@
 local engine = require "engine"
 
 function love.load()
-  engine.load("config.yaml")
+  engine.load()
 end
