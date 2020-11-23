@@ -12,7 +12,7 @@ describe("Load an empty config", function ()
   it("should load a world with zero gravity", function ()
     local config = ""
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.are.same(0, engine.world.gravity)
   end)
@@ -20,7 +20,7 @@ describe("Load an empty config", function ()
   it("should map ASWD keys", function ()
     local config = ""
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.are.same("a", engine.keys.left)
     assert.are.same("d", engine.keys.right)
@@ -33,7 +33,7 @@ describe("Load an empty world", function ()
   it("should load a world with zero gravity", function ()
     local config = "world:"
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.are.same(0, engine.world.gravity)
   end)
@@ -46,7 +46,7 @@ describe("Load world with gravity", function ()
         gravity: 500
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.are.same(500, engine.world.gravity)
   end)
@@ -56,7 +56,7 @@ describe("Load an empty keys structure", function ()
   it("should load a world with default movement keys", function ()
     local config = "keys:"
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.are.same("a", engine.keys.left)
     assert.are.same("d", engine.keys.right)
@@ -77,7 +77,7 @@ describe("Load all movement keys", function ()
         down: k
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.are.same("j", engine.keys.left)
     assert.are.same("l", engine.keys.right)
@@ -94,7 +94,7 @@ describe("Load some movement keys", function ()
         down: k
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.are.same("j", engine.keys.left)
     assert.are.same("d", engine.keys.right)
@@ -111,7 +111,7 @@ describe("Load some non movement keys", function ()
         super cool action 2: k
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.are.same("j", engine.keys["super cool action 1"])
     assert.are.same("k", engine.keys["super cool action 2"])
@@ -124,7 +124,7 @@ describe("Load an empty entities list", function ()
       entities:
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.is.falsy(engine.gameState)
   end)
@@ -137,7 +137,7 @@ describe("Load an entity without components", function ()
         player:
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.is.falsy(engine.gameState)
   end)
@@ -151,7 +151,7 @@ describe("Load an entity with an empty input", function ()
           input:
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     local playerInput = engine.gameState.input.player
     assert.are.same("left", playerInput.left)
@@ -177,7 +177,7 @@ describe("Load an entity with movement input and lacking keys", function ()
             down: down2
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     local playerInput = engine.gameState.input.player
     assert.are.same("left2", playerInput.left)
@@ -204,7 +204,7 @@ describe("Load an entity with movement input and keys", function ()
             down: down2
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     local playerInput = engine.gameState.input.player
     assert.are.same("left2", playerInput.left)
@@ -222,7 +222,7 @@ describe("Load an entity with only an empty speed list", function ()
           impulseSpeed:
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     assert.is.falsy(engine.gameState)
   end)
@@ -240,7 +240,7 @@ describe("Load an entity with impulse speeds", function ()
             climb: 400
     ]]
 
-    engine.load(config)
+    engine.loadFromString(config)
 
     local playerSpeed = engine.gameState.impulseSpeed.player
     assert.are.same(400, playerSpeed.walk)

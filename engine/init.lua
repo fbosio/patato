@@ -35,7 +35,7 @@ local function copyImpulseSpeedToState(component, componentName, entityName)
   end
 end
 
-function M.load(configYaml)
+function M.loadFromString(configYaml)
   local config = #configYaml > 0 and tinyyaml.parse(configYaml) or {}
 
   M.world = isNull(config.world) and {} or config.world
