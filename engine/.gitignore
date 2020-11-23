@@ -1,0 +1,3 @@
+lua-tinyyaml/*
+!lua-tinyyaml/LICENSE
+!lua-tinyyaml/tinyyaml.lua

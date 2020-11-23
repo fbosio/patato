@@ -1,4 +1,4 @@
-local tinyyaml = require "tinyyaml"
+local tinyyaml = require "engine.tinyyaml"
 
 local M = {}
 
@@ -50,6 +50,11 @@ local function copyImpulseSpeedToState(component, entityName)
     setComponentAttribute(componentNames.impulseSpeed, entityName, impulseName,
                           speed)
   end
+end
+
+function M.load(path)
+  io.input(path)
+  M.loadFromString(io.read("*a"))
 end
 
 function M.loadFromString(configYaml)

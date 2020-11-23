@@ -18,9 +18,7 @@ jobs:
     - uses: leafo/gh-actions-luarocks@v4.0.0
 
     - name: build
-      run: |
-        luarocks install lua-tinyyaml
-        luarocks install busted
+      run: luarocks install busted
 
     - name: test
       run: busted engine -m "./?.lua;./?/?.lua;./?/init.lua"
