@@ -4,7 +4,8 @@ local M = {}
 
 local componentNames = {
   input = "input",
-  impulseSpeed = "impulseSpeed"
+  impulseSpeed = "impulseSpeed",
+  position = "position"
 }
 
 local function isNull(parsedYaml)
@@ -20,7 +21,7 @@ local function setComponentAttribute(componentName, entityName, attribute,
   M.gameState[componentName][entityName][attribute] = value
 end
 
-local function copyInputToState(component, componentName, entityName)
+local function copyInputToState(component, entityName)
   local defaultInput = {
     left = "left",
     right = "right",
@@ -30,18 +31,24 @@ local function copyInputToState(component, componentName, entityName)
   component = isNull(component) and defaultInput or component
   for action, key in pairs(component) do
     if M.keys[key] then
-      setComponentAttribute(componentName, entityName, action, key)
+      setComponentAttribute(componentNames.input, entityName, action, key)
     end
   end
 end
 
-local function createDefaultImpulseSpeed(componentName, entityName)
-  setComponentAttribute(componentName, entityName, "walk", 400)
+local function createDefaultImpulseSpeed(entityName)
+  setComponentAttribute(componentNames.impulseSpeed, entityName, "walk", 400)
 end
 
-local function copyImpulseSpeedToState(component, componentName, entityName)
+local function createDefaultPosition(entityName)
+  setComponentAttribute(componentNames.position, entityName, "x", 0)
+  setComponentAttribute(componentNames.position, entityName, "y", 0)
+end
+
+local function copyImpulseSpeedToState(component, entityName)
   for impulseName, speed in pairs(component) do
-    setComponentAttribute(componentName, entityName, impulseName, speed)
+    setComponentAttribute(componentNames.impulseSpeed, entityName, impulseName,
+                          speed)
   end
 end
 
@@ -61,10 +68,11 @@ function M.loadFromString(configYaml)
     for entityName, entity in pairs(config.entities) do
       for componentName, component in pairs(entity) do
         if componentName == componentNames.input then
-          copyInputToState(component, componentName, entityName)
-          createDefaultImpulseSpeed(componentNames.impulseSpeed, entityName)
+          copyInputToState(component, entityName)
+          createDefaultImpulseSpeed(entityName)
+          createDefaultPosition(entityName)
         elseif componentName == componentNames.impulseSpeed then
-          copyImpulseSpeedToState(component, componentName, entityName)
+          copyImpulseSpeedToState(component, entityName)
         end
       end
     end

@@ -165,7 +165,16 @@ describe("Load an entity with an empty input", function ()
 
   it("should create game state with default walk speed", function ()
     engine.loadFromString(config)
+
     assert.are.same(400, engine.gameState.impulseSpeed.player.walk)
+  end)
+
+  it("should create game state with default position", function ()
+    engine.loadFromString(config)
+
+    local playerPosition = engine.gameState.position.player
+    assert.are.same(0, playerPosition.x)
+    assert.are.same(0, playerPosition.y)
   end)
 end)
 
