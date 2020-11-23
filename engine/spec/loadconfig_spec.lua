@@ -214,6 +214,20 @@ describe("Load an entity with movement input and keys", function ()
   end)
 end)
 
+describe("Load an entity with only an empty speed list", function ()
+  it("should not create game", function ()
+    local config = [[
+      entities:
+        player:
+          impulseSpeed:
+    ]]
+
+    engine.load(config)
+
+    assert.is.falsy(engine.gameState)
+  end)
+end)
+
 describe("Load an entity with impulse speeds", function ()
   it("should copy the define speeds to the component", function ()
     local config = [[
