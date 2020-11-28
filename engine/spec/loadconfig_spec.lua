@@ -170,11 +170,12 @@ describe("Load an entity with an empty input", function ()
   end)
 
   it("should create game state with default position", function ()
+    engine.getDimensions = function () return 800, 600 end
     engine.loadFromString(config)
 
     local playerPosition = engine.gameState.position.player
-    assert.are.same(0, playerPosition.x)
-    assert.are.same(0, playerPosition.y)
+    assert.are.same(400, playerPosition.x)
+    assert.are.same(300, playerPosition.y)
   end)
 
   it("should create game state with default velocity", function ()

@@ -2,6 +2,14 @@ local tinyyaml = require "engine.tinyyaml"
 
 local M = {}
 
+if love then
+  M.getDimensions = love.graphics.getDimensions
+else
+  M.getDimensions = function ()
+    return 0, 0
+  end
+end
+
 local componentNames = {
   input = "input",
   impulseSpeed = "impulseSpeed",
@@ -39,8 +47,9 @@ end
 
 local function createDefaults(entityName)
   setComponentAttribute(componentNames.impulseSpeed, entityName, "walk", 400)
-  setComponentAttribute(componentNames.position, entityName, "x", 0)
-  setComponentAttribute(componentNames.position, entityName, "y", 0)
+  local width, height = M.getDimensions()
+  setComponentAttribute(componentNames.position, entityName, "x", width/2)
+  setComponentAttribute(componentNames.position, entityName, "y", height/2)
   setComponentAttribute(componentNames.velocity, entityName, "x", 0)
   setComponentAttribute(componentNames.velocity, entityName, "y", 0)
 end
@@ -81,7 +90,7 @@ end
 function M.load(path)
   local paths = {path, "config.yaml", "config.yml"}
   local read = ""
-  for _, p in ipairs(paths) do
+  for _, p in pairs(paths) do
     local file, msg = io.open(p, "r")
     if file then
       read = file:read("*a")
@@ -93,9 +102,9 @@ function M.load(path)
 end
 
 function M.draw()
-  width, height = love.graphics.getDimensions()
-  position = (M.gameState or {}).position or {x=0, y=0}
-  love.graphics.points({position.x+width/2, position.y+height/2})
+  for entity, position in pairs((M.gameState or {}).position or {}) do
+    love.graphics.points({position.x, position.y})
+  end
 end
 
 return M
