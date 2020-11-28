@@ -1,14 +1,7 @@
 local tinyyaml = require "engine.tinyyaml"
+local love = require "engine.love"
 
 local M = {}
-
-if love then
-  M.getDimensions = love.graphics.getDimensions
-else
-  M.getDimensions = function ()
-    return 0, 0
-  end
-end
 
 local componentNames = {
   input = "input",
@@ -47,7 +40,7 @@ end
 
 local function createDefaults(entityName)
   setComponentAttribute(componentNames.impulseSpeed, entityName, "walk", 400)
-  local width, height = M.getDimensions()
+  local width, height = love.graphics.getDimensions()
   setComponentAttribute(componentNames.position, entityName, "x", width/2)
   setComponentAttribute(componentNames.position, entityName, "y", height/2)
   setComponentAttribute(componentNames.velocity, entityName, "x", 0)
