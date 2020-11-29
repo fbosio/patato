@@ -124,19 +124,19 @@ describe("Load some non movement keys", function ()
 end)
 
 describe("Load an empty entities list", function ()
-  it("should not create game state", function ()
+  it("should create an empty game state", function ()
     local config = [[
       entities:
     ]]
 
     local loadedConfig = loader.loadFromString(config)
 
-    assert.is.falsy(loadedConfig.gameState)
+    assert.are.same({}, loadedConfig.gameState)
   end)
 end)
 
 describe("Load an entity without components", function ()
-  it("should not create game state", function ()
+  it("should create an empty game state", function ()
     local config = [[
       entities:
         player:
@@ -144,7 +144,7 @@ describe("Load an entity without components", function ()
 
     local loadedConfig = loader.loadFromString(config)
 
-    assert.is.falsy(loadedConfig.gameState)
+    assert.are.same({}, loadedConfig.gameState)
   end)
 end)
 
@@ -245,7 +245,7 @@ describe("Load an entity with movement input and keys", function ()
 end)
 
 describe("Load an entity with only an empty speed list", function ()
-  it("should not create game", function ()
+  it("should create an empty game state", function ()
     local config = [[
       entities:
         player:
@@ -254,7 +254,7 @@ describe("Load an entity with only an empty speed list", function ()
 
     local loadedConfig = loader.loadFromString(config)
 
-    assert.is.falsy(loadedConfig.gameState)
+    assert.are.same({}, loadedConfig.gameState)
   end)
 end)
 

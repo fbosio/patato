@@ -15,7 +15,6 @@ end
 
 local function setComponentAttribute(result, componentName, entityName,
                                      attribute, value)
-  result.gameState = result.gameState or {}
   result.gameState[componentName] = result.gameState[componentName] or {}
   result.gameState[componentName][entityName] =
     result.gameState[componentName][entityName] or {}
@@ -64,8 +63,10 @@ function M.init(love)
 end
 
 function M.loadFromString(configYaml)
-  local config = #configYaml > 0 and tinyyaml.parse(configYaml) or {}
+  local config = tinyyaml.parse(configYaml) or {}
   local result = {}
+
+  result.gameState = {}
 
   result.world = isNull(config.world) and {} or config.world
   result.world.gravity = result.world.gravity or 0
