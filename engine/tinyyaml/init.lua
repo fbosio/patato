@@ -701,7 +701,7 @@ end
 local function parsedocuments(lines)
   lines = select(lines, function(s) return not isemptyline(s) end)
 
-  if sfind(lines[1], '^%%YAML') then tremove(lines, 1) end
+  if sfind(lines[1] or "", '^%%YAML') then tremove(lines, 1) end
 
   local root = {}
   local in_document = false
