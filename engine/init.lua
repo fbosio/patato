@@ -1,4 +1,5 @@
 local loader = require "engine.loader"
+local systems = require "engine.systems"
 
 local M = {}
 
@@ -18,8 +19,12 @@ function M.load(path)
   for k, v in pairs(config) do M[k] = v end
 end
 
+function M.update(dt)
+  systems.update(dt, M.keys, M.gameState)
+end
+
 function M.draw()
-  for entity, position in pairs((M.gameState or {}).position or {}) do
+  for entity, position in pairs(M.gameState.position or {}) do
     love.graphics.points({position.x, position.y})
   end
 end
