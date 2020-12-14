@@ -4,18 +4,18 @@ local systems = require "engine.systems"
 local M = {}
 
 function M.load(path)
-  local paths = {path, "config.yaml", "config.yml"}
-  local read = ""
-  for _, p in pairs(paths) do
-    local file, msg = io.open(p, "r")
-    if file then
-      read = file:read("*a")
-      file:close()
-      break
-    end
-  end
+  -- local paths = {path, "config.yaml", "config.yml"}
+  -- local read = ""
+  -- for _, p in pairs(paths) do
+  --   local file, msg = io.open(p, "r")
+  --   if file then
+  --     read = file:read("*a")
+  --     file:close()
+  --     break
+  --   end
+  -- end
   loader.init(love)
-  local config = loader.loadFromString(read)
+  local config = loader.loadFromString("")
   for k, v in pairs(config) do M[k] = v end
 end
 

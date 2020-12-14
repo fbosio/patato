@@ -1,4 +1,4 @@
-local tinyyaml = require "engine.tinyyaml"
+local config = require "config"
 
 local M = {}
 
@@ -8,10 +8,6 @@ local componentNames = {
   position = "position",
   velocity = "velocity"
 }
-
-local function isNull(parsedYaml)
-  return not parsedYaml or parsedYaml.isnull and parsedYaml.isnull()
-end
 
 local function setComponentAttribute(result, componentName, entityName,
                                      attribute, value)
@@ -28,9 +24,8 @@ local function copyInputToState(result, component, entityName)
     up = "up",
     down = "down"
   }
-  component = isNull(component) and defaultInput or component
-  for action, key in pairs(component) do
-    if result.keys[key] then
+  for action, key in pairs(defaultInput) do
+    if result.keys[key] and not component[action] then
       setComponentAttribute(result, componentNames.input, entityName, action,
                             key)
     end
@@ -63,21 +58,21 @@ function M.init(love)
 end
 
 function M.loadFromString(configYaml)
-  local config = tinyyaml.parse(configYaml) or {}
+  -- local config = tinyyaml.parse(configYaml) or {}
   local result = {}
 
   result.gameState = {}
 
-  result.world = isNull(config.world) and {} or config.world
+  result.world = config.world or {}
   result.world.gravity = result.world.gravity or 0
 
-  result.keys = isNull(config.keys) and {} or config.keys
+  result.keys = config.keys or {}
   result.keys.left = result.keys.left or "a"
   result.keys.right = result.keys.right or "d"
   result.keys.up = result.keys.up or "w"
   result.keys.down = result.keys.down or "s"
 
-  if not isNull(config.entities) then
+  if config.entities then
     for entityName, entity in pairs(config.entities) do
       for componentName, component in pairs(entity) do
         if componentName == componentNames.input then
