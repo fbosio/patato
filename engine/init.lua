@@ -4,7 +4,7 @@ local systems = require "engine.systems"
 
 local M = {}
 
-function M.load(path)
+function M.load()
   systems.load(love)
   resourcemanager.load(love)
   for k, v in pairs(resourcemanager.buildWorld(config)) do
