@@ -19,23 +19,26 @@ local omissions = {
   [{"up", "down"}] = function (v) v.y = 0 end,
 }
 
-function M.load(love)
-  M.love = love
-end
-
-function M.update(keys, inputs, velocity, impulseSpeed)
+local function doActionIfKeyIsDown(keys, inputs, velocity, impulseSpeed)
   local pressed = {}
-  inputs = inputs or {}
 
   for virtualKey, physicalKey in pairs(keys) do
     if M.love.keyboard.isDown(physicalKey) then
       pressed[#pressed+1] = virtualKey
-      for entity, _ in pairs(inputs) do
-        actions[virtualKey](velocity[entity], impulseSpeed[entity])
+      for entity, input in pairs(inputs) do
+        for inputName, inputKey in pairs(input) do
+          if inputKey == virtualKey then
+            actions[inputName](velocity[entity], impulseSpeed[entity])
+          end
+        end
       end
     end
   end
 
+  return pressed
+end
+
+local function doOmissionIfKeyIsUp(pressed, inputs, velocity)
   for omittedKeys, omission in pairs(omissions) do
     local mustOmit = true
 
@@ -48,11 +51,32 @@ function M.update(keys, inputs, velocity, impulseSpeed)
     end
 
     if mustOmit then
-      for entity, _ in pairs(inputs) do
-        omission(velocity[entity])
+      for entity, input in pairs(inputs) do
+        for _, inputKey in pairs(input) do
+          for _, omittedKey in ipairs(omittedKeys) do
+            -- Hay que diferenciar entre inputName e inputKey
+            -- presionar left no es lo mismo que presionar left2
+            -- aun asi ambos inputKeys apuntan al mismo inputName: left
+            -- ARMAR TESTS
+            if omittedKey == inputKey then
+              omission(velocity[entity])
+            end
+          end
+        end
       end
     end
   end
+end
+
+function M.load(love)
+  M.love = love
+end
+
+function M.update(keys, inputs, velocity, impulseSpeed)
+  inputs = inputs or {}
+
+  local pressed = doActionIfKeyIsDown(keys, inputs, velocity, impulseSpeed)
+  doOmissionIfKeyIsUp(pressed, inputs, velocity)
 end
 
 return M
