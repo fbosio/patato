@@ -1,3 +1,4 @@
+local config = require "config"
 local loader = require "engine.loader"
 local systems = require "engine.systems"
 
@@ -15,8 +16,9 @@ function M.load(path)
   --   end
   -- end
   loader.init(love)
-  local config = loader.loadFromString("")
-  for k, v in pairs(config) do M[k] = v end
+  for k, v in pairs(loader.loadFromTable(config)) do
+    M[k] = v
+  end
 end
 
 function M.update(dt)

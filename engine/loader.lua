@@ -1,5 +1,3 @@
-local config = require "config"
-
 local M = {}
 
 local componentNames = {
@@ -17,15 +15,18 @@ local function setComponentAttribute(result, componentName, entityName,
   result.gameState[componentName][entityName][attribute] = value
 end
 
-local function copyInputToState(result, component, entityName)
+local function copyInputToState(result, input, entityName)
   local defaultInput = {
     left = "left",
     right = "right",
     up = "up",
     down = "down"
   }
-  for action, key in pairs(defaultInput) do
-    if result.keys[key] and not component[action] then
+  for action, defaultKey in pairs(defaultInput) do
+    input[action] = input[action] or defaultKey
+  end
+  for action, key in pairs(input) do
+    if result.keys[key] then
       setComponentAttribute(result, componentNames.input, entityName, action,
                             key)
     end
@@ -57,7 +58,7 @@ function M.init(love)
   M.love = love
 end
 
-function M.loadFromString(configYaml)
+function M.loadFromTable(config)
   -- local config = tinyyaml.parse(configYaml) or {}
   local result = {}
 

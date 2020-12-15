@@ -1,7 +1,7 @@
 local controller = require "engine.systems.controller"
 local transporter = require "engine.systems.transporter"
 
-M = {}
+local M = {}
 
 function M.update(dt, keys, st)
   controller.update(keys, st.input, st.velocity, st.impulseSpeed)

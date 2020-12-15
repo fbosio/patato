@@ -15,17 +15,17 @@ end)
 
 describe("Load an empty config", function ()
   it("should load a world with zero gravity", function ()
-    local config = ""
+    local config = {}
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same(0, loadedConfig.world.gravity)
   end)
 
   it("should map ASWD keys", function ()
-    local config = ""
+    local config = {}
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same("a", loadedConfig.keys.left)
     assert.are.same("d", loadedConfig.keys.right)
@@ -36,9 +36,9 @@ end)
 
 describe("Load an empty world", function ()
   it("should load a world with zero gravity", function ()
-    local config = "world:"
+    local config = {world = {}}
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same(0, loadedConfig.world.gravity)
   end)
@@ -46,12 +46,13 @@ end)
 
 describe("Load world with gravity", function ()
   it("should copy the defined world", function ()
-    local config = [[
-      world:
-        gravity: 500
-    ]]
+    local config = {
+      world = {
+        gravity = 500
+      }
+    }
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same(500, loadedConfig.world.gravity)
   end)
@@ -59,9 +60,9 @@ end)
 
 describe("Load an empty keys structure", function ()
   it("should load a world with default movement keys", function ()
-    local config = "keys:"
+    local config = {keys = {}}
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same("a", loadedConfig.keys.left)
     assert.are.same("d", loadedConfig.keys.right)
@@ -71,18 +72,18 @@ describe("Load an empty keys structure", function ()
 end)
 
 describe("Load all movement keys", function ()
-  local config
 
   it("should copy the defined keys", function ()
-    local config = [[
-      keys:
-        left: j
-        right: l
-        up: i
-        down: k
-    ]]
+    local config = {
+      keys = {
+        left = "j",
+        right = "l",
+        up = "i",
+        down = "k"
+      }
+    }
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same("j", loadedConfig.keys.left)
     assert.are.same("l", loadedConfig.keys.right)
@@ -93,13 +94,14 @@ end)
 
 describe("Load some movement keys", function ()
   it("should fill lacking keys with default values", function ()
-    local config = [[
-      keys:
-        left: j
-        down: k
-    ]]
+    local config = {
+      keys = {
+        left = "j",
+        down = "k"
+      }
+    }
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same("j", loadedConfig.keys.left)
     assert.are.same("d", loadedConfig.keys.right)
@@ -110,13 +112,14 @@ end)
 
 describe("Load some non movement keys", function ()
   it("should copy the defined keys to loader", function ()
-    local config = [[
-      keys:
-        super cool action 1: j
-        super cool action 2: k
-    ]]
+    local config = {
+      keys = {
+        ["super cool action 1"] = "j",
+        ["super cool action 2"] = "k"
+      }
+    }
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same("j", loadedConfig.keys["super cool action 1"])
     assert.are.same("k", loadedConfig.keys["super cool action 2"])
@@ -125,11 +128,11 @@ end)
 
 describe("Load an empty entities list", function ()
   it("should create an empty game state", function ()
-    local config = [[
-      entities:
-    ]]
+    local config = {
+      entities = {}
+    }
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same({}, loadedConfig.gameState)
   end)
@@ -137,12 +140,13 @@ end)
 
 describe("Load an entity without components", function ()
   it("should create an empty game state", function ()
-    local config = [[
-      entities:
-        player:
-    ]]
+    local config = {
+      entities = {
+        player = {}
+      }
+    }
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same({}, loadedConfig.gameState)
   end)
@@ -151,15 +155,17 @@ end)
 describe("Load an entity with an empty input", function ()
   local config
   before_each(function ()
-    config = [[
-      entities:
-        player:
-          input:
-    ]]
+    config = {
+      entities = {
+        player = {
+          input = {}
+        }
+      }
+    }
   end)
 
   it("should create game state with input as default keys", function ()
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     local playerInput = loadedConfig.gameState.input.player
     assert.are.same("left", playerInput.left)
@@ -169,13 +175,13 @@ describe("Load an entity with an empty input", function ()
   end)
 
   it("should create game state with default walk speed", function ()
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same(400, loadedConfig.gameState.impulseSpeed.player.walk)
   end)
 
   it("should create game state with default position", function ()
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     local playerPosition = loadedConfig.gameState.position.player
     assert.are.same(400, playerPosition.x)
@@ -183,7 +189,7 @@ describe("Load an entity with an empty input", function ()
   end)
 
   it("should create game state with default velocity", function ()
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     local playerVelocity = loadedConfig.gameState.velocity.player
     assert.are.same(0, playerVelocity.x)
@@ -193,21 +199,25 @@ end)
 
 describe("Load an entity with movement input and lacking keys", function ()
   it("should copy the defined keys and ignore the rest", function ()
-    local config = [[
-      keys:
-        left2: j
-        right2: l
-        down2: k
-      entities:
-        player:
-          input:
-            left: left2
-            right: right2
-            up: up2
-            down: down2
-    ]]
+    local config = {
+      keys = {
+        left2 = "j",
+        right2 = "l",
+        down2 = "k"
+      },
+      entities = {
+        player = {
+          input = {
+            left = "left2",
+            right = "right2",
+            up = "up2",
+            down = "down2"
+          }
+        }
+      }
+    }
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     local playerInput = loadedConfig.gameState.input.player
     assert.are.same("left2", playerInput.left)
@@ -219,22 +229,26 @@ end)
 
 describe("Load an entity with movement input and keys", function ()
   it("should copy the defined keys to the component", function ()
-    local config = [[
-      keys:
-        left2: j
-        right2: l
-        up2: i
-        down2: k
-      entities:
-        player:
-          input:
-            left: left2
-            right: right2
-            up: up2
-            down: down2
-    ]]
+    local config = {
+      keys = {
+        left2 = "j",
+        right2 = "l",
+        up2 = "i",
+        down2 = "k"
+      },
+      entities = {
+        player = {
+          input = {
+            left = "left2",
+            right = "right2",
+            up = "up2",
+            down = "down2"
+          }
+        }
+      }
+    }
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     local playerInput = loadedConfig.gameState.input.player
     assert.are.same("left2", playerInput.left)
@@ -246,13 +260,15 @@ end)
 
 describe("Load an entity with only an empty speed list", function ()
   it("should create an empty game state", function ()
-    local config = [[
-      entities:
-        player:
-          impulseSpeed:
-    ]]
+    local config = {
+      entities = {
+        player = {
+          impulseSpeed = {}
+        }
+      }
+    }
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     assert.are.same({}, loadedConfig.gameState)
   end)
@@ -260,17 +276,20 @@ end)
 
 describe("Load an entity with impulse speeds", function ()
   it("should copy the define speeds to the component", function ()
-    local config = [[
-      entities:
-        player:
-          impulseSpeed:
-            walk: 400
-            crouchWalk: 200
-            jump: 1200
-            climb: 400
-    ]]
+    local config = {
+      entities = {
+        player = {
+          impulseSpeed = {
+            walk = 400,
+            crouchWalk = 200,
+            jump = 1200,
+            climb = 400
+          }
+        }
+      }
+    }
 
-    local loadedConfig = loader.loadFromString(config)
+    local loadedConfig = loader.loadFromTable(config)
 
     local playerSpeed = loadedConfig.gameState.impulseSpeed.player
     assert.are.same(400, playerSpeed.walk)
