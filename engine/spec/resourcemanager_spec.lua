@@ -1,36 +1,37 @@
-local loader
+local config = require "config"
+local resourcemanager
 
 before_each(function ()
-  loader = require "engine.loader"
+  resourcemanager = require "engine.resourcemanager"
   local loveMock = {graphics = {}}
   function loveMock.graphics.getDimensions()
     return 800, 600
   end
-  loader.init(loveMock)
+  resourcemanager.load(loveMock)
 end)
 
 after_each(function ()
-  package.loaded.loader = nil
+  package.loaded.resourcemanager = nil
 end)
 
 describe("Load an empty config", function ()
+  local emptyConfig = {}
+  local loadedEmptyConfig
+
+  before_each(function ()
+    emptyConfig = {}
+    loadedEmptyConfig = resourcemanager.buildWorld(emptyConfig)
+  end)
+  
   it("should load a world with zero gravity", function ()
-    local config = {}
-
-    local loadedConfig = loader.loadFromTable(config)
-
-    assert.are.same(0, loadedConfig.world.gravity)
+    assert.are.same(0, loadedEmptyConfig.world.gravity)
   end)
 
   it("should map ASWD keys", function ()
-    local config = {}
-
-    local loadedConfig = loader.loadFromTable(config)
-
-    assert.are.same("a", loadedConfig.keys.left)
-    assert.are.same("d", loadedConfig.keys.right)
-    assert.are.same("w", loadedConfig.keys.up)
-    assert.are.same("s", loadedConfig.keys.down)
+    assert.are.same("a", loadedEmptyConfig.keys.left)
+    assert.are.same("d", loadedEmptyConfig.keys.right)
+    assert.are.same("w", loadedEmptyConfig.keys.up)
+    assert.are.same("s", loadedEmptyConfig.keys.down)
   end)
 end)
 
@@ -38,7 +39,7 @@ describe("Load an empty world", function ()
   it("should load a world with zero gravity", function ()
     local config = {world = {}}
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     assert.are.same(0, loadedConfig.world.gravity)
   end)
@@ -52,7 +53,7 @@ describe("Load world with gravity", function ()
       }
     }
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     assert.are.same(500, loadedConfig.world.gravity)
   end)
@@ -62,7 +63,7 @@ describe("Load an empty keys structure", function ()
   it("should load a world with default movement keys", function ()
     local config = {keys = {}}
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     assert.are.same("a", loadedConfig.keys.left)
     assert.are.same("d", loadedConfig.keys.right)
@@ -83,7 +84,7 @@ describe("Load all movement keys", function ()
       }
     }
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     assert.are.same("j", loadedConfig.keys.left)
     assert.are.same("l", loadedConfig.keys.right)
@@ -101,7 +102,7 @@ describe("Load some movement keys", function ()
       }
     }
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     assert.are.same("j", loadedConfig.keys.left)
     assert.are.same("d", loadedConfig.keys.right)
@@ -111,7 +112,7 @@ describe("Load some movement keys", function ()
 end)
 
 describe("Load some non movement keys", function ()
-  it("should copy the defined keys to loader", function ()
+  it("should copy the defined keys to resourcemanager", function ()
     local config = {
       keys = {
         ["super cool action 1"] = "j",
@@ -119,7 +120,7 @@ describe("Load some non movement keys", function ()
       }
     }
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     assert.are.same("j", loadedConfig.keys["super cool action 1"])
     assert.are.same("k", loadedConfig.keys["super cool action 2"])
@@ -132,7 +133,7 @@ describe("Load an empty entities list", function ()
       entities = {}
     }
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     assert.are.same({}, loadedConfig.gameState)
   end)
@@ -146,7 +147,7 @@ describe("Load an entity without components", function ()
       }
     }
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     assert.are.same({}, loadedConfig.gameState)
   end)
@@ -165,7 +166,7 @@ describe("Load an entity with an empty input", function ()
   end)
 
   it("should create game state with input as default keys", function ()
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     local playerInput = loadedConfig.gameState.input.player
     assert.are.same("left", playerInput.left)
@@ -175,13 +176,13 @@ describe("Load an entity with an empty input", function ()
   end)
 
   it("should create game state with default walk speed", function ()
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     assert.are.same(400, loadedConfig.gameState.impulseSpeed.player.walk)
   end)
 
   it("should create game state with default position", function ()
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     local playerPosition = loadedConfig.gameState.position.player
     assert.are.same(400, playerPosition.x)
@@ -189,7 +190,7 @@ describe("Load an entity with an empty input", function ()
   end)
 
   it("should create game state with default velocity", function ()
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     local playerVelocity = loadedConfig.gameState.velocity.player
     assert.are.same(0, playerVelocity.x)
@@ -217,7 +218,7 @@ describe("Load an entity with movement input and lacking keys", function ()
       }
     }
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     local playerInput = loadedConfig.gameState.input.player
     assert.are.same("left2", playerInput.left)
@@ -248,7 +249,7 @@ describe("Load an entity with movement input and keys", function ()
       }
     }
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     local playerInput = loadedConfig.gameState.input.player
     assert.are.same("left2", playerInput.left)
@@ -268,7 +269,7 @@ describe("Load an entity with only an empty speed list", function ()
       }
     }
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     assert.are.same({}, loadedConfig.gameState)
   end)
@@ -289,7 +290,7 @@ describe("Load an entity with impulse speeds", function ()
       }
     }
 
-    local loadedConfig = loader.loadFromTable(config)
+    local loadedConfig = resourcemanager.buildWorld(config)
 
     local playerSpeed = loadedConfig.gameState.impulseSpeed.player
     assert.are.same(400, playerSpeed.walk)

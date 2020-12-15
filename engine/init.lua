@@ -1,22 +1,13 @@
 local config = require "config"
-local loader = require "engine.loader"
+local resourcemanager = require "engine.resourcemanager"
 local systems = require "engine.systems"
 
 local M = {}
 
 function M.load(path)
-  -- local paths = {path, "config.yaml", "config.yml"}
-  -- local read = ""
-  -- for _, p in pairs(paths) do
-  --   local file, msg = io.open(p, "r")
-  --   if file then
-  --     read = file:read("*a")
-  --     file:close()
-  --     break
-  --   end
-  -- end
-  loader.init(love)
-  for k, v in pairs(loader.loadFromTable(config)) do
+  systems.load(love)
+  resourcemanager.load(love)
+  for k, v in pairs(resourcemanager.buildWorld(config)) do
     M[k] = v
   end
 end

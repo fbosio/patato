@@ -1,10 +1,10 @@
 local M = {}
 
-M.entities = {
-  patato = {
-    input = {
-    }
-  }
-}
+-- M.entities = {
+--   patato = {
+--     input = {
+--     }
+--   }
+-- }
 
 return M

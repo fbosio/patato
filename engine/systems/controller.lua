@@ -19,13 +19,18 @@ local omissions = {
   [{"up", "down"}] = function (v) v.y = 0 end,
 }
 
+function M.load(love)
+  M.love = love
+end
+
 function M.update(keys, inputs, velocity, impulseSpeed)
   local pressed = {}
+  inputs = inputs or {}
 
   for virtualKey, physicalKey in pairs(keys) do
-    if love.keyboard.isDown(physicalKey) then
+    if M.love.keyboard.isDown(physicalKey) then
       pressed[#pressed+1] = virtualKey
-      for entity, input in pairs(inputs) do
+      for entity, _ in pairs(inputs) do
         actions[virtualKey](velocity[entity], impulseSpeed[entity])
       end
     end
@@ -34,8 +39,8 @@ function M.update(keys, inputs, velocity, impulseSpeed)
   for omittedKeys, omission in pairs(omissions) do
     local mustOmit = true
 
-    for __, omittedKey in ipairs(omittedKeys) do
-      for __, pressedKey in ipairs(pressed) do
+    for _, omittedKey in ipairs(omittedKeys) do
+      for _, pressedKey in ipairs(pressed) do
         if pressedKey == omittedKey then
           mustOmit = false
         end
@@ -43,7 +48,7 @@ function M.update(keys, inputs, velocity, impulseSpeed)
     end
 
     if mustOmit then
-      for entity, input in pairs(inputs) do
+      for entity, _ in pairs(inputs) do
         omission(velocity[entity])
       end
     end

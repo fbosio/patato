@@ -54,12 +54,11 @@ local function copyImpulseSpeedToState(result, component, entityName)
   end
 end
 
-function M.init(love)
+function M.load(love)
   M.love = love
 end
 
-function M.loadFromTable(config)
-  -- local config = tinyyaml.parse(configYaml) or {}
+function M.buildWorld(config)
   local result = {}
 
   result.gameState = {}
