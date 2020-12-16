@@ -8,6 +8,15 @@ if not pcall(function() config = require "config" end) then
     }
   }
 end
+if type(config) ~= "table" then
+  local message = "Incorrect config, received " .. type(config) .. "."
+  if type(config) == "boolean" and config then
+    message = message .. "\n"
+                      .. "Probably config.lua is empty or you forgot the "
+                      .. '"return M" statement.'
+  end
+  error(message)
+end
 
 local resourcemanager = require "engine.resourcemanager"
 local systems = require "engine.systems"
