@@ -1,4 +1,14 @@
-local config = require "config"
+local config
+if not pcall(function() config = require "config" end) then
+  config = {
+    entities = {
+      player = {
+        input = {}
+      }
+    }
+  }
+end
+
 local resourcemanager = require "engine.resourcemanager"
 local systems = require "engine.systems"
 

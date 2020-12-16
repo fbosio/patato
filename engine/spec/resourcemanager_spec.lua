@@ -1,4 +1,3 @@
-local config = require "config"
 local resourcemanager
 
 before_each(function ()
@@ -73,7 +72,6 @@ describe("Load an empty keys structure", function ()
 end)
 
 describe("Load all movement keys", function ()
-
   it("should copy the defined keys", function ()
     local config = {
       keys = {
@@ -209,10 +207,10 @@ describe("Load an entity with movement input and lacking keys", function ()
       entities = {
         player = {
           input = {
-            left = "left2",
-            right = "right2",
-            up = "up2",
-            down = "down2"
+            walkLeft = "left2",
+            walkRight = "right2",
+            walkUp = "up2",
+            walkDown = "down2"
           }
         }
       }
@@ -221,10 +219,28 @@ describe("Load an entity with movement input and lacking keys", function ()
     local loadedConfig = resourcemanager.buildWorld(config)
 
     local playerInput = loadedConfig.gameState.input.player
-    assert.are.same("left2", playerInput.left)
-    assert.are.same("right2", playerInput.right)
-    assert.is.falsy(playerInput.up)
-    assert.are.same("down2", playerInput.down)
+    assert.are.same("left2", playerInput.walkLeft)
+    assert.are.same("right2", playerInput.walkRight)
+    assert.is.falsy(playerInput.walkUp)
+    assert.are.same("down2", playerInput.walkDown)
+  end)
+end)
+
+describe("Load an entity with lacking movement input", function ()
+  it("should not set lacking input", function ()
+    local config = {
+      entities = {
+        player = {
+          input = {
+            walkLeft = "left"
+          }
+        }
+      }
+    }
+
+    local loadedConfig = resourcemanager.buildWorld(config)
+
+    assert.are.falsy(loadedConfig.gameState.input.player.walkRight)
   end)
 end)
 
@@ -240,10 +256,10 @@ describe("Load an entity with movement input and keys", function ()
       entities = {
         player = {
           input = {
-            left = "left2",
-            right = "right2",
-            up = "up2",
-            down = "down2"
+            walkLeft = "left2",
+            walkRight = "right2",
+            walkUp = "up2",
+            walkDown = "down2"
           }
         }
       }
@@ -252,10 +268,10 @@ describe("Load an entity with movement input and keys", function ()
     local loadedConfig = resourcemanager.buildWorld(config)
 
     local playerInput = loadedConfig.gameState.input.player
-    assert.are.same("left2", playerInput.left)
-    assert.are.same("right2", playerInput.right)
-    assert.are.same("up2", playerInput.up)
-    assert.are.same("down2", playerInput.down)
+    assert.are.same("left2", playerInput.walkLeft)
+    assert.are.same("right2", playerInput.walkRight)
+    assert.are.same("up2", playerInput.walkUp)
+    assert.are.same("down2", playerInput.walkDown)
   end)
 end)
 

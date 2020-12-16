@@ -3,6 +3,8 @@ local M = {}
 local actions = {
   walkLeft = function (v, s) v.x = -s.walk end,
   walkRight = function (v, s) v.x = s.walk end,
+  walkUp = function (v, s) v.y = -s.walk end,
+  walkDown = function (v, s) v.y = s.walk end,
 }
 setmetatable(actions, {
   __index = function ()
@@ -12,6 +14,7 @@ setmetatable(actions, {
 
 local omissions = {
   [{"walkLeft", "walkRight"}] = function (v) v.x = 0 end,
+  [{"walkUp", "walkDown"}] = function (v) v.y = 0 end,
 }
 
 local function doActionIfKeyIsDown(keys, input, velocity, impulseSpeed)

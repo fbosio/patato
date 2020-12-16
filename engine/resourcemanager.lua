@@ -22,8 +22,10 @@ local function copyInputToState(result, input, entityName)
     walkUp = "up",
     walkDown = "down"
   }
-  for actionName, defaultKey in pairs(defaultInput) do
-    input[actionName] = input[actionName] or defaultKey
+  if not next(input) then  -- check that input (non-boolean) is an empty table
+    for actionName, defaultKey in pairs(defaultInput) do
+      input[actionName] = input[actionName] or defaultKey
+    end
   end
   for actionName, virtualKey in pairs(input) do
     if result.keys[virtualKey] then
