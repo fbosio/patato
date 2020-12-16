@@ -1,8 +1,98 @@
 # Patato Man
-A platform adventure video game, ported with Löve2D.
+A platform adventure video game, ported with [Löve2D](https://love2d.org/).
 
 ![test](https://github.com/fbosio/patato/workflows/test/badge.svg)
 
+
+## Engine
+The engine has three functions, similar to those in [Löve2D](https://love2d.org/).
+
+* `load()`
+* `update(dt)`
+* `draw()`
+
+In its simplest form, the engine is used like follows.
+
+Create a `main.lua` file along with the `engine` directory that contains the Game engine.
+```lua
+local engine = require "engine"
+
+function love.load()
+  engine.load()
+end
+
+function love.update(dt)
+  engine.update(dt)
+end
+
+function love.draw()
+  engine.draw()
+end
+```
+
+After running `love .` in the directory that contains those files, a window with one character, drawn as a point, is loaded.
+The character movement is controlled by the AWSD keys.
+
+### Configuration file
+Create a `config.lua` file along with `main.lua` and `engine/`.
+**The file must be non empty**, because is loaded as a module.
+
+* In its simplest form, the file looks like this.
+  ```lua
+  local M = {}
+
+  return M
+  ```
+  When `main.lua` is run with [Löve2D](https://love2d.org/), an empty window is opened.
+* Game with one player.
+   ```lua
+  local M = {}
+  
+  M.entities = {
+    myPlayer = {
+      input = {}
+    }
+  }
+  
+  return M
+  ```
+  This is the same configuration that is used when no `config.lua` file is present.
+* More options
+  ```lua
+  local M = {}
+
+  M.keys = {
+    left2 = "j",
+    right2 = "l"
+  }
+
+  M.entities = {
+    playerOne = {
+      input = {
+      }
+    },
+    playerTwo = {
+      input = {
+        walkLeft = "left2",
+        walkRight = "right2"
+      },
+      impulseSpeed = {
+        walk = 100
+      }
+    }
+  }
+
+  return M
+  ```
+  Now the game is loaded with two players in it.
+  - `playerOne` is moved by pressing the AWSD keys, because that is what the engine does by default.
+  - `playerTwo` is moved only in the horizontal direction by pressing the `"left2"` and `"right2"` keys, which are mapped to the J and L physical keys of the keyboard by the `keys` table, defined above.
+  - `impulseSpeed` defines how fast each player moves when the corresponding keys are pressed.
+    + `playerOne` walk speed is implicitly defined by the engine.
+    + `playerTwo` walk speed is explicitly defined as `100` by the `walk` field in the `impulseSpeed` table.
+
+
+## Specs
 | Game | Engine  |
 |------|---------|
 | Specific | General |
