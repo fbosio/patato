@@ -47,8 +47,9 @@ describe("With one player with AD as walking input", function ()
   end)
 
   describe("pressing A key", function ()
+    local loveMock = {keyboard = {}}
+
     before_each(function ()
-      local loveMock = {keyboard = {}}
       loveMock.keyboard.isDown = function (key)
         return key == "a"
       end
@@ -60,11 +61,28 @@ describe("With one player with AD as walking input", function ()
 
       assert.are.same(-impulseSpeed.playerOne.walk, velocity.playerOne.x)
     end)
+
+    describe("and then leaving it", function ()
+      before_each(function ()
+        controller.update(keys, inputs, velocity, impulseSpeed)
+
+        loveMock.keyboard.isDown = function ()
+          return false
+        end
+      end)
+
+      it("should set the velocity to zero", function ()
+        controller.update(keys, inputs, velocity, impulseSpeed)
+
+        assert.are.same(0, velocity.playerOne.x)
+      end)
+    end)
   end)
 
   describe("pressing D key", function ()
+    local loveMock = {keyboard = {}}
+
     before_each(function ()
-      local loveMock = {keyboard = {}}
       loveMock.keyboard.isDown = function (key)
         return key == "d"
       end
@@ -75,6 +93,22 @@ describe("With one player with AD as walking input", function ()
       controller.update(keys, inputs, velocity, impulseSpeed)
 
       assert.are.same(impulseSpeed.playerOne.walk, velocity.playerOne.x)
+    end)
+
+    describe("and then leaving it", function ()
+      before_each(function ()
+        controller.update(keys, inputs, velocity, impulseSpeed)
+
+        loveMock.keyboard.isDown = function ()
+          return false
+        end
+      end)
+
+      it("should set the velocity to zero", function ()
+        controller.update(keys, inputs, velocity, impulseSpeed)
+
+        assert.are.same(0, velocity.playerOne.x)
+      end)
     end)
   end)
 end)
@@ -161,8 +195,9 @@ describe("With two players with AD and JL as walking input", function ()
   end)
 
   describe("pressing J key", function ()
+    local loveMock = {keyboard = {}}
+
     before_each(function ()
-      local loveMock = {keyboard = {}}
       loveMock.keyboard.isDown = function (key)
         return key == "j"
       end
@@ -174,6 +209,22 @@ describe("With two players with AD and JL as walking input", function ()
 
       assert.are.same(0, velocity.playerOne.x)
       assert.are.same(-impulseSpeed.playerTwo.walk, velocity.playerTwo.x)
+    end)
+
+    describe("and then leaving it", function ()
+      before_each(function ()
+        controller.update(keys, inputs, velocity, impulseSpeed)
+
+        loveMock.keyboard.isDown = function ()
+          return false
+        end
+      end)
+
+      it("should set player two velocity to zero", function ()
+        controller.update(keys, inputs, velocity, impulseSpeed)
+
+        assert.are.same(0, velocity.playerTwo.x)
+      end)
     end)
   end)
 

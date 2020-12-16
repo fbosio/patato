@@ -39,26 +39,26 @@ local function doActionIfKeyIsDown(keys, inputs, velocity, impulseSpeed)
 end
 
 local function doOmissionIfKeyIsUp(pressed, inputs, velocity)
-  for omittedKeys, omission in pairs(omissions) do
+  for omittedActions, omission in pairs(omissions) do
     local mustOmit = true
 
-    for _, omittedKey in ipairs(omittedKeys) do
+    for _, omittedAction in ipairs(omittedActions) do
       for _, pressedKey in ipairs(pressed) do
-        if pressedKey == omittedKey then
-          mustOmit = false
+        for _, input in pairs(inputs) do
+          for inputAction, inputKey in pairs(input) do
+            if inputKey == pressedKey and inputAction == omittedAction then
+              mustOmit = false
+            end
+          end
         end
       end
     end
 
     if mustOmit then
       for entity, input in pairs(inputs) do
-        for _, inputKey in pairs(input) do
-          for _, omittedKey in ipairs(omittedKeys) do
-            -- Hay que diferenciar entre inputName e inputKey
-            -- presionar left no es lo mismo que presionar left2
-            -- aun asi ambos inputKeys apuntan al mismo inputName: left
-            -- ARMAR TESTS
-            if omittedKey == inputKey then
+        for inputAction, _ in pairs(input) do
+          for _, omittedAction in ipairs(omittedActions) do
+            if omittedAction == inputAction then
               omission(velocity[entity])
             end
           end
