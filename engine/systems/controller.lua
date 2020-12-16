@@ -5,12 +5,8 @@ local actions = {
   walkRight = function (v, s) v.x = s.walk end,
 }
 setmetatable(actions, {
-  __index = function (t, k)
-    if not rawget(t, k) then
-      return function () end
-    else
-      return t[k]
-    end
+  __index = function ()
+    return function () end
   end
 })
 
