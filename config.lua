@@ -14,8 +14,8 @@ M.entities = {
   },
   bee = {
     input = {
-      left = "left2",
-      right = "right2"
+      walkLeft = "left2",
+      walkRight = "right2"
     }
   }
 }

@@ -169,10 +169,10 @@ describe("Load an entity with an empty input", function ()
     local loadedConfig = resourcemanager.buildWorld(config)
 
     local playerInput = loadedConfig.gameState.input.player
-    assert.are.same("left", playerInput.left)
-    assert.are.same("right", playerInput.right)
-    assert.are.same("up", playerInput.up)
-    assert.are.same("down", playerInput.down)
+    assert.are.same("left", playerInput.walkLeft)
+    assert.are.same("right", playerInput.walkRight)
+    assert.are.same("up", playerInput.walkUp)
+    assert.are.same("down", playerInput.walkDown)
   end)
 
   it("should create game state with default walk speed", function ()

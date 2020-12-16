@@ -18,8 +18,8 @@ describe("With one player with AD as walking input", function ()
     }
     inputs = {
       playerOne = {
-        left = "left",
-        right = "right"
+        walkLeft = "left",
+        walkRight = "right"
       }
     }
     velocity = {
@@ -125,12 +125,12 @@ describe("With two players with AD and JL as walking input", function ()
     }
     inputs = {
       playerOne = {
-        left = "left",
-        right = "right"
+        walkLeft = "left",
+        walkRight = "right"
       },
       playerTwo = {
-        left = "left2",
-        right = "right2"
+        walkLeft = "left2",
+        walkRight = "right2"
       }
     }
     velocity = {

@@ -17,18 +17,18 @@ end
 
 local function copyInputToState(result, input, entityName)
   local defaultInput = {
-    left = "left",
-    right = "right",
-    up = "up",
-    down = "down"
+    walkLeft = "left",
+    walkRight = "right",
+    walkUp = "up",
+    walkDown = "down"
   }
-  for action, defaultKey in pairs(defaultInput) do
-    input[action] = input[action] or defaultKey
+  for actionName, defaultKey in pairs(defaultInput) do
+    input[actionName] = input[actionName] or defaultKey
   end
-  for action, key in pairs(input) do
-    if result.keys[key] then
-      setComponentAttribute(result, componentNames.input, entityName, action,
-                            key)
+  for actionName, virtualKey in pairs(input) do
+    if result.keys[virtualKey] then
+      setComponentAttribute(result, componentNames.input, entityName,
+                            actionName, virtualKey)
     end
   end
 end
