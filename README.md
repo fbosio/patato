@@ -5,11 +5,16 @@ A platform adventure video game, ported with [Löve2D](https://love2d.org/).
 
 
 ## Engine
-The engine has three functions, similar to those in [Löve2D](https://love2d.org/).
+The engine API has **events** and **public functions**.
 
-* `load()`
-* `update(dt)`
-* `draw()`
+* **Four events**, similar to those in [Löve2D](https://love2d.org/).
+  - `load()`
+  - `update(dt)`
+  - `draw()`
+  - `keypressed(key)`
+* **Two public functions**
+  - `startGame(levelName)`
+  - `setMenuOption(entity, index, callback)`
 
 In its simplest form, the engine is used like follows.
 
@@ -31,19 +36,20 @@ end
 ```
 
 After running `love .` in the directory that contains those files, a window with one character, drawn as a point, is loaded.
-The character movement is controlled by the AWSD keys.
+The character movement is controlled by the AWSD keys by default.
 
 ### Configuration file
 Create a `config.lua` file along with `main.lua` and `engine/`.
 **The file must be non empty**, because is loaded as a module.
+The engine displays an error if `config.lua` is empty or lacks a `return M` statement, where `M` is the engine module table.
 
-* In its simplest form, the file looks like this.
+* In its simplest form, `config.lua` looks like this.
   ```lua
   local M = {}
 
   return M
   ```
-  When `main.lua` is run with [Löve2D](https://love2d.org/), an empty window is opened.
+  When `main.lua` is run with [Löve2D](https://love2d.org/) using this configuration, an empty window is opened.
 * Game with one player.
    ```lua
   local M = {}
@@ -90,6 +96,103 @@ Create a `config.lua` file along with `main.lua` and `engine/`.
   - `impulseSpeed` defines how fast each player moves when the corresponding keys are pressed.
     + `playerOne` walk speed is implicitly defined by the engine.
     + `playerTwo` walk speed is explicitly defined as `100` by the `walk` field in the `impulseSpeed` table.
+
+### Menu
+For the engine, a menu is just another entity with a `menu` component attached to it.
+Here's an example `config.lua` that defines a menu with two options:
+
+1. Start game.
+2. Print a message on screen.
+
+```lua
+local M = {}
+
+M.entities = {
+  player = {
+    input = {}
+  },
+  mainMenu = {
+    input = {},
+    menu = {
+      options = {"Start", "Show message"},
+    }
+  }
+}
+
+return M
+```
+
+In order for the menu to do actually _something_, a more elaborated `main.lua` is required.
+```lua
+local engine = require "engine"
+local elapsed, showingMessage
+
+
+function love.load()
+  engine.load()
+
+  -- setMenuOption(entity, index, callback)
+  engine.setMenuOption("mainMenu", 1, function ()
+    engine.startGame()
+  end)
+  engine.setMenuOption("mainMenu", 2, function ()
+    elapsed = 0
+    showingMessage = true
+  end)
+end
+
+function love.update(dt)
+  engine.update(dt)
+
+  if elapsed then
+    elapsed = elapsed + dt
+    if elapsed > 1 then
+      elapsed = nil
+      showingMessage = false
+    end
+  end
+end
+
+function love.draw()
+  engine.draw()
+
+  if showingMessage then
+    love.graphics.print("Get up for the down stroke!", 0, 0)
+  end
+end
+
+function love.keypressed(key)
+  engine.keypressed(key)
+end
+```
+
+An option may be now selected by pressing the Return/Enter key.
+
+1. The first option _starts_ the game, i.e., it hides the menu and shows the `player` that you can move.
+2. The other option shows a message and hides it after one second.
+
+If you prefer the Spacebar for selecting the options, change `config.lua`.
+```lua
+local M = {}
+
+M.keys = {
+  start = "space"  -- now Spacebar is used to select an option
+}
+
+M.entities = {
+  player = {
+    input = {}
+  },
+  mainMenu = {
+    input = {},
+    menu = {
+      options = {"Start", "Show message"},
+    }
+  }
+}
+
+return M
+```
 
 
 ## Specs
