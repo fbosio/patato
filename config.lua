@@ -17,6 +17,12 @@ M.entities = {
       walkLeft = "left2",
       walkRight = "right2"
     }
+  },
+  mainMenu = {
+    input = {},
+    menu = {
+      options = {"Start", "Show message"}
+    }
   }
 }
 

@@ -109,7 +109,7 @@ describe("Load some movement keys", function ()
   end)
 end)
 
-describe("Load some non movement keys", function ()
+describe("Load some keys that are not for movement", function ()
   it("should copy the defined keys to resourcemanager", function ()
     local config = {
       keys = {
@@ -313,5 +313,23 @@ describe("Load an entity with impulse speeds", function ()
     assert.are.same(200, playerSpeed.crouchWalk)
     assert.are.same(1200, playerSpeed.jump)
     assert.are.same(400, playerSpeed.climb)
+  end)
+end)
+
+describe("Load config with nonempty menu", function ()
+  it("should copy the menu", function ()
+    local config = {
+      entities = {
+        mainMenu = {
+          menu = {
+            options = {"Start"}
+          }
+        }
+      }
+    }
+
+    local loadedConfig = resourcemanager.buildWorld(config)
+
+    assert.are.same({"Start"}, loadedConfig.gameState.menu.mainMenu.options)
   end)
 end)

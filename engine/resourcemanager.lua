@@ -1,17 +1,10 @@
 local M = {}
 
-local componentNames = {
-  input = "input",
-  impulseSpeed = "impulseSpeed",
-  position = "position",
-  velocity = "velocity"
-}
-
 local function setComponentAttribute(result, componentName, entityName,
-                                     attribute, value)
+  attribute, value)
   result.gameState[componentName] = result.gameState[componentName] or {}
   result.gameState[componentName][entityName] =
-    result.gameState[componentName][entityName] or {}
+  result.gameState[componentName][entityName] or {}
   result.gameState[componentName][entityName][attribute] = value
 end
 
@@ -29,30 +22,57 @@ local function copyInputToState(result, input, entityName)
   end
   for actionName, virtualKey in pairs(input) do
     if result.keys[virtualKey] then
-      setComponentAttribute(result, componentNames.input, entityName,
-                            actionName, virtualKey)
+      setComponentAttribute(result, "input", entityName, actionName,
+                            virtualKey)
     end
   end
 end
 
 local function createDefaults(result, entityName)
-  setComponentAttribute(result, componentNames.impulseSpeed, entityName,
-                        "walk", 400)
+  setComponentAttribute(result, "impulseSpeed", entityName, "walk", 400)
   local width, height = M.love.graphics.getDimensions()
-  setComponentAttribute(result, componentNames.position, entityName,
-                        "x", width/2)
-  setComponentAttribute(result, componentNames.position, entityName,
-                        "y", height/2)
-  setComponentAttribute(result, componentNames.velocity, entityName,
-                        "x", 0)
-  setComponentAttribute(result, componentNames.velocity, entityName,
-                        "y", 0)
+  setComponentAttribute(result, "position", entityName, "x", width/2)
+  setComponentAttribute(result, "position", entityName, "y", height/2)
+  setComponentAttribute(result, "velocity", entityName, "x", 0)
+  setComponentAttribute(result, "velocity", entityName, "y", 0)
 end
 
-local function copyImpulseSpeedToState(result, component, entityName)
-  for impulseName, speed in pairs(component) do
-    setComponentAttribute(result, componentNames.impulseSpeed, entityName,
-                          impulseName, speed)
+local function copyImpulseSpeedToState(result, impulseSpeed, entityName)
+  for impulseName, speed in pairs(impulseSpeed) do
+    setComponentAttribute(result, "impulseSpeed", entityName, impulseName,
+                          speed)
+  end
+end
+
+local function copyMenuToState(result, menu, entityName)
+  local menuOptions = {}
+  for _, option in ipairs(menu.options) do
+    menuOptions[#menuOptions+1] = option
+  end
+  setComponentAttribute(result, "menu", entityName, "options", menuOptions)
+end
+
+local stateBuilders = {
+  input = function (result, component, entityName)
+    copyInputToState(result, component, entityName)
+    createDefaults(result, entityName)
+  end,
+  impulseSpeed = function (result, component, entityName)
+    copyImpulseSpeedToState(result, component, entityName)
+  end,
+  menu = function (result, component, entityName)
+    copyMenuToState(result, component, entityName)
+  end
+}
+
+local function buildState(config, result)
+  result.gameState = {}
+  if config.entities then
+    for entityName, entity in pairs(config.entities) do
+      for componentName, component in pairs(entity) do
+        stateBuilders[componentName](result, component, entityName)
+      end
+    end
   end
 end
 
@@ -62,30 +82,17 @@ end
 
 function M.buildWorld(config)
   local result = {}
-
-  result.gameState = {}
-
+  
   result.world = config.world or {}
   result.world.gravity = result.world.gravity or 0
-
+  
   result.keys = config.keys or {}
   result.keys.left = result.keys.left or "a"
   result.keys.right = result.keys.right or "d"
   result.keys.up = result.keys.up or "w"
   result.keys.down = result.keys.down or "s"
-
-  if config.entities then
-    for entityName, entity in pairs(config.entities) do
-      for componentName, component in pairs(entity) do
-        if componentName == componentNames.input then
-          copyInputToState(result, component, entityName)
-          createDefaults(result, entityName)
-        elseif componentName == componentNames.impulseSpeed then
-          copyImpulseSpeedToState(result, component, entityName)
-        end
-      end
-    end
-  end
+  
+  buildState(config, result)
 
   return result
 end
