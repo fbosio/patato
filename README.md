@@ -1,7 +1,7 @@
 # Patato Man
 A platform adventure video game, ported with [Löve2D](https://love2d.org/).
 
-![test](https://github.com/fbosio/patato/workflows/test/badge.svg)
+[![test](https://github.com/fbosio/patato/workflows/test/badge.svg)](https://github.com/fbosio/patato/actions)
 
 
 ## Engine
