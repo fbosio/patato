@@ -60,17 +60,26 @@ local stateBuilders = {
   impulseSpeed = function (world, component, entityName)
     copyImpulseSpeedToState(world, component, entityName)
   end,
-  menu = function (world, component, entityName)
-    copyMenuToState(world, component, entityName)
-  end
 }
 
 local function buildState(config, world)
   world.gameState = {}
   if config.entities then
+    local foundMenu = false
     for entityName, entity in pairs(config.entities) do
       for componentName, component in pairs(entity) do
-        stateBuilders[componentName](world, component, entityName)
+        if componentName == "menu" then
+          copyMenuToState(world, component, entityName)
+          foundMenu = true
+        end
+      end
+    end
+
+    if not foundMenu then
+      for entityName, entity in pairs(config.entities) do
+        for componentName, component in pairs(entity) do
+          stateBuilders[componentName](world, component, entityName)
+        end
       end
     end
   end

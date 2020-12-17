@@ -240,7 +240,7 @@ describe("Load an entity with lacking movement input", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.falsy(world.gameState.input.player.walkRight)
+    assert.is.falsy(world.gameState.input.player.walkRight)
   end)
 end)
 
@@ -331,5 +331,31 @@ describe("Load config with nonempty menu", function ()
     local world = resourcemanager.buildWorld(config)
 
     assert.are.same({"Start"}, world.gameState.menu.mainMenu.options)
+  end)
+
+end)
+
+describe("Load config with nonempty menu and other entities", function ()
+  it("should not load entities that have not the menu component", function ()
+    local config = {
+      entities = {
+        playerOne = {
+          input = {}
+        },
+        playerTwo = {
+          input = {}
+        },
+        mainMenu = {
+          menu = {
+            options = {"Start"}
+          }
+        }
+      }
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    assert.is.falsy(world.gameState.input)
+    assert.is.falsy(world.gameState.position)
   end)
 end)
