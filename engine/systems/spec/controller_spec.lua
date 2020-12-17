@@ -269,16 +269,8 @@ describe("With a menu", function ()
   end)
 
   describe("Pressing S key", function ()
-    before_each(function ()
-      local loveMock = {keyboard = {}}
-      loveMock.keyboard.isDown = function (key)
-        return key == "s"
-      end
-      controller.load(loveMock)
-    end)
-
     it("should select the next menu option", function ()
-      controller.update(keys, inputs, {}, {}, menus)
+      controller.keypressed("s", menus)
 
       assert.are.same(2, menus.mainMenu.selected)
     end)
