@@ -5,20 +5,20 @@ local actions = {
   walkRight = function (t) t.velocity.x = t.walkSpeed end,
   walkUp = function (t) t.velocity.y = -t.walkSpeed end,
   walkDown = function (t) t.velocity.y = t.walkSpeed end,
-  -- menuPrevious = function (t)
-  --   local menu = t.menu
-  --   menu.selected = menu.selected - 1
-  --   if menu.selected == 0 then
-  --     menu.selected = #menu.options
-  --   end
-  -- end,
-  -- menuNext = function (t)
-  --   local menu = t.menu
-  --   menu.selected = menu.selected + 1
-  --   if menu.selected == #menu.options + 1 then
-  --     menu.selected = 1
-  --   end
-  -- end,
+  menuPrevious = function (t)
+    local menu = t.menu
+    menu.selected = menu.selected - 1
+    if menu.selected == 0 then
+      menu.selected = #menu.options
+    end
+  end,
+  menuNext = function (t)
+    local menu = t.menu
+    menu.selected = menu.selected + 1
+    if menu.selected == #menu.options + 1 then
+      menu.selected = 1
+    end
+  end,
 }
 setmetatable(actions, {
   __index = function ()
@@ -31,14 +31,14 @@ local omissions = {
   [{"walkUp", "walkDown"}] = function (v) v.y = 0 end,
 }
 
-local function doActionIfKeyIsDown(keys, input, components)
+local function doActionIfKeyIsDown(keys, input, components, isMenu)
   local held = {}
 
   for virtualKey, physicalKey in pairs(keys) do
     if M.love.keyboard.isDown(physicalKey) then
       held[#held+1] = virtualKey
       for actionName, inputKey in pairs(input) do
-        if inputKey == virtualKey then
+        if inputKey == virtualKey and not isMenu then
           actions[actionName](components)
         end
       end
@@ -79,37 +79,31 @@ function M.load(love)
 end
 
 function M.update(keys, inputs, velocities, impulseSpeeds, menus)
-  inputs = inputs or {}
-
-  for entity, input in pairs(inputs) do
+  for entity, input in pairs(inputs or {}) do
     local components = {
       velocity = (velocities or {})[entity],
       walkSpeed = ((impulseSpeeds or {})[entity] or {}).walk,
-      -- menu = (menus or {})[entity]
     }
-    local held = doActionIfKeyIsDown(keys, input, components)
+    local isMenu = (menus or {})[entity]
+    local held = doActionIfKeyIsDown(keys, input, components, isMenu)
     doOmissionIfKeyIsUp(held, input, components.velocity)
   end
 end
 
-function M.keypressed(key, menus)
-  for _, menu in pairs(menus) do
-    (({
-      w = function (t)
-        local menu = t.menu
-        menu.selected = menu.selected - 1
-        if menu.selected == 0 then
-          menu.selected = #menu.options
-        end
-      end,
-      s = function (t)
-        local menu = t.menu
-        menu.selected = menu.selected + 1
-        if menu.selected == #menu.options + 1 then
-          menu.selected = 1
-        end
-      end,
-    })[key] or function () end){menu = menu}
+function M.keypressed(key, keys, inputs, menus)
+  local pressedVirtualKey
+  for virtualKey, physicalKey in pairs(keys) do
+    if physicalKey == key then
+      pressedVirtualKey = virtualKey
+      break
+    end
+  end
+  for entity, menu in pairs(menus) do
+    for actionName, virtualKey in pairs(inputs[entity]) do
+      if pressedVirtualKey == virtualKey then
+        actions[actionName]{menu=menu}
+      end
+    end
   end
 end
 

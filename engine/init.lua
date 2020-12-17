@@ -42,7 +42,7 @@ function M.draw()
 end
 
 function M.keypressed(key)
-  systems.keypressed(key, M.gameState.menu)
+  systems.keypressed(key, M.keys, M.gameState.input, M.gameState.menu)
 end
 
 return M

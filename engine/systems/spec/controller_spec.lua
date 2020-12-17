@@ -247,9 +247,19 @@ describe("With two players with AD and JL as walking input", function ()
 end)
 
 describe("With a menu", function ()
-  local menus
+  local keys, inputs, menus
 
   before_each(function ()
+    keys = {
+      up = "w",
+      down = "s"
+    }
+    inputs = {
+      mainMenu = {
+        menuPrevious = "up",
+        menuNext = "down"
+      }
+    }
     menus = {
       mainMenu = {
         options = {"Start", "Options", "Help"},
@@ -260,7 +270,7 @@ describe("With a menu", function ()
 
   describe("Pressing S key", function ()
     it("should select the next menu option", function ()
-      controller.keypressed("s", menus)
+      controller.keypressed("s", keys, inputs, menus)
 
       assert.are.same(2, menus.mainMenu.selected)
     end)

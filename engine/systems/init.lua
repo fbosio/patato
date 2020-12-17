@@ -1,6 +1,5 @@
 local controller = require "engine.systems.controller"
 local transporter = require "engine.systems.transporter"
-local config = require "config"
 
 local M = {}
 
@@ -13,8 +12,8 @@ function M.update(dt, keys, st)
   transporter.update(dt, st.velocity, st.position)
 end
 
-function M.keypressed(key, menu)
-  controller.keypressed(key, menu)
+function M.keypressed(key, keys, input, menu)
+  controller.keypressed(key, keys, input, menu)
 end
 
 return M
