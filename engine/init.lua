@@ -24,6 +24,7 @@ local renderer = require "engine.renderer"
 
 local M = {}
 
+-- Löve2D events
 function M.load()
   systems.load(love)
   resourcemanager.load(love)
@@ -42,7 +43,20 @@ function M.draw()
 end
 
 function M.keypressed(key)
-  systems.keypressed(key, M.keys, M.gameState.input, M.gameState.menu)
+  systems.keypressed(key, M.keys, M.gameState.input, M.gameState.menu,
+                     M.inMenu)
+end
+
+-- Public API
+function M.startGame()
+  M.inMenu = false
+  resourcemanager.buildState(config, M)
+end
+
+function M.setMenuOption(entity, index, callback)
+  if M.gameState.menu then
+    M.gameState.menu[entity].callbacks[index] = callback
+  end
 end
 
 return M

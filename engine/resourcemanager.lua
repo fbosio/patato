@@ -12,7 +12,8 @@ local function copyInputToState(world, input, entityName, foundMenu)
   if not next(input) then  -- check that input (non-boolean) is an empty table
     local defaultInput = foundMenu and {
       menuPrevious = "up",
-      menuNext = "down"
+      menuNext = "down",
+      menuSelect = "start"
     } or {
       walkLeft = "left",
       walkRight = "right",
@@ -53,6 +54,7 @@ local function copyMenuToState(world, menu, entityName)
     menuOptions[#menuOptions+1] = option
   end
   setComponentAttribute(world, "menu", entityName, "options", menuOptions)
+  setComponentAttribute(world, "menu", entityName, "callbacks", {})
   setComponentAttribute(world, "menu", entityName, "selected", 1)
   world.inMenu = true  -- cambiar por escena
 end
@@ -67,17 +69,18 @@ local stateBuilders = {
   end,
 }
 
-local function buildState(config, world)
+function M.buildState(config, world)
   world.gameState = {}
   if config.entities then
     local foundMenu = false
     for entityName, entity in pairs(config.entities) do
       for componentName, component in pairs(entity) do
-        if componentName == "menu" then
+        if componentName == "menu" and world.inMenu == nil then
           foundMenu = true
           copyMenuToState(world, component, entityName)
-          world.gameState.input = world.gameState.input or {[entityName]={}}
-          copyInputToState(world, world.gameState.input[entityName],
+          world.gameState.input = world.gameState.input or {}
+          world.gameState.input[entityName] = entity.input
+          copyInputToState(world, world.gameState.input[entityName] or {},
                            entityName, true)
         end
       end
@@ -85,8 +88,12 @@ local function buildState(config, world)
 
     if not foundMenu then
       for entityName, entity in pairs(config.entities) do
-        for componentName, component in pairs(entity) do
-          stateBuilders[componentName](world, component, entityName)
+        if not entity.menu then
+          for componentName, component in pairs(entity) do
+            if componentName ~= "menu" then
+              stateBuilders[componentName](world, component, entityName)
+            end
+          end
         end
       end
     end
@@ -109,7 +116,7 @@ function M.buildWorld(config)
   world.keys.up = world.keys.up or "w"
   world.keys.down = world.keys.down or "s"
 
-  buildState(config, world)
+  M.buildState(config, world)
 
   return world
 end

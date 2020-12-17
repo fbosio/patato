@@ -4,7 +4,8 @@ M.keys = {
   left2 = "j",
   right2 = "l",
   up2 = "i",
-  down2 = "k"
+  down2 = "k",
+  start = "z"
 }
 
 M.entities = {
@@ -19,12 +20,9 @@ M.entities = {
     }
   },
   mainMenu = {
-    input = {
-      menuPrevious = "up",
-      menuNext = "down"
-    },
+    input = {},
     menu = {
-      options = {"Start", "Show message", "Drink coffee", "Get up"}
+      options = {"Start", "Show message", "Drink coffee", "Get up"},
     }
   }
 }

@@ -6,18 +6,19 @@ local actions = {
   walkUp = function (t) t.velocity.y = -t.walkSpeed end,
   walkDown = function (t) t.velocity.y = t.walkSpeed end,
   menuPrevious = function (t)
-    local menu = t.menu
-    menu.selected = menu.selected - 1
-    if menu.selected == 0 then
-      menu.selected = #menu.options
+    t.menu.selected = t.menu.selected - 1
+    if t.menu.selected == 0 then
+      t.menu.selected = #t.menu.options
     end
   end,
   menuNext = function (t)
-    local menu = t.menu
-    menu.selected = menu.selected + 1
-    if menu.selected == #menu.options + 1 then
-      menu.selected = 1
+    t.menu.selected = t.menu.selected + 1
+    if t.menu.selected == #t.menu.options + 1 then
+      t.menu.selected = 1
     end
+  end,
+  menuSelect = function (t)
+    (t.menu.callbacks[t.menu.selected] or function () end)()
   end,
 }
 setmetatable(actions, {
@@ -90,18 +91,20 @@ function M.update(keys, inputs, velocities, impulseSpeeds, menus)
   end
 end
 
-function M.keypressed(key, keys, inputs, menus)
-  local pressedVirtualKey
-  for virtualKey, physicalKey in pairs(keys) do
-    if physicalKey == key then
-      pressedVirtualKey = virtualKey
-      break
+function M.keypressed(key, keys, inputs, menus, inMenu)
+  if inMenu then
+    local pressedVirtualKey
+    for virtualKey, physicalKey in pairs(keys) do
+      if physicalKey == key then
+        pressedVirtualKey = virtualKey
+        break
+      end
     end
-  end
-  for entity, menu in pairs(menus) do
-    for actionName, virtualKey in pairs(inputs[entity]) do
-      if pressedVirtualKey == virtualKey then
-        actions[actionName]{menu=menu}
+    for entity, menu in pairs(menus or {}) do
+      for actionName, virtualKey in pairs(inputs[entity]) do
+        if pressedVirtualKey == virtualKey then
+          actions[actionName]{menu=menu}
+        end
       end
     end
   end

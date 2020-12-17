@@ -12,8 +12,8 @@ function M.update(dt, keys, st)
   transporter.update(dt, st.velocity, st.position)
 end
 
-function M.keypressed(key, keys, input, menu)
-  controller.keypressed(key, keys, input, menu)
+function M.keypressed(key, keys, input, menu, inMenu)
+  controller.keypressed(key, keys, input, menu, inMenu)
 end
 
 return M
