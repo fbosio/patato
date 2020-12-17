@@ -247,19 +247,9 @@ describe("With two players with AD and JL as walking input", function ()
 end)
 
 describe("With a menu", function ()
-  local keys, inputs, menus
+  local menus
 
   before_each(function ()
-    keys = {
-      up = "w",
-      down = "s"
-    }
-    inputs = {
-      mainMenu = {
-        menuPrevious = "up",
-        menuNext = "down"
-      }
-    }
     menus = {
       mainMenu = {
         options = {"Start", "Options", "Help"},
