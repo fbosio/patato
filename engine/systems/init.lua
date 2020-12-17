@@ -8,7 +8,7 @@ function M.load(love)
 end
 
 function M.update(dt, keys, st)
-  controller.update(keys, st.input, st.velocity, st.impulseSpeed)
+  controller.update(keys, st.input, st.velocity, st.impulseSpeed, st.menu)
   transporter.update(dt, st.velocity, st.position)
 end
 

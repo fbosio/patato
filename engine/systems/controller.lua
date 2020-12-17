@@ -1,10 +1,24 @@
 local M = {}
 
 local actions = {
-  walkLeft = function (v, s) v.x = -s.walk end,
-  walkRight = function (v, s) v.x = s.walk end,
-  walkUp = function (v, s) v.y = -s.walk end,
-  walkDown = function (v, s) v.y = s.walk end,
+  walkLeft = function (t) t.velocity.x = -t.walkSpeed end,
+  walkRight = function (t) t.velocity.x = t.walkSpeed end,
+  walkUp = function (t) t.velocity.y = -t.walkSpeed end,
+  walkDown = function (t) t.velocity.y = t.walkSpeed end,
+  menuPrevious = function (t)
+    local menu = t.menu
+    menu.selected = menu.selected - 1
+    if menu.selected == 0 then
+      menu.selected = #menu.options
+    end
+  end,
+  menuNext = function (t)
+    local menu = t.menu
+    menu.selected = menu.selected + 1
+    if menu.selected == #menu.options + 1 then
+      menu.selected = 1
+    end
+  end,
 }
 setmetatable(actions, {
   __index = function ()
@@ -17,15 +31,15 @@ local omissions = {
   [{"walkUp", "walkDown"}] = function (v) v.y = 0 end,
 }
 
-local function doActionIfKeyIsDown(keys, input, velocity, impulseSpeed)
+local function doActionIfKeyIsDown(keys, input, components)
   local pressed = {}
 
   for virtualKey, physicalKey in pairs(keys) do
     if M.love.keyboard.isDown(physicalKey) then
       pressed[#pressed+1] = virtualKey
-      for inputName, inputKey in pairs(input) do
+      for actionName, inputKey in pairs(input) do
         if inputKey == virtualKey then
-          actions[inputName](velocity, impulseSpeed)
+          actions[actionName](components)
         end
       end
     end
@@ -64,14 +78,17 @@ function M.load(love)
   M.love = love
 end
 
-function M.update(keys, inputs, velocities, impulseSpeeds)
+function M.update(keys, inputs, velocities, impulseSpeeds, menus)
   inputs = inputs or {}
 
   for entity, input in pairs(inputs) do
-    local velocity = velocities[entity]
-    local impulseSpeed = impulseSpeeds[entity]
-    local pressed = doActionIfKeyIsDown(keys, input, velocity, impulseSpeed)
-    doOmissionIfKeyIsUp(pressed, input, velocity)
+    local components = {
+      velocity = (velocities or {})[entity],
+      walkSpeed = ((impulseSpeeds or {})[entity] or {}).walk,
+      menu = (menus or {})[entity]
+    }
+    local pressed = doActionIfKeyIsDown(keys, input, components)
+    doOmissionIfKeyIsUp(pressed, input, components.velocity)
   end
 end
 

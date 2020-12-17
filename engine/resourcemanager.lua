@@ -8,14 +8,17 @@ local function setComponentAttribute(world, componentName, entityName,
   world.gameState[componentName][entityName][attribute] = value
 end
 
-local function copyInputToState(world, input, entityName)
-  local defaultInput = {
-    walkLeft = "left",
-    walkRight = "right",
-    walkUp = "up",
-    walkDown = "down"
-  }
+local function copyInputToState(world, input, entityName, foundMenu)
   if not next(input) then  -- check that input (non-boolean) is an empty table
+    local defaultInput = foundMenu and {
+      menuPrevious = "up",
+      menuNext = "down"
+    } or {
+      walkLeft = "left",
+      walkRight = "right",
+      walkUp = "up",
+      walkDown = "down"
+    }
     for actionName, defaultKey in pairs(defaultInput) do
       input[actionName] = input[actionName] or defaultKey
     end
@@ -50,6 +53,8 @@ local function copyMenuToState(world, menu, entityName)
     menuOptions[#menuOptions+1] = option
   end
   setComponentAttribute(world, "menu", entityName, "options", menuOptions)
+  setComponentAttribute(world, "menu", entityName, "selected", 1)
+  world.inMenu = true  -- cambiar por escena
 end
 
 local stateBuilders = {
@@ -69,8 +74,11 @@ local function buildState(config, world)
     for entityName, entity in pairs(config.entities) do
       for componentName, component in pairs(entity) do
         if componentName == "menu" then
-          copyMenuToState(world, component, entityName)
           foundMenu = true
+          copyMenuToState(world, component, entityName)
+          world.gameState.input = world.gameState.input or {[entityName]={}}
+          copyInputToState(world, world.gameState.input[entityName],
+                           entityName, true)
         end
       end
     end

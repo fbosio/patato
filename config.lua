@@ -19,9 +19,12 @@ M.entities = {
     }
   },
   mainMenu = {
-    input = {},
+    input = {
+      menuPrevious = "up",
+      menuNext = "down"
+    },
     menu = {
-      options = {"Start", "Show message"}
+      options = {"Start", "Show message", "Drink coffee", "Get up"}
     }
   }
 }

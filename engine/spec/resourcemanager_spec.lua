@@ -336,8 +336,10 @@ describe("Load config with nonempty menu", function ()
 end)
 
 describe("Load config with nonempty menu and other entities", function ()
-  it("should not load entities that have not the menu component", function ()
-    local config = {
+  local config, world
+
+  before_each(function ()
+    config = {
       entities = {
         playerOne = {
           input = {}
@@ -346,16 +348,30 @@ describe("Load config with nonempty menu and other entities", function ()
           input = {}
         },
         mainMenu = {
+          input = {},
           menu = {
             options = {"Start"}
           }
         }
       }
     }
+    world = resourcemanager.buildWorld(config)
+  end)
 
-    local world = resourcemanager.buildWorld(config)
+  it("should load components with menu entity", function ()
+    assert.are.same({"Start"}, world.gameState.menu.mainMenu.options)
+    assert.are.truthy(world.gameState.input.mainMenu)
+  end)
 
-    assert.is.falsy(world.gameState.input)
+  it("should load menu with default input", function ()
+    local menuInput = world.gameState.input.mainMenu
+    assert.are.same("up", menuInput.menuPrevious)
+    assert.are.same("down", menuInput.menuNext)
+  end)
+
+  it("should not load entities that have not the menu component", function ()
+    assert.is.falsy(world.gameState.input.playerOne)
+    assert.is.falsy(world.gameState.input.playerTwo)
     assert.is.falsy(world.gameState.position)
   end)
 end)

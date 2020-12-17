@@ -9,7 +9,7 @@ after_each(function ()
 end)
 
 describe("With one player with AD as walking input", function ()
-  local keys, inputs, velocity, impulseSpeed
+  local keys, inputs, velocities, impulseSpeeds
 
   before_each(function ()
     keys = {
@@ -22,10 +22,10 @@ describe("With one player with AD as walking input", function ()
         walkRight = "right"
       }
     }
-    velocity = {
+    velocities = {
       playerOne = {x = 0, y = 0}
     }
-    impulseSpeed = {
+    impulseSpeeds = {
       playerOne = {walk = 100}
     }
   end)
@@ -40,9 +40,9 @@ describe("With one player with AD as walking input", function ()
     end)
 
     it("should set the velocity to zero", function ()
-      controller.update(keys, inputs, velocity, impulseSpeed)
+      controller.update(keys, inputs, velocities, impulseSpeeds)
 
-      assert.are.same(0, velocity.playerOne.x)
+      assert.are.same(0, velocities.playerOne.x)
     end)
   end)
 
@@ -57,14 +57,14 @@ describe("With one player with AD as walking input", function ()
     end)
 
     it("should set the velocity to negative walk speed", function ()
-      controller.update(keys, inputs, velocity, impulseSpeed)
+      controller.update(keys, inputs, velocities, impulseSpeeds)
 
-      assert.are.same(-impulseSpeed.playerOne.walk, velocity.playerOne.x)
+      assert.are.same(-impulseSpeeds.playerOne.walk, velocities.playerOne.x)
     end)
 
     describe("and then leaving it", function ()
       before_each(function ()
-        controller.update(keys, inputs, velocity, impulseSpeed)
+        controller.update(keys, inputs, velocities, impulseSpeeds)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -72,9 +72,9 @@ describe("With one player with AD as walking input", function ()
       end)
 
       it("should set the velocity to zero", function ()
-        controller.update(keys, inputs, velocity, impulseSpeed)
+        controller.update(keys, inputs, velocities, impulseSpeeds)
 
-        assert.are.same(0, velocity.playerOne.x)
+        assert.are.same(0, velocities.playerOne.x)
       end)
     end)
   end)
@@ -90,14 +90,14 @@ describe("With one player with AD as walking input", function ()
     end)
 
     it("should set the velocity to positive walk speed", function ()
-      controller.update(keys, inputs, velocity, impulseSpeed)
+      controller.update(keys, inputs, velocities, impulseSpeeds)
 
-      assert.are.same(impulseSpeed.playerOne.walk, velocity.playerOne.x)
+      assert.are.same(impulseSpeeds.playerOne.walk, velocities.playerOne.x)
     end)
 
     describe("and then leaving it", function ()
       before_each(function ()
-        controller.update(keys, inputs, velocity, impulseSpeed)
+        controller.update(keys, inputs, velocities, impulseSpeeds)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -105,16 +105,16 @@ describe("With one player with AD as walking input", function ()
       end)
 
       it("should set the velocity to zero", function ()
-        controller.update(keys, inputs, velocity, impulseSpeed)
+        controller.update(keys, inputs, velocities, impulseSpeeds)
 
-        assert.are.same(0, velocity.playerOne.x)
+        assert.are.same(0, velocities.playerOne.x)
       end)
     end)
   end)
 end)
 
 describe("With two players with AD and JL as walking input", function ()
-  local keys, inputs, velocity, impulseSpeed
+  local keys, inputs, velocities, impulseSpeeds
 
   before_each(function ()
     keys = {
@@ -133,11 +133,11 @@ describe("With two players with AD and JL as walking input", function ()
         walkRight = "right2"
       }
     }
-    velocity = {
+    velocities = {
       playerOne = {x = 0, y = 0},
       playerTwo = {x = 0, y = 0}
     }
-    impulseSpeed = {
+    impulseSpeeds = {
       playerOne = {walk = 100},
       playerTwo = {walk = 150}
     }
@@ -153,10 +153,10 @@ describe("With two players with AD and JL as walking input", function ()
     end)
 
     it("should set both velocities to zero", function ()
-      controller.update(keys, inputs, velocity, impulseSpeed)
+      controller.update(keys, inputs, velocities, impulseSpeeds)
 
-      assert.are.same(0, velocity.playerOne.x)
-      assert.are.same(0, velocity.playerTwo.x)
+      assert.are.same(0, velocities.playerOne.x)
+      assert.are.same(0, velocities.playerTwo.x)
     end)
   end)
 
@@ -170,10 +170,10 @@ describe("With two players with AD and JL as walking input", function ()
     end)
 
     it("should set player one velocity to negative walk speed", function ()
-      controller.update(keys, inputs, velocity, impulseSpeed)
+      controller.update(keys, inputs, velocities, impulseSpeeds)
 
-      assert.are.same(-impulseSpeed.playerOne.walk, velocity.playerOne.x)
-      assert.are.same(0, velocity.playerTwo.x)
+      assert.are.same(-impulseSpeeds.playerOne.walk, velocities.playerOne.x)
+      assert.are.same(0, velocities.playerTwo.x)
     end)
   end)
 
@@ -187,10 +187,10 @@ describe("With two players with AD and JL as walking input", function ()
     end)
 
     it("should set player one velocity to positive walk speed", function ()
-      controller.update(keys, inputs, velocity, impulseSpeed)
+      controller.update(keys, inputs, velocities, impulseSpeeds)
 
-      assert.are.same(impulseSpeed.playerOne.walk, velocity.playerOne.x)
-      assert.are.same(0, velocity.playerTwo.x)
+      assert.are.same(impulseSpeeds.playerOne.walk, velocities.playerOne.x)
+      assert.are.same(0, velocities.playerTwo.x)
     end)
   end)
 
@@ -205,15 +205,15 @@ describe("With two players with AD and JL as walking input", function ()
     end)
 
     it("should set player two velocity to negative walk speed", function ()
-      controller.update(keys, inputs, velocity, impulseSpeed)
+      controller.update(keys, inputs, velocities, impulseSpeeds)
 
-      assert.are.same(0, velocity.playerOne.x)
-      assert.are.same(-impulseSpeed.playerTwo.walk, velocity.playerTwo.x)
+      assert.are.same(0, velocities.playerOne.x)
+      assert.are.same(-impulseSpeeds.playerTwo.walk, velocities.playerTwo.x)
     end)
 
     describe("and then leaving it", function ()
       before_each(function ()
-        controller.update(keys, inputs, velocity, impulseSpeed)
+        controller.update(keys, inputs, velocities, impulseSpeeds)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -221,9 +221,9 @@ describe("With two players with AD and JL as walking input", function ()
       end)
 
       it("should set player two velocity to zero", function ()
-        controller.update(keys, inputs, velocity, impulseSpeed)
+        controller.update(keys, inputs, velocities, impulseSpeeds)
 
-        assert.are.same(0, velocity.playerTwo.x)
+        assert.are.same(0, velocities.playerTwo.x)
       end)
     end)
   end)
@@ -238,10 +238,49 @@ describe("With two players with AD and JL as walking input", function ()
     end)
 
     it("should set player two velocity to positive walk speed", function ()
-      controller.update(keys, inputs, velocity, impulseSpeed)
+      controller.update(keys, inputs, velocities, impulseSpeeds)
 
-      assert.are.same(0, velocity.playerOne.x)
-      assert.are.same(impulseSpeed.playerTwo.walk, velocity.playerTwo.x)
+      assert.are.same(0, velocities.playerOne.x)
+      assert.are.same(impulseSpeeds.playerTwo.walk, velocities.playerTwo.x)
+    end)
+  end)
+end)
+
+describe("With a menu", function ()
+  local keys, inputs, menus
+
+  before_each(function ()
+    keys = {
+      up = "w",
+      down = "s"
+    }
+    inputs = {
+      mainMenu = {
+        menuPrevious = "up",
+        menuNext = "down"
+      }
+    }
+    menus = {
+      mainMenu = {
+        options = {"Start", "Options", "Help"},
+        selected = 1
+      }
+    }
+  end)
+
+  describe("Pressing S key", function ()
+    before_each(function ()
+      local loveMock = {keyboard = {}}
+      loveMock.keyboard.isDown = function (key)
+        return key == "s"
+      end
+      controller.load(loveMock)
+    end)
+
+    it("should select the next menu option", function ()
+      controller.update(keys, inputs, {}, {}, menus)
+
+      assert.are.same(2, menus.mainMenu.selected)
     end)
   end)
 end)

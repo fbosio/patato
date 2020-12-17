@@ -20,6 +20,7 @@ end
 
 local resourcemanager = require "engine.resourcemanager"
 local systems = require "engine.systems"
+local renderer = require "engine.renderer"
 
 local M = {}
 
@@ -29,6 +30,7 @@ function M.load()
   for k, v in pairs(resourcemanager.buildWorld(config)) do
     M[k] = v
   end
+  renderer.load(love)
 end
 
 function M.update(dt)
@@ -36,9 +38,7 @@ function M.update(dt)
 end
 
 function M.draw()
-  for entity, position in pairs(M.gameState.position or {}) do
-    love.graphics.points({position.x, position.y})
-  end
+  renderer.draw(M)
 end
 
 return M
