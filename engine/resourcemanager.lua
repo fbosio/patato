@@ -97,7 +97,7 @@ local function buildMenu(config, world)
   return not foundMenu
 end
 
-function M.buildState(config, world)
+function M.buildState(config, world, levelName)
   world.gameState = {}
   if config.entities then
     local hasNoMenuComponents = buildMenu(config, world)
@@ -105,8 +105,9 @@ function M.buildState(config, world)
       for entityName, entity in pairs(config.entities) do
         if config.levels then
           local firstLevelName = config.levels.first or next(config.levels)
-          local firstLevel = config.levels[firstLevelName] or {}
-          local position = firstLevel[entityName]
+          levelName = levelName or firstLevelName
+          local level = config.levels[levelName] or {}
+          local position = level[entityName]
           if position then
             buildNonMenu(entityName, entity, world)
             setComponentAttribute(world, "position", entityName, "x",

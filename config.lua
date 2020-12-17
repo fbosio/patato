@@ -29,7 +29,8 @@ M.entities = {
 
 M.levels = {
   firstLevel = {
-    patato = {100, 287}
+    patato = {100, 287},
+    bee = {300, 287}
   },
   first = "firstLevel"
 }

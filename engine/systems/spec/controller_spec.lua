@@ -247,32 +247,53 @@ describe("With two players with AD and JL as walking input", function ()
 end)
 
 describe("With a menu", function ()
-  local keys, inputs, menus
+  local keys, inputs, menus, started
 
   before_each(function ()
     keys = {
       up = "w",
-      down = "s"
+      down = "s",
+      start = "return"
     }
     inputs = {
       mainMenu = {
         menuPrevious = "up",
-        menuNext = "down"
+        menuNext = "down",
+        menuSelect = "start"
       }
     }
     menus = {
       mainMenu = {
         options = {"Start", "Options", "Help"},
+        callbacks = {function ()
+          started = true
+        end},
         selected = 1
       }
     }
   end)
 
   describe("Pressing S key", function ()
-    it("should select the next menu option", function ()
+    it("should select the second menu option", function ()
       controller.keypressed("s", keys, inputs, menus, true)
 
       assert.are.same(2, menus.mainMenu.selected)
+    end)
+  end)
+
+  describe("Pressing W key", function ()
+    it("should select the third menu option", function ()
+      controller.keypressed("w", keys, inputs, menus, true)
+
+      assert.are.same(3, menus.mainMenu.selected)
+    end)
+  end)
+
+  describe("Pressing RETURN key", function ()
+    it("should run the callback of the first menu option", function ()
+      controller.keypressed("return", keys, inputs, menus, true)
+
+      assert.is.truthy(started)
     end)
   end)
 end)
