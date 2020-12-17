@@ -138,6 +138,7 @@ function M.buildWorld(config)
   world.keys.right = world.keys.right or "d"
   world.keys.up = world.keys.up or "w"
   world.keys.down = world.keys.down or "s"
+  world.keys.start = world.keys.start or "return"
 
   M.buildState(config, world)
 
