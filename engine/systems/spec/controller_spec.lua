@@ -270,7 +270,7 @@ describe("With a menu", function ()
 
   describe("Pressing S key", function ()
     it("should select the next menu option", function ()
-      controller.keypressed("s", keys, inputs, menus)
+      controller.keypressed("s", keys, inputs, menus, true)
 
       assert.are.same(2, menus.mainMenu.selected)
     end)
