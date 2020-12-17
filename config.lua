@@ -5,7 +5,7 @@ M.keys = {
   right2 = "l",
   up2 = "i",
   down2 = "k",
-  start = "z"
+  start = "return"
 }
 
 M.entities = {
@@ -22,7 +22,7 @@ M.entities = {
   mainMenu = {
     input = {},
     menu = {
-      options = {"Start", "Show message", "Drink coffee", "Get up"},
+      options = {"Start", "Show message", "Secret level"},
     }
   }
 }
@@ -31,6 +31,9 @@ M.levels = {
   firstLevel = {
     patato = {100, 287},
     bee = {300, 287}
+  },
+  secretLevel = {
+    patato = {200, 500}
   },
   first = "firstLevel"
 }

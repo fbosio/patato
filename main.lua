@@ -12,6 +12,9 @@ function love.load()
     elapsed = 0
     showingMessage = true
   end)
+  engine.setMenuOption("mainMenu", 3, function ()
+    engine.startGame("secretLevel")
+  end)
 end
 
 function love.update(dt)

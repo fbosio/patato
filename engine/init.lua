@@ -48,9 +48,9 @@ function M.keypressed(key)
 end
 
 -- Public API
-function M.startGame()
+function M.startGame(levelName)
   M.inMenu = false
-  resourcemanager.buildState(config, M)
+  resourcemanager.buildState(config, M, levelName)
 end
 
 function M.setMenuOption(entity, index, callback)
