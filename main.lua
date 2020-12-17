@@ -11,3 +11,7 @@ end
 function love.draw()
   engine.draw()
 end
+
+function love.keypressed(key)
+  engine.keypressed(key)
+end

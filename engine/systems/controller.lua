@@ -5,20 +5,20 @@ local actions = {
   walkRight = function (t) t.velocity.x = t.walkSpeed end,
   walkUp = function (t) t.velocity.y = -t.walkSpeed end,
   walkDown = function (t) t.velocity.y = t.walkSpeed end,
-  menuPrevious = function (t)
-    local menu = t.menu
-    menu.selected = menu.selected - 1
-    if menu.selected == 0 then
-      menu.selected = #menu.options
-    end
-  end,
-  menuNext = function (t)
-    local menu = t.menu
-    menu.selected = menu.selected + 1
-    if menu.selected == #menu.options + 1 then
-      menu.selected = 1
-    end
-  end,
+  -- menuPrevious = function (t)
+  --   local menu = t.menu
+  --   menu.selected = menu.selected - 1
+  --   if menu.selected == 0 then
+  --     menu.selected = #menu.options
+  --   end
+  -- end,
+  -- menuNext = function (t)
+  --   local menu = t.menu
+  --   menu.selected = menu.selected + 1
+  --   if menu.selected == #menu.options + 1 then
+  --     menu.selected = 1
+  --   end
+  -- end,
 }
 setmetatable(actions, {
   __index = function ()
@@ -32,11 +32,11 @@ local omissions = {
 }
 
 local function doActionIfKeyIsDown(keys, input, components)
-  local pressed = {}
+  local held = {}
 
   for virtualKey, physicalKey in pairs(keys) do
     if M.love.keyboard.isDown(physicalKey) then
-      pressed[#pressed+1] = virtualKey
+      held[#held+1] = virtualKey
       for actionName, inputKey in pairs(input) do
         if inputKey == virtualKey then
           actions[actionName](components)
@@ -45,7 +45,7 @@ local function doActionIfKeyIsDown(keys, input, components)
     end
   end
 
-  return pressed
+  return held
 end
 
 local function doOmissionIfKeyIsUp(pressed, input, velocity)
@@ -85,10 +85,31 @@ function M.update(keys, inputs, velocities, impulseSpeeds, menus)
     local components = {
       velocity = (velocities or {})[entity],
       walkSpeed = ((impulseSpeeds or {})[entity] or {}).walk,
-      menu = (menus or {})[entity]
+      -- menu = (menus or {})[entity]
     }
-    local pressed = doActionIfKeyIsDown(keys, input, components)
-    doOmissionIfKeyIsUp(pressed, input, components.velocity)
+    local held = doActionIfKeyIsDown(keys, input, components)
+    doOmissionIfKeyIsUp(held, input, components.velocity)
+  end
+end
+
+function M.keypressed(key, menus)
+  for _, menu in pairs(menus) do
+    ({
+      w = function (t)
+        local menu = t.menu
+        menu.selected = menu.selected - 1
+        if menu.selected == 0 then
+          menu.selected = #menu.options
+        end
+      end,
+      s = function (t)
+        local menu = t.menu
+        menu.selected = menu.selected + 1
+        if menu.selected == #menu.options + 1 then
+          menu.selected = 1
+        end
+      end,
+    })[key]{menu = menu}
   end
 end
 

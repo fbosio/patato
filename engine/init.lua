@@ -41,4 +41,8 @@ function M.draw()
   renderer.draw(M)
 end
 
+function M.keypressed(key)
+  systems.keypressed(key, M.gameState.menu)
+end
+
 return M
