@@ -69,31 +69,53 @@ local stateBuilders = {
   end,
 }
 
+local function buildNonMenu(entityName, entity, world)
+  if not entity.menu then
+    for componentName, component in pairs(entity) do
+      if componentName ~= "menu" then
+        stateBuilders[componentName](world, component, entityName)
+      end
+    end
+  end
+end
+
+local function buildMenu(config, world)
+  local foundMenu = false
+  for entityName, entity in pairs(config.entities) do
+    for componentName, component in pairs(entity) do
+      if componentName == "menu" and world.inMenu == nil then
+        foundMenu = true
+        copyMenuToState(world, component, entityName)
+        world.gameState.input = world.gameState.input or {}
+        world.gameState.input[entityName] = entity.input
+        copyInputToState(world, world.gameState.input[entityName] or {},
+                          entityName, true)
+      end
+    end
+  end
+
+  return not foundMenu
+end
+
 function M.buildState(config, world)
   world.gameState = {}
   if config.entities then
-    local foundMenu = false
-    for entityName, entity in pairs(config.entities) do
-      for componentName, component in pairs(entity) do
-        if componentName == "menu" and world.inMenu == nil then
-          foundMenu = true
-          copyMenuToState(world, component, entityName)
-          world.gameState.input = world.gameState.input or {}
-          world.gameState.input[entityName] = entity.input
-          copyInputToState(world, world.gameState.input[entityName] or {},
-                           entityName, true)
-        end
-      end
-    end
-
-    if not foundMenu then
+    local hasNoMenuComponents = buildMenu(config, world)
+    if hasNoMenuComponents then
       for entityName, entity in pairs(config.entities) do
-        if not entity.menu then
-          for componentName, component in pairs(entity) do
-            if componentName ~= "menu" then
-              stateBuilders[componentName](world, component, entityName)
-            end
+        if config.levels then
+          local firstLevelName = config.levels.first or next(config.levels)
+          local firstLevel = config.levels[firstLevelName] or {}
+          local position = firstLevel[entityName]
+          if position then
+            buildNonMenu(entityName, entity, world)
+            setComponentAttribute(world, "position", entityName, "x",
+                                  position[1])
+            setComponentAttribute(world, "position", entityName, "y",
+                                  position[2])
           end
+        else
+          buildNonMenu(entityName, entity, world)
         end
       end
     end

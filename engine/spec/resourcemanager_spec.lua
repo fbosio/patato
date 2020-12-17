@@ -21,7 +21,7 @@ describe("Load an empty config", function ()
     emptyConfig = {}
     emptyWorld = resourcemanager.buildWorld(emptyConfig)
   end)
-  
+
   it("should load physics with zero gravity", function ()
     assert.are.same(0, emptyWorld.physics.gravity)
   end)
@@ -363,15 +363,55 @@ describe("Load config with nonempty menu and other entities", function ()
     assert.are.truthy(world.gameState.input.mainMenu)
   end)
 
-  it("should load menu with default input", function ()
+  it("should copy menu with default input", function ()
     local menuInput = world.gameState.input.mainMenu
     assert.are.same("up", menuInput.menuPrevious)
     assert.are.same("down", menuInput.menuNext)
   end)
 
-  it("should not load entities that have not the menu component", function ()
+  it("should not copy entities that have not the menu component", function ()
     assert.is.falsy(world.gameState.input.playerOne)
     assert.is.falsy(world.gameState.input.playerTwo)
     assert.is.falsy(world.gameState.position)
+  end)
+end)
+
+describe("Load entities and an empty levels table", function ()
+  it("should not copy the entities", function ()
+    local config = {
+      entities = {
+        player = {
+          input = {}
+        }
+      },
+      levels = {}
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    assert.is.falsy(world.gameState.input)
+  end)
+end)
+
+describe("Load a level with defined entity and position", function ()
+  it("should copy that entity with that position", function ()
+    local config = {
+      entities = {
+        sonic = {
+          input = {}
+        }
+      },
+      levels = {
+        ["green hill zone"] = {
+          sonic = {200, 300}
+        }
+      }
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    assert.is.truthy(world.gameState.input.sonic)
+    assert.are.same(200, world.gameState.position.sonic.x)
+    assert.are.same(300, world.gameState.position.sonic.y)
   end)
 end)

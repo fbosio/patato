@@ -27,4 +27,11 @@ M.entities = {
   }
 }
 
+M.levels = {
+  firstLevel = {
+    patato = {100, 287}
+  },
+  first = "firstLevel"
+}
+
 return M
