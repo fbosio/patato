@@ -94,7 +94,7 @@ end
 
 function M.keypressed(key, menus)
   for _, menu in pairs(menus) do
-    ({
+    (({
       w = function (t)
         local menu = t.menu
         menu.selected = menu.selected - 1
@@ -109,7 +109,7 @@ function M.keypressed(key, menus)
           menu.selected = 1
         end
       end,
-    })[key]{menu = menu}
+    })[key] or function () end){menu = menu}
   end
 end
 
