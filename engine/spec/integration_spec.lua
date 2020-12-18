@@ -33,7 +33,8 @@ describe("Loading 3 levels with players, a menu with 4 options", function ()
         ["metropolis zone"] = {
           sonic = {200, 500}
         }
-      }
+      },
+      firstLevel = "green hill zone"
     }
     local loveMock = {graphics = {}}
     function loveMock.graphics.getDimensions()
