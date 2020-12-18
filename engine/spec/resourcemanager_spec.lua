@@ -415,3 +415,30 @@ describe("Load a level with defined entity and position", function ()
     assert.are.same(300, world.gameState.position.sonic.y)
   end)
 end)
+
+describe("Load two levels and the name of the first one", function ()
+  it("should start the game in the first level", function ()
+    local config = {
+      entities = {
+        sonic = {
+          input = {}
+        }
+      },
+      levels = {
+        ["metropolis zone"] = {
+          sonic = {735, 97}
+        },
+        ["green hill zone"] = {
+          sonic = {200, 300}
+        }
+      },
+      firstLevel = "green hill zone"
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    assert.is.truthy(world.gameState.input.sonic)
+    assert.are.same(200, world.gameState.position.sonic.x)
+    assert.are.same(300, world.gameState.position.sonic.y)
+  end)
+end)

@@ -32,8 +32,7 @@ describe("Loading 3 levels with players, a menu with 4 options", function ()
         },
         ["metropolis zone"] = {
           sonic = {200, 500}
-        },
-        first = "green hill zone"
+        }
       }
     }
     local loveMock = {graphics = {}}
@@ -73,10 +72,10 @@ describe("Loading 3 levels with players, a menu with 4 options", function ()
       controller.keypressed("return", world.keys, world.gameState.input,
                             world.gameState.menu, world.inMenu)
 
-      local firstLevel = config.levels[config.levels.first]
+      local level = config.levels["green hill zone"]
       local playerPosition = world.gameState.position.sonic
-      assert.are.same(firstLevel.sonic[1], playerPosition.x)
-      assert.are.same(firstLevel.sonic[2], playerPosition.y)
+      assert.are.same(level.sonic[1], playerPosition.x)
+      assert.are.same(level.sonic[2], playerPosition.y)
     end)
   end)
 

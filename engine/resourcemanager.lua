@@ -104,7 +104,7 @@ function M.buildState(config, world, levelName)
     if hasNoMenuComponents then
       for entityName, entity in pairs(config.entities) do
         if config.levels then
-          local firstLevelName = config.levels.first or next(config.levels)
+          local firstLevelName = config.firstLevel or next(config.levels)
           levelName = levelName or firstLevelName
           local level = config.levels[levelName] or {}
           local position = level[entityName]
