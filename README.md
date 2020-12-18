@@ -194,6 +194,95 @@ M.entities = {
 return M
 ```
 
+### Levels
+The following `config.lua` declares two levels.
+```lua
+local M = {}
+
+M.entities = {
+  player = {
+    input = {}
+  }
+}
+
+M.levels = {
+  quest = {
+    player = {700, 100}
+  },
+  minigame = {
+    player = {100, 500}
+  }
+}
+M.firstLevel = "quest"
+
+return M
+```
+
+The `firstLevel` string states which field of the `levels` table corresponds to the level that is loaded at start by default.
+If `firstLevel` is changed to `"minigame"` instead of `"quest"`, the player appears in the opposite corner of the window.
+
+The level can be selected from a menu, too.
+```lua
+local M = {}
+
+M.entities = {
+  player = {
+    input = {}
+  },
+  mainMenu = {
+    input = {},
+    menu = {
+      options = {"Start quest", "Play minigame"}
+    }
+  }
+}
+
+M.levels = {
+  quest = {
+    player = {700, 100}
+  },
+  minigame = {
+    player = {100, 500}
+  }
+}
+M.firstLevel = "quest"
+
+return M
+```
+
+But, in this case, proper callbacks are required in the `main.lua` file.
+```lua
+local engine = require "engine"
+
+
+function love.load()
+  engine.load()
+
+  -- setMenuOption(entity, index, callback)
+  engine.setMenuOption("mainMenu", 1, function ()
+    engine.startGame()
+  end)
+  engine.setMenuOption("mainMenu", 2, function ()
+    engine.startGame("minigame")
+  end)
+end
+
+function love.update(dt)
+  engine.update(dt)
+end
+
+function love.draw()
+  engine.draw()
+end
+
+function love.keypressed(key)
+  engine.keypressed(key)
+end
+```
+
+Since selecting the first menu option loads the first level, there is no need to pass `"quest"` to the `startGame` function explicitly (although is totally allowed).
+In the other case, `"minigame"` is required because that level is not declared as the first one by the `firstLevel` field in `config.lua`, and therefore, is not loaded by default.
+
 
 ## Specs
 | Game | Engine  |
