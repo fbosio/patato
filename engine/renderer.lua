@@ -21,8 +21,15 @@ function M.draw(engine)
     end
 
   else
-    for _, position in pairs(st.position or {}) do
-      M.love.graphics.points({position.x, position.y})
+    for entity, position in pairs(st.position or {}) do
+      local x, y = position.x, position.y
+      M.love.graphics.points({x, y})
+
+      if st.collisionBox and st.collisionBox[entity] then
+        local box = st.collisionBox[entity]
+        M.love.graphics.rectangle("fill", x+box.x, y+box.y, box.width,
+                                  box.height)
+      end
     end
   end
 end

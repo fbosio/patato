@@ -5,37 +5,39 @@ M.keys = {
   right2 = "l",
   up2 = "i",
   down2 = "k",
-  start = "return"
+  start = "return",
 }
 
 M.entities = {
   patato = {
     input = {
-    }
+    },
+    collector = true,
+    collisionBox = {-15, -35, 30, 70},
   },
   bee = {
     input = {
       walkLeft = "left2",
-      walkRight = "right2"
+      walkRight = "right2",
     }
   },
   mainMenu = {
     input = {},
     menu = {
       options = {"Start", "Show message", "Secret level"},
-    }
+    },
   }
 }
 
 M.levels = {
-  firstLevel = {
+  garden = {
     patato = {100, 287},
-    bee = {300, 287}
+    bee = {300, 287},
   },
   secretLevel = {
-    patato = {200, 500}
+    patato = {200, 500},
   },
-  first = "firstLevel"
 }
+M.firstLevel = "garden"
 
 return M

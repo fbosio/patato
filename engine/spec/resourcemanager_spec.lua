@@ -151,6 +151,20 @@ describe("Load an entity without components", function ()
   end)
 end)
 
+describe("Load an entity with a nonexistent component", function ()
+  it("should throw an error", function ()
+    local config = {
+      entities = {
+        player = {
+          someWeirdThingWithAVeryAnnoyingName = "Gloryhallastoopid"
+        }
+      }
+    }
+
+    assert.has_error(function () resourcemanager.buildWorld(config) end)
+  end)
+end)
+
 describe("Load an entity with an empty input", function ()
   local config
   before_each(function ()
@@ -440,5 +454,42 @@ describe("Load two levels and the name of the first one", function ()
     assert.is.truthy(world.gameState.input.sonic)
     assert.are.same(200, world.gameState.position.sonic.x)
     assert.are.same(300, world.gameState.position.sonic.y)
+  end)
+end)
+
+describe("Loading a collector entity", function ()
+  it("should copy the component", function ()
+    local config = {
+      entities = {
+        player = {
+          collector = true
+        }
+      }
+    }
+    
+    local world = resourcemanager.buildWorld(config)
+    
+    assert.is.truthy(world.gameState.collector.player)
+  end)
+end)
+
+describe("Loading a collision box", function ()
+  it("should copy the component", function ()
+    local config = {
+      entities = {
+        player = {
+          collisionBox = {-15, -35, 30, 70}
+        }
+      }
+    }
+    
+    local world = resourcemanager.buildWorld(config)
+
+    local box = world.gameState.collisionBox.player
+    
+    assert.are.same(-15, box.x)
+    assert.are.same(-35, box.y)
+    assert.are.same(30, box.width)
+    assert.are.same(70, box.height)
   end)
 end)

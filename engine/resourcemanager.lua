@@ -1,10 +1,10 @@
 local M = {}
 
 local function setComponentAttribute(world, componentName, entityName,
-  attribute, value)
+    attribute, value)
   world.gameState[componentName] = world.gameState[componentName] or {}
   world.gameState[componentName][entityName] =
-  world.gameState[componentName][entityName] or {}
+    world.gameState[componentName][entityName] or {}
   world.gameState[componentName][entityName][attribute] = value
 end
 
@@ -41,13 +41,6 @@ local function createDefaults(world, entityName)
   setComponentAttribute(world, "velocity", entityName, "y", 0)
 end
 
-local function copyImpulseSpeedToState(world, impulseSpeed, entityName)
-  for impulseName, speed in pairs(impulseSpeed) do
-    setComponentAttribute(world, "impulseSpeed", entityName, impulseName,
-                          speed)
-  end
-end
-
 local function copyMenuToState(world, menu, entityName)
   local menuOptions = {}
   for _, option in ipairs(menu.options) do
@@ -65,14 +58,30 @@ local stateBuilders = {
     createDefaults(world, entityName)
   end,
   impulseSpeed = function (world, component, entityName)
-    copyImpulseSpeedToState(world, component, entityName)
+    for impulseName, speed in pairs(component) do
+      setComponentAttribute(world, "impulseSpeed", entityName, impulseName,
+                            speed)
+    end
   end,
+  collector = function (world, component, entityName)
+    world.gameState.collector = world.gameState.collector or {}
+    world.gameState.collector[entityName] = component
+  end,
+  collisionBox = function (world, component, entityName)
+    local attribute = {"x", "y", "width", "height"}
+    for i, value in ipairs(component) do
+      setComponentAttribute(world, "collisionBox", entityName, attribute[i],
+                            value)
+    end
+  end
 }
 
 local function buildNonMenu(entityName, entity, world)
   if not entity.menu then
     for componentName, component in pairs(entity) do
       if componentName ~= "menu" then
+        assert(stateBuilders[componentName],
+               "Unexpected component in config.lua: " .. componentName)
         stateBuilders[componentName](world, component, entityName)
       end
     end
