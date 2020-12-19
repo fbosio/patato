@@ -473,6 +473,22 @@ describe("Loading a collector entity", function ()
   end)
 end)
 
+describe("Loading a collectable entity", function ()
+  it("should copy the component", function ()
+    local config = {
+      entities = {
+        player = {
+          collectable = true
+        }
+      }
+    }
+    
+    local world = resourcemanager.buildWorld(config)
+    
+    assert.is.truthy(world.gameState.collectable.player)
+  end)
+end)
+
 describe("Loading a collision box", function ()
   it("should copy the component", function ()
     local config = {

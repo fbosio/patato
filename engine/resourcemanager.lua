@@ -1,5 +1,10 @@
 local M = {}
 
+local function setComponent(world, componentName, entityName, value)
+  world.gameState[componentName] = world.gameState[componentName] or {}
+  world.gameState[componentName][entityName] = value
+end
+
 local function setComponentAttribute(world, componentName, entityName,
     attribute, value)
   world.gameState[componentName] = world.gameState[componentName] or {}
@@ -64,8 +69,10 @@ local stateBuilders = {
     end
   end,
   collector = function (world, component, entityName)
-    world.gameState.collector = world.gameState.collector or {}
-    world.gameState.collector[entityName] = component
+    setComponent(world, "collector", entityName, component)
+  end,
+  collectable = function (world, component, entityName)
+    setComponent(world, "collectable", entityName, component)
   end,
   collisionBox = function (world, component, entityName)
     local attribute = {"x", "y", "width", "height"}
