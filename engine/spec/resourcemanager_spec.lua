@@ -466,9 +466,9 @@ describe("Loading a collector entity", function ()
         }
       }
     }
-    
+
     local world = resourcemanager.buildWorld(config)
-    
+
     assert.is.truthy(world.gameState.collector.player)
   end)
 end)
@@ -482,9 +482,9 @@ describe("Loading a collectable entity", function ()
         }
       }
     }
-    
+
     local world = resourcemanager.buildWorld(config)
-    
+
     assert.is.truthy(world.gameState.collectable.item)
   end)
 end)
@@ -505,22 +505,33 @@ describe("Loading an entity that is both collector and collectable", function ()
 end)
 
 describe("Loading a collision box", function ()
-  it("should copy the component", function ()
-    local config = {
+  local config
+
+  before_each(function ()
+     config = {
       entities = {
         player = {
           collisionBox = {-15, -35, 30, 70}
         }
       }
     }
-    
+  end)
+
+  it("should copy the component", function ()
     local world = resourcemanager.buildWorld(config)
 
     local box = world.gameState.collisionBox.player
-    
     assert.are.same(-15, box.x)
     assert.are.same(-35, box.y)
     assert.are.same(30, box.width)
     assert.are.same(70, box.height)
+  end)
+
+  it("should create game state with default position", function ()
+    local world = resourcemanager.buildWorld(config)
+
+    local playerPosition = world.gameState.position.player
+    assert.are.same(400, playerPosition.x)
+    assert.are.same(300, playerPosition.y)
   end)
 end)

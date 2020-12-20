@@ -37,11 +37,15 @@ local function copyInputToState(world, input, entityName, foundMenu)
   end
 end
 
-local function createDefaults(world, entityName)
-  setComponentAttribute(world, "impulseSpeed", entityName, "walk", 400)
+local function createDefaultPosition(world, entityName)
   local width, height = M.love.graphics.getDimensions()
   setComponentAttribute(world, "position", entityName, "x", width/2)
   setComponentAttribute(world, "position", entityName, "y", height/2)
+end
+
+local function createDefaults(world, entityName)
+  setComponentAttribute(world, "impulseSpeed", entityName, "walk", 400)
+  createDefaultPosition(world, entityName)
   setComponentAttribute(world, "velocity", entityName, "x", 0)
   setComponentAttribute(world, "velocity", entityName, "y", 0)
 end
@@ -79,6 +83,7 @@ local stateBuilders = {
     for i, value in ipairs(component) do
       setComponentAttribute(world, "collisionBox", entityName, attribute[i],
                             value)
+      createDefaultPosition(world, entityName)
     end
   end
 }
