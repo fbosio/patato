@@ -85,8 +85,20 @@ local stateBuilders = {
 
 local function buildNonMenu(entityName, entity, world)
   if not entity.menu then
+    local isCollectable = false
+    local isCollector = false
     for componentName, component in pairs(entity) do
       if componentName ~= "menu" then
+        if componentName == "collectable" then
+          isCollectable = true
+        end
+        if componentName == "collector" then
+          isCollector = true
+        end
+        assert(not (isCollectable and isCollector),
+               "Entities must not be collectables and collectors at the "
+                .. "same time, but entity " .. entityName .. " has both "
+                .. "components declared in config.lua")
         assert(stateBuilders[componentName],
                "Unexpected component in config.lua: " .. componentName)
         stateBuilders[componentName](world, component, entityName)

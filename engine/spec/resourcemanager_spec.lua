@@ -477,7 +477,7 @@ describe("Loading a collectable entity", function ()
   it("should copy the component", function ()
     local config = {
       entities = {
-        player = {
+        item = {
           collectable = true
         }
       }
@@ -485,7 +485,22 @@ describe("Loading a collectable entity", function ()
     
     local world = resourcemanager.buildWorld(config)
     
-    assert.is.truthy(world.gameState.collectable.player)
+    assert.is.truthy(world.gameState.collectable.item)
+  end)
+end)
+
+describe("Loading an entity that is both collector and collectable", function ()
+  it("should throw an error", function ()
+    local config = {
+      entities = {
+        absurdSpecimen = {
+          collector = true,
+          collectable = true
+        }
+      }
+    }
+
+    assert.has_error(function () resourcemanager.buildWorld(config) end)
   end)
 end)
 
