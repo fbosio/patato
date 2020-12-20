@@ -100,7 +100,8 @@ local function buildNonMenu(entityName, entity, world)
                 .. "same time, but entity " .. entityName .. " has both "
                 .. "components declared in config.lua")
         assert(stateBuilders[componentName],
-               "Unexpected component in config.lua: " .. componentName)
+               "Entity " .. entityName .. " has a component named "
+                .. componentName .. " that was not expected in config.lua")
         stateBuilders[componentName](world, component, entityName)
       end
     end
