@@ -430,7 +430,7 @@ describe("loading a level with defined entity and position", function ()
   end)
 end)
 
-describe("loading two levels and the name of the first one", function ()
+describe("load two levels and the name of the first one", function ()
   it("should start the game in the first level", function ()
     local config = {
       entities = {
@@ -474,7 +474,7 @@ describe("loading a collector entity", function ()
 end)
 
 describe("loading a collectable entity that is not in any level", function ()
-  it("should copy the component", function ()
+  it("should not copy the component", function ()
     local config = {
       entities = {
         item = {
@@ -485,7 +485,7 @@ describe("loading a collectable entity that is not in any level", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.is.truthy(world.gameState.collectable.item)
+    assert.is.falsy(world.gameState.collectable)
   end)
 end)
 

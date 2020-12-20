@@ -95,20 +95,8 @@ local stateBuilders = {
 
 local function buildNonMenu(entityName, entity, world)
   if not entity.menu then
-    local isCollectable = false
-    local isCollector = false
     for componentName, component in pairs(entity) do
       if componentName ~= "menu" then
-        if componentName == "collectable" then
-          isCollectable = true
-        end
-        if componentName == "collector" then
-          isCollector = true
-        end
-        assert(not (isCollectable and isCollector),
-               "Entities must not be collectables and collectors at the "
-                .. "same time, but entity " .. entityName .. " has both "
-                .. "components declared in config.lua")
         assert(stateBuilders[componentName],
                "Entity " .. entityName .. " has a component named "
                 .. componentName .. " that was not expected in config.lua")
@@ -136,6 +124,21 @@ local function buildMenu(config, world)
   return not foundMenu
 end
 
+local function buildNonMenuIfInLevel(config, world, levelName, entityName,
+                                     entity)
+  local firstLevelName = config.firstLevel or next(config.levels)
+  levelName = levelName or firstLevelName
+  local level = config.levels[levelName] or {}
+  local position = level[entityName]
+  if position then
+    buildNonMenu(entityName, entity, world)
+    setComponentAttribute(world, "position", entityName, "x",
+                          position[1])
+    setComponentAttribute(world, "position", entityName, "y",
+                          position[2])
+  end
+end
+
 function M.buildState(config, world, levelName)
   world.gameState = {}
   if config.entities then
@@ -143,19 +146,17 @@ function M.buildState(config, world, levelName)
     if hasNoMenuComponents then
       for entityName, entity in pairs(config.entities) do
         if config.levels then
-          local firstLevelName = config.firstLevel or next(config.levels)
-          levelName = levelName or firstLevelName
-          local level = config.levels[levelName] or {}
-          local position = level[entityName]
-          if position then
-            buildNonMenu(entityName, entity, world)
-            setComponentAttribute(world, "position", entityName, "x",
-                                  position[1])
-            setComponentAttribute(world, "position", entityName, "y",
-                                  position[2])
-          end
+          buildNonMenuIfInLevel(config, world, levelName, entityName, entity)
         else
-          buildNonMenu(entityName, entity, world)
+          local isNotCollectable = not config.entities[entityName].collectable
+          local isNotCollector = not config.entities[entityName].collector
+          assert(isNotCollectable or isNotCollector,
+                 "Entities must not be collectables and collectors at the "
+                 .. "same time, but entity " .. entityName .. " has both "
+                 .. "components declared in config.lua")
+          if isNotCollectable then
+            buildNonMenu(entityName, entity, world)
+          end
         end
       end
     end
