@@ -511,7 +511,7 @@ describe("Loading a collision box", function ()
      config = {
       entities = {
         player = {
-          collisionBox = {-15, -35, 30, 70}
+          collisionBox = {15, 35, 30, 70}
         }
       }
     }
@@ -521,8 +521,8 @@ describe("Loading a collision box", function ()
     local world = resourcemanager.buildWorld(config)
 
     local box = world.gameState.collisionBox.player
-    assert.are.same(-15, box.x)
-    assert.are.same(-35, box.y)
+    assert.are.same(15, box.origin.x)
+    assert.are.same(35, box.origin.y)
     assert.are.same(30, box.width)
     assert.are.same(70, box.height)
   end)

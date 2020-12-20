@@ -79,12 +79,17 @@ local stateBuilders = {
     setComponent(world, "collectable", entityName, component)
   end,
   collisionBox = function (world, component, entityName)
-    local attribute = {"x", "y", "width", "height"}
-    for i, value in ipairs(component) do
-      setComponentAttribute(world, "collisionBox", entityName, attribute[i],
-                            value)
-      createDefaultPosition(world, entityName)
+    local t = {
+      origin = {x=component[1], y=component[2]},
+      width = component[3],
+      height = component[4],
+      x = 0,
+      y = 0
+    }
+    for k, v in pairs(t) do
+      setComponentAttribute(world, "collisionBox", entityName, k, v)
     end
+    createDefaultPosition(world, entityName)
   end
 }
 

@@ -13,7 +13,7 @@ M.entities = {
     input = {
     },
     collector = true,
-    collisionBox = {-15, -35, 30, 70},
+    collisionBox = {15, 35, 30, 70},
   },
   bee = {
     input = {

@@ -1,5 +1,6 @@
 local controller = require "engine.systems.controller"
 local transporter = require "engine.systems.transporter"
+local messenger = require "engine.systems.messenger"
 
 local M = {}
 
@@ -10,6 +11,7 @@ end
 function M.update(dt, keys, st)
   controller.update(keys, st.input, st.velocity, st.impulseSpeed, st.menu)
   transporter.update(dt, st.velocity, st.position)
+  messenger.update(st.collector, st.collectable, st.collisionBox)
 end
 
 function M.keypressed(key, keys, input, menu, inMenu)
