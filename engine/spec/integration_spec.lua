@@ -1,4 +1,4 @@
-describe("Loading 3 levels with players, a menu with 4 options", function ()
+describe("loading 3 levels with players, a menu with 4 options", function ()
   local resourcemanager, controller, config, world, drankCoffee
 
   before_each(function ()

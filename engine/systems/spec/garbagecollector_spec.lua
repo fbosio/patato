@@ -52,7 +52,7 @@ describe("Loading an entity that is marked as garbage", function ()
         }
       }
     }
-    
+
     garbagecollector.update(gameState)
   end)
 

@@ -9,7 +9,7 @@ after_each(function ()
   package.loaded.transporter = nil
 end)
 
-describe("Use empty velocity, position and collision box tables", function ()
+describe("with empty velocity, position and collision box tables", function ()
   it("should keep those tables empty", function ()
     local velocities = {}
     local positions = {}
@@ -23,7 +23,7 @@ describe("Use empty velocity, position and collision box tables", function ()
   end)
 end)
 
-describe("With nonzero velocity", function ()
+describe("receiving an entity with nonzero velocity", function ()
   local velocities, positions, collisionBoxes
 
   before_each(function ()
@@ -54,11 +54,11 @@ describe("With nonzero velocity", function ()
     transporter.update(dt, velocities, positions, collisionBoxes)
   end)
 
-  it("should update the position", function ()
+  it("should update its position", function ()
     assert.are.same({x=-395, y=253}, positions.player)
   end)
 
-  it("should update the collision box", function ()
+  it("should update its collision box", function ()
     assert.are.same(-379, collisionBoxes.player.x)
     assert.are.same(317, collisionBoxes.player.y)
   end)

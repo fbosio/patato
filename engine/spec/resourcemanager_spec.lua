@@ -13,7 +13,7 @@ after_each(function ()
   package.loaded.resourcemanager = nil
 end)
 
-describe("Load an empty config", function ()
+describe("loading an empty config", function ()
   local emptyConfig = {}
   local emptyWorld
 
@@ -34,7 +34,7 @@ describe("Load an empty config", function ()
   end)
 end)
 
-describe("Load an empty physics table", function ()
+describe("loading an empty physics table", function ()
   it("should load physics with zero gravity", function ()
     local config = {physics = {}}
 
@@ -44,7 +44,7 @@ describe("Load an empty physics table", function ()
   end)
 end)
 
-describe("Load gravity", function ()
+describe("loading gravity", function ()
   it("should copy the defined physics", function ()
     local config = {
       physics = {
@@ -58,7 +58,7 @@ describe("Load gravity", function ()
   end)
 end)
 
-describe("Load an empty keys structure", function ()
+describe("loading an empty keys structure", function ()
   it("should load a physics with default movement keys", function ()
     local config = {keys = {}}
 
@@ -71,7 +71,7 @@ describe("Load an empty keys structure", function ()
   end)
 end)
 
-describe("Load all movement keys", function ()
+describe("loading all movement keys", function ()
   it("should copy the defined keys", function ()
     local config = {
       keys = {
@@ -91,7 +91,7 @@ describe("Load all movement keys", function ()
   end)
 end)
 
-describe("Load some movement keys", function ()
+describe("loading some movement keys", function ()
   it("should fill lacking keys with default values", function ()
     local config = {
       keys = {
@@ -109,7 +109,7 @@ describe("Load some movement keys", function ()
   end)
 end)
 
-describe("Load some keys that are not for movement", function ()
+describe("loading some keys that are not for movement", function ()
   it("should copy the defined keys to resourcemanager", function ()
     local config = {
       keys = {
@@ -125,7 +125,7 @@ describe("Load some keys that are not for movement", function ()
   end)
 end)
 
-describe("Load an empty entities list", function ()
+describe("loading an empty entities list", function ()
   it("should create an empty game state", function ()
     local config = {
       entities = {}
@@ -137,7 +137,7 @@ describe("Load an empty entities list", function ()
   end)
 end)
 
-describe("Load an entity without components", function ()
+describe("loading an entity without components", function ()
   it("should create an empty game state", function ()
     local config = {
       entities = {
@@ -151,7 +151,7 @@ describe("Load an entity without components", function ()
   end)
 end)
 
-describe("Load an entity with a nonexistent component", function ()
+describe("loading an entity with a nonexistent component", function ()
   it("should throw an error", function ()
     local config = {
       entities = {
@@ -165,7 +165,7 @@ describe("Load an entity with a nonexistent component", function ()
   end)
 end)
 
-describe("Load an entity with an empty input", function ()
+describe("loading an entity with an empty input", function ()
   local config
   before_each(function ()
     config = {
@@ -210,7 +210,7 @@ describe("Load an entity with an empty input", function ()
   end)
 end)
 
-describe("Load an entity with movement input and lacking keys", function ()
+describe("loading an entity with movement input and lacking keys", function ()
   it("should copy the defined keys and ignore the rest", function ()
     local config = {
       keys = {
@@ -240,7 +240,7 @@ describe("Load an entity with movement input and lacking keys", function ()
   end)
 end)
 
-describe("Load an entity with lacking movement input", function ()
+describe("loading an entity with lacking movement input", function ()
   it("should not set lacking input", function ()
     local config = {
       entities = {
@@ -258,7 +258,7 @@ describe("Load an entity with lacking movement input", function ()
   end)
 end)
 
-describe("Load an entity with movement input and keys", function ()
+describe("loading an entity with movement input and keys", function ()
   it("should copy the defined keys to the component", function ()
     local config = {
       keys = {
@@ -289,7 +289,7 @@ describe("Load an entity with movement input and keys", function ()
   end)
 end)
 
-describe("Load an entity with only an empty speed list", function ()
+describe("loading an entity with only an empty speed list", function ()
   it("should create an empty game state", function ()
     local config = {
       entities = {
@@ -305,7 +305,7 @@ describe("Load an entity with only an empty speed list", function ()
   end)
 end)
 
-describe("Load an entity with impulse speeds", function ()
+describe("loading an entity with impulse speeds", function ()
   it("should copy the define speeds to the component", function ()
     local config = {
       entities = {
@@ -330,7 +330,7 @@ describe("Load an entity with impulse speeds", function ()
   end)
 end)
 
-describe("Load config with nonempty menu", function ()
+describe("loading config with nonempty menu", function ()
   it("should copy the menu", function ()
     local config = {
       entities = {
@@ -349,7 +349,7 @@ describe("Load config with nonempty menu", function ()
 
 end)
 
-describe("Load config with nonempty menu and other entities", function ()
+describe("loading config with nonempty menu and other entities", function ()
   local config, world
 
   before_each(function ()
@@ -390,7 +390,7 @@ describe("Load config with nonempty menu and other entities", function ()
   end)
 end)
 
-describe("Load entities and an empty levels table", function ()
+describe("loading entities and an empty levels table", function ()
   it("should not copy the entities", function ()
     local config = {
       entities = {
@@ -407,7 +407,7 @@ describe("Load entities and an empty levels table", function ()
   end)
 end)
 
-describe("Load a level with defined entity and position", function ()
+describe("loading a level with defined entity and position", function ()
   it("should copy that entity with that position", function ()
     local config = {
       entities = {
@@ -430,7 +430,7 @@ describe("Load a level with defined entity and position", function ()
   end)
 end)
 
-describe("Load two levels and the name of the first one", function ()
+describe("loading two levels and the name of the first one", function ()
   it("should start the game in the first level", function ()
     local config = {
       entities = {
@@ -457,7 +457,7 @@ describe("Load two levels and the name of the first one", function ()
   end)
 end)
 
-describe("Loading a collector entity", function ()
+describe("loading a collector entity", function ()
   it("should copy the component", function ()
     local config = {
       entities = {
@@ -473,7 +473,7 @@ describe("Loading a collector entity", function ()
   end)
 end)
 
-describe("Loading a collectable entity", function ()
+describe("loading a collectable entity that is not in any level", function ()
   it("should copy the component", function ()
     local config = {
       entities = {
@@ -489,7 +489,7 @@ describe("Loading a collectable entity", function ()
   end)
 end)
 
-describe("Loading an entity that is both collector and collectable", function ()
+describe("loading an entity that is both collector and collectable", function ()
   it("should throw an error", function ()
     local config = {
       entities = {
@@ -504,7 +504,7 @@ describe("Loading an entity that is both collector and collectable", function ()
   end)
 end)
 
-describe("Loading a collision box", function ()
+describe("loading a collision box", function ()
   local config
 
   before_each(function ()

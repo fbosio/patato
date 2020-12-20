@@ -8,7 +8,7 @@ after_each(function ()
   package.loaded.messenger = nil
 end)
 
-describe("Loading a collector that collides with a collectable", function ()
+describe("loading a collector that collides with a collectable", function ()
   it("should remove the collectable", function ()
     local collectors = {
       mario = true

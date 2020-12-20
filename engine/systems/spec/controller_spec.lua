@@ -8,7 +8,7 @@ after_each(function ()
   package.loaded.controller = nil
 end)
 
-describe("With one player with AD as walking input", function ()
+describe("with one player with AD as walking input", function ()
   local keys, inputs, velocities, impulseSpeeds
 
   before_each(function ()
@@ -113,7 +113,7 @@ describe("With one player with AD as walking input", function ()
   end)
 end)
 
-describe("With two players with AD and JL as walking input", function ()
+describe("with two players with AD and JL as walking input", function ()
   local keys, inputs, velocities, impulseSpeeds
 
   before_each(function ()
@@ -246,7 +246,7 @@ describe("With two players with AD and JL as walking input", function ()
   end)
 end)
 
-describe("With a menu", function ()
+describe("with a menu", function ()
   local keys, inputs, menus, started
 
   before_each(function ()
@@ -273,7 +273,7 @@ describe("With a menu", function ()
     }
   end)
 
-  describe("Pressing S key", function ()
+  describe("pressing S key", function ()
     it("should select the second menu option", function ()
       controller.keypressed("s", keys, inputs, menus, true)
 
@@ -281,7 +281,7 @@ describe("With a menu", function ()
     end)
   end)
 
-  describe("Pressing W key", function ()
+  describe("pressing W key", function ()
     it("should select the third menu option", function ()
       controller.keypressed("w", keys, inputs, menus, true)
 
@@ -289,7 +289,7 @@ describe("With a menu", function ()
     end)
   end)
 
-  describe("Pressing RETURN key", function ()
+  describe("pressing RETURN key", function ()
     it("should run the callback of the first menu option", function ()
       controller.keypressed("return", keys, inputs, menus, true)
 
