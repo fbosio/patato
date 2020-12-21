@@ -93,7 +93,11 @@ local stateBuilders = {
     createDefaultPosition(world, entity)
   end,
   animations = function (world, component, entity)
+    local entityName = M.entityTagger.getName(entity)
+
     world.animations = world.animations or {}
+    world.animations[entityName] = world.animations[entityName] or {}
+
     for animationName, animation in pairs(component) do
       local t = {
         frames = {},
@@ -112,7 +116,7 @@ local stateBuilders = {
           t.frames[i] = v
         end
       end
-      world.animations[M.animationTagger.tag(animationName)] = t
+      world.animations[entityName][animationName] = t
     end
     setComponentAttribute(world, "animation", entity, "frame", 1)
   end
@@ -213,10 +217,9 @@ function M.buildState(config, world, levelName)
   end
 end
 
-function M.load(love, entityTagger, animationTagger)
+function M.load(love, entityTagger)
   M.love = love
   M.entityTagger = entityTagger
-  M.animationTagger = animationTagger
 end
 
 function M.buildWorld(config)

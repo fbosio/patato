@@ -2,12 +2,12 @@ local entityTagger
 
 before_each(
   function ()
-    entityTagger = require "engine.tagger.entity"
+    entityTagger = require "engine.tagger"
   end
 )
 
 after_each(function ()
-  package.loaded["engine.tagger.entity"] = nil
+  package.loaded["engine.tagger"] = nil
 end)
 
 describe("tagging an entity once", function ()

@@ -5,7 +5,7 @@ before_each(function ()
 end)
 
 after_each(function ()
-  package.loaded.garbagecollector = nil
+  package.loaded["engine.systems.garbagecollector"] = nil
 end)
 
 describe("Loading an entity that is marked as garbage", function ()

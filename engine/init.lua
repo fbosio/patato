@@ -18,7 +18,7 @@ if type(config) ~= "table" then
   error(message)
 end
 
-local tagger = require "engine.tagger"
+local entityTagger = require "engine.tagger.entity"
 local resourcemanager = require "engine.resourcemanager"
 local systems = require "engine.systems"
 local renderer = require "engine.renderer"
@@ -28,7 +28,7 @@ local M = {}
 -- Löve2D events
 function M.load()
   systems.load(love)
-  resourcemanager.load(love, tagger.newTagger(), tagger.newTagger())
+  resourcemanager.load(love, entityTagger)
   for k, v in pairs(resourcemanager.buildWorld(config)) do
     M[k] = v
   end
@@ -62,7 +62,7 @@ end
 
 function M.setMenuOption(entity, index, callback)
   if M.gameState.menu then
-    M.gameState.menu[tagger.getId(entity)].callbacks[index] = callback
+    M.gameState.menu[entityTagger.getId(entity)].callbacks[index] = callback
   end
 end
 

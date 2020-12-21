@@ -1,10 +1,9 @@
 describe("loading 3 levels with players, a menu with 4 options", function ()
-  local entityTagger, animationTagger
+  local entityTagger
   local resourcemanager, controller, config, world, drankCoffee
 
   before_each(function ()
-    entityTagger = require "engine.tagger.entity"
-    animationTagger = require "engine.tagger.animation"
+    entityTagger = require "engine.tagger"
     resourcemanager = require "engine.resourcemanager"
     controller = require "engine.systems.controller"
     config = {
@@ -44,7 +43,7 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
       return 800, 600
     end
     controller.load(loveMock)
-    resourcemanager.load(loveMock, entityTagger, animationTagger)
+    resourcemanager.load(loveMock, entityTagger)
     world = resourcemanager.buildWorld(config)
     drankCoffee = false
     local mainMenuId = entityTagger.getId("mainMenu")
@@ -70,8 +69,7 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
   after_each(function ()
     package.loaded["engine.systems.controller"] = nil
     package.loaded["engine.resourcemanager"] = nil
-    package.loaded["engine.tagger.entity"] = nil
-    package.loaded["engine.tagger.animation"] = nil
+    package.loaded["engine.tagger"] = nil
   end)
 
   describe("and selecting the 'go to first level' option", function ()
