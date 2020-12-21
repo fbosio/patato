@@ -1,8 +1,9 @@
 local M = {}
 
-function M.update(collectors, collectables, collisionBoxes, garbage)
+function M.update(collectors, collectables, collectableEffects,
+                  collisionBoxes, garbage)
   for collectorEntity, _ in pairs(collectors or {}) do
-    for collectableEntity, _ in pairs(collectables or {}) do
+    for collectableEntity, collectable in pairs(collectables or {}) do
       local box1 = collisionBoxes[collectorEntity]
       local box2 = collisionBoxes[collectableEntity]
 
@@ -17,6 +18,7 @@ function M.update(collectors, collectables, collisionBoxes, garbage)
 
       if left1 <= right2 and right1 >= left2 and top1 <= bottom2
           and bottom1 >= top2 then
+        collectableEffects[collectable.name]()
         garbage[collectableEntity] = true
       end
     end

@@ -14,7 +14,7 @@ describe("loading a collector that collides with a collectable", function ()
       mario = true
     }
     local collectables = {
-      coin = true
+      coin = {name = "coin"}
     }
     local collisionBoxes = {
       mario = {
@@ -32,9 +32,13 @@ describe("loading a collector that collides with a collectable", function ()
         height = 32
       }
     }
+    local collectableEffects = {
+      coin = function () end
+    }
     local garbage = {}
 
-    messenger.update(collectors, collectables, collisionBoxes, garbage)
+    messenger.update(collectors, collectables, collectableEffects,
+                     collisionBoxes, garbage)
 
     assert.are.truthy(garbage.coin)
   end)

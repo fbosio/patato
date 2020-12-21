@@ -32,11 +32,16 @@ function M.load()
   for k, v in pairs(resourcemanager.buildWorld(config)) do
     M[k] = v
   end
+  M.collectableEffects = {
+    __index = function ()
+      return function () end
+    end
+  }
   renderer.load(love)
 end
 
 function M.update(dt)
-  systems.update(dt, M.keys, M.gameState)
+  systems.update(dt, M.keys, M.gameState, M.collectableEffects)
 end
 
 function M.draw()
@@ -58,6 +63,10 @@ function M.setMenuOption(entity, index, callback)
   if M.gameState.menu then
     M.gameState.menu[tagger.getId(entity)].callbacks[index] = callback
   end
+end
+
+function M.setCollectableEffect(name, callback)
+  M.collectableEffects[name] = callback
 end
 
 return M
