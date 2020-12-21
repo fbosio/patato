@@ -180,6 +180,7 @@ end
 local function buildAssets(config, world)
   if config.spriteSheet and config.sprites then
     local spriteSheet = M.love.graphics.newImage(config.spriteSheet)
+    world.spriteSheet = spriteSheet
     world.sprites = {}
     for _, spriteData in ipairs(config.sprites) do
       local x, y, w, h, originX, originY = unpack(spriteData)

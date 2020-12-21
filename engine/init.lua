@@ -18,7 +18,7 @@ if type(config) ~= "table" then
   error(message)
 end
 
-local entityTagger = require "engine.tagger.entity"
+local entityTagger = require "engine.tagger"
 local resourcemanager = require "engine.resourcemanager"
 local systems = require "engine.systems"
 local renderer = require "engine.renderer"
@@ -38,7 +38,7 @@ function M.load()
       return function () end
     end
   })
-  renderer.load(love)
+  renderer.load(love, entityTagger)
 end
 
 function M.update(dt)

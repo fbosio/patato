@@ -1,8 +1,9 @@
 local M = {}
 
-function M.load(love)
+function M.load(love, tagger)
   M.love = love
   M.love.graphics.setPointSize(5)
+  M.tagger = tagger
 end
 
 function M.draw(engine)
@@ -26,6 +27,16 @@ function M.draw(engine)
       M.love.graphics.rectangle("fill", box.x, box.y, box.width, box.height)
     end
 
+    if engine.sprites then
+      for entity, animation in pairs(st.animation or {}) do
+        local position = (st.position or {})[entity]
+        local x, y = position.x, position.y
+        local _, t = next(engine.animations[M.tagger.getName(entity)])
+        local sprite = engine.sprites[t.frames[animation.frame]]
+        love.graphics.draw(engine.spriteSheet, sprite.quad, x, y)
+      end
+    end
+    
     for entity, position in pairs(st.position or {}) do
       local x, y = position.x, position.y
       M.love.graphics.points{{x, y, 1, 0, 0, 1}}
