@@ -13,4 +13,12 @@ function M.getId(name)
   return tags[name]
 end
 
+function M.getName(entity)
+  for k, v in pairs(tags) do
+    if v == entity then
+      return k
+    end
+  end
+end
+
 return M

@@ -76,7 +76,7 @@ local stateBuilders = {
     setComponent(world, "collector", entity, component)
   end,
   collectable = function (world, component, entity)
-    setComponent(world, "collectable", entity, component)
+    setComponent(world, "collectable", entity, {name=M.tagger.getName(entity)})
   end,
   collisionBox = function (world, component, entity)
     local t = {

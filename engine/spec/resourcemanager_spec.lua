@@ -2,10 +2,12 @@ local resourcemanager, taggerMock
 
 before_each(function ()
   resourcemanager = require "engine.resourcemanager"
+
   local loveMock = {graphics = {}}
   function loveMock.graphics.getDimensions()
     return 800, 600
   end
+
   taggerMock = {}
   local id = 0
   local tags = {}
@@ -17,11 +19,20 @@ before_each(function ()
   function taggerMock.getId(name)
     return tags[name]
   end
+  function taggerMock.getName(entity)
+    for k, v in pairs(tags) do
+      if v == entity then
+        return k
+      end
+    end
+  end
+
   resourcemanager.load(loveMock, taggerMock)
 end)
 
 after_each(function ()
   package.loaded.resourcemanager = nil
+  package.loaded.tagger = nil
 end)
 
 describe("loading an empty config", function ()
@@ -206,7 +217,7 @@ describe("loading an entity with an empty input", function ()
   it("should create game state with default walk speed", function ()
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = 1
+    local playerId = taggerMock.getId("player")
     assert.are.same(400, world.gameState.impulseSpeed[playerId].walk)
   end)
 
@@ -367,7 +378,7 @@ describe("loading config with nonempty menu", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local mainMenuId = 1
+    local mainMenuId = taggerMock.getId("mainMenu")
     assert.are.same({"Start"}, world.gameState.menu[mainMenuId].options)
   end)
 
@@ -451,7 +462,7 @@ describe("loading a level with defined entity and position", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = 1
+    local playerId = taggerMock.getId("sonic")
     assert.is.truthy(world.gameState.input[playerId])
     assert.are.same(200, world.gameState.position[playerId].x)
     assert.are.same(300, world.gameState.position[playerId].y)
@@ -479,7 +490,7 @@ describe("load two levels and the name of the first one", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = 1
+    local playerId = taggerMock.getId("sonic")
     assert.is.truthy(world.gameState.input[playerId])
     assert.are.same(200, world.gameState.position[playerId].x)
     assert.are.same(300, world.gameState.position[playerId].y)
@@ -498,7 +509,7 @@ describe("loading a collector entity", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = 1
+    local playerId = taggerMock.getId("player")
     assert.is.truthy(world.gameState.collector[playerId])
   end)
 end)
@@ -539,10 +550,11 @@ describe("loading collectable entities that are in a level", function ()
 
   local world = resourcemanager.buildWorld(config)
 
-  it("sould copy the collectable components", function ()
-    assert.are.truthy(world.gameState.collectable[1])
-    assert.are.truthy(world.gameState.collectable[2])
-    assert.are.truthy(world.gameState.collectable[3])
+  it("sould copy the collectable components with its name", function ()
+    local collectable = world.gameState.collectable
+    assert.are.same("bottle", collectable[1].name)
+    assert.are.same("bottle", collectable[2].name)
+    assert.are.same("bottle", collectable[3].name)
   end)
 end)
 
@@ -589,7 +601,7 @@ describe("loading a collision box", function ()
   it("should create game state with default position", function ()
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = 1
+    local playerId = taggerMock.getId("player")
     local playerPosition = world.gameState.position[playerId]
     assert.are.same(400, playerPosition.x)
     assert.are.same(300, playerPosition.y)
