@@ -32,11 +32,12 @@ function M.load()
   for k, v in pairs(resourcemanager.buildWorld(config)) do
     M[k] = v
   end
-  M.collectableEffects = {
+  M.collectableEffects = {}
+  setmetatable(M.collectableEffects, {
     __index = function ()
       return function () end
     end
-  }
+  })
   renderer.load(love)
 end
 
@@ -53,7 +54,7 @@ function M.keypressed(key)
                      M.inMenu)
 end
 
--- Public API
+-- API
 function M.startGame(levelName)
   M.inMenu = false
   resourcemanager.buildState(config, M, levelName)
