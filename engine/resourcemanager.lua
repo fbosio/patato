@@ -1,19 +1,19 @@
 local M = {}
 
-local function setComponent(world, componentName, entityName, value)
+local function setComponent(world, componentName, entity, value)
   world.gameState[componentName] = world.gameState[componentName] or {}
-  world.gameState[componentName][entityName] = value
+  world.gameState[componentName][entity] = value
 end
 
-local function setComponentAttribute(world, componentName, entityName,
+local function setComponentAttribute(world, componentName, entity,
     attribute, value)
   world.gameState[componentName] = world.gameState[componentName] or {}
-  world.gameState[componentName][entityName] =
-    world.gameState[componentName][entityName] or {}
-  world.gameState[componentName][entityName][attribute] = value
+  world.gameState[componentName][entity] =
+    world.gameState[componentName][entity] or {}
+  world.gameState[componentName][entity][attribute] = value
 end
 
-local function copyInputToState(world, input, entityName, foundMenu)
+local function copyInputToState(world, input, entity, foundMenu)
   if not next(input) then  -- check that input (non-boolean) is an empty table
     local defaultInput = foundMenu and {
       menuPrevious = "up",
@@ -31,54 +31,54 @@ local function copyInputToState(world, input, entityName, foundMenu)
   end
   for actionName, virtualKey in pairs(input) do
     if world.keys[virtualKey] then
-      setComponentAttribute(world, "input", entityName, actionName,
+      setComponentAttribute(world, "input", entity, actionName,
                             virtualKey)
     end
   end
 end
 
-local function createDefaultPosition(world, entityName)
+local function createDefaultPosition(world, entity)
   local width, height = M.love.graphics.getDimensions()
-  setComponentAttribute(world, "position", entityName, "x", width/2)
-  setComponentAttribute(world, "position", entityName, "y", height/2)
+  setComponentAttribute(world, "position", entity, "x", width/2)
+  setComponentAttribute(world, "position", entity, "y", height/2)
 end
 
-local function createDefaults(world, entityName)
-  setComponentAttribute(world, "impulseSpeed", entityName, "walk", 400)
-  createDefaultPosition(world, entityName)
-  setComponentAttribute(world, "velocity", entityName, "x", 0)
-  setComponentAttribute(world, "velocity", entityName, "y", 0)
+local function createDefaults(world, entity)
+  setComponentAttribute(world, "impulseSpeed", entity, "walk", 400)
+  createDefaultPosition(world, entity)
+  setComponentAttribute(world, "velocity", entity, "x", 0)
+  setComponentAttribute(world, "velocity", entity, "y", 0)
 end
 
-local function copyMenuToState(world, menu, entityName)
+local function copyMenuToState(world, menu, entity)
   local menuOptions = {}
   for _, option in ipairs(menu.options) do
     menuOptions[#menuOptions+1] = option
   end
-  setComponentAttribute(world, "menu", entityName, "options", menuOptions)
-  setComponentAttribute(world, "menu", entityName, "callbacks", {})
-  setComponentAttribute(world, "menu", entityName, "selected", 1)
+  setComponentAttribute(world, "menu", entity, "options", menuOptions)
+  setComponentAttribute(world, "menu", entity, "callbacks", {})
+  setComponentAttribute(world, "menu", entity, "selected", 1)
   world.inMenu = true  -- cambiar por escena
 end
 
 local stateBuilders = {
-  input = function (world, component, entityName)
-    copyInputToState(world, component, entityName)
-    createDefaults(world, entityName)
+  input = function (world, component, entity)
+    copyInputToState(world, component, entity)
+    createDefaults(world, entity)
   end,
-  impulseSpeed = function (world, component, entityName)
+  impulseSpeed = function (world, component, entity)
     for impulseName, speed in pairs(component) do
-      setComponentAttribute(world, "impulseSpeed", entityName, impulseName,
+      setComponentAttribute(world, "impulseSpeed", entity, impulseName,
                             speed)
     end
   end,
-  collector = function (world, component, entityName)
-    setComponent(world, "collector", entityName, component)
+  collector = function (world, component, entity)
+    setComponent(world, "collector", entity, component)
   end,
-  collectable = function (world, component, entityName)
-    setComponent(world, "collectable", entityName, component)
+  collectable = function (world, component, entity)
+    setComponent(world, "collectable", entity, component)
   end,
-  collisionBox = function (world, component, entityName)
+  collisionBox = function (world, component, entity)
     local t = {
       origin = {x=component[1], y=component[2]},
       width = component[3],
@@ -87,36 +87,40 @@ local stateBuilders = {
       y = 0
     }
     for k, v in pairs(t) do
-      setComponentAttribute(world, "collisionBox", entityName, k, v)
+      setComponentAttribute(world, "collisionBox", entity, k, v)
     end
-    createDefaultPosition(world, entityName)
+    createDefaultPosition(world, entity)
   end
 }
 
-local function buildNonMenu(entityName, entity, world)
-  if not entity.menu then
-    for componentName, component in pairs(entity) do
+local function buildNonMenu(entityName, entityComponents, world)
+  local entity = nil
+  if not entityComponents.menu then
+    for componentName, component in pairs(entityComponents) do
       if componentName ~= "menu" then
+        entity = entity or M.tagger.tag(entityName)
         assert(stateBuilders[componentName],
-               "Entity " .. entityName .. " has a component named "
-                .. componentName .. " that was not expected in config.lua")
-        stateBuilders[componentName](world, component, entityName)
+        "Entity " .. entityName .. " has a component named "
+        .. componentName .. " that was not expected in config.lua")
+        stateBuilders[componentName](world, component, entity)
       end
     end
   end
+  return entity
 end
 
 local function buildMenu(config, world)
   local foundMenu = false
-  for entityName, entity in pairs(config.entities) do
-    for componentName, component in pairs(entity) do
+  for entityName, entityComponents in pairs(config.entities) do
+    for componentName, component in pairs(entityComponents) do
       if componentName == "menu" and world.inMenu == nil then
+        local entity = M.tagger.tag(entityName)
         foundMenu = true
-        copyMenuToState(world, component, entityName)
+        copyMenuToState(world, component, entity)
         world.gameState.input = world.gameState.input or {}
-        world.gameState.input[entityName] = entity.input
-        copyInputToState(world, world.gameState.input[entityName] or {},
-                          entityName, true)
+        world.gameState.input[entity] = entityComponents.input
+        copyInputToState(world, world.gameState.input[entity] or {},
+                         entity, true)
       end
     end
   end
@@ -125,17 +129,22 @@ local function buildMenu(config, world)
 end
 
 local function buildNonMenuIfInLevel(config, world, levelName, entityName,
-                                     entity)
+                                     entityComponents)
   local firstLevelName = config.firstLevel or next(config.levels)
   levelName = levelName or firstLevelName
   local level = config.levels[levelName] or {}
-  local position = level[entityName]
-  if position then
-    buildNonMenu(entityName, entity, world)
-    setComponentAttribute(world, "position", entityName, "x",
-                          position[1])
-    setComponentAttribute(world, "position", entityName, "y",
-                          position[2])
+  local positions = level[entityName]
+  if positions then
+    if type(positions[1]) == "number" then
+      positions = {positions}
+    end
+    for _, position in ipairs(positions) do
+      local entity = buildNonMenu(entityName, entityComponents, world)
+      if entity then
+        setComponentAttribute(world, "position", entity, "x", position[1])
+        setComponentAttribute(world, "position", entity, "y", position[2])
+      end
+    end
   end
 end
 
@@ -144,9 +153,10 @@ function M.buildState(config, world, levelName)
   if config.entities then
     local hasNoMenuComponents = buildMenu(config, world)
     if hasNoMenuComponents then
-      for entityName, entity in pairs(config.entities) do
+      for entityName, entityComponents in pairs(config.entities) do
         if config.levels then
-          buildNonMenuIfInLevel(config, world, levelName, entityName, entity)
+          buildNonMenuIfInLevel(config, world, levelName, entityName,
+                                entityComponents)
         else
           local isNotCollectable = not config.entities[entityName].collectable
           local isNotCollector = not config.entities[entityName].collector
@@ -155,7 +165,7 @@ function M.buildState(config, world, levelName)
                  .. "same time, but entity " .. entityName .. " has both "
                  .. "components declared in config.lua")
           if isNotCollectable then
-            buildNonMenu(entityName, entity, world)
+            buildNonMenu(entityName, entityComponents, world)
           end
         end
       end
@@ -163,8 +173,9 @@ function M.buildState(config, world, levelName)
   end
 end
 
-function M.load(love)
+function M.load(love, tagger)
   M.love = love
+  M.tagger = tagger
 end
 
 function M.buildWorld(config)

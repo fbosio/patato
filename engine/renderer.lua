@@ -26,6 +26,7 @@ function M.draw(engine)
       M.love.graphics.points({x, y})
 
       local box = (st.collisionBox or {})[entity]
+      M.love.graphics.print(tostring(entity), x, y - 50)
       if box then
         M.love.graphics.rectangle("fill", x+box.x, y+box.y, box.width,
                                   box.height)
