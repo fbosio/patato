@@ -20,9 +20,9 @@ M.entities = {
     },
     collector = true,
     collisionBox = {15, 70, 30, 70},
-    -- animations = {
-    --   standing = {{{1, 1}}, false} -- {{{sprite, duration}, ...}, looping}
-    -- }
+    animations = {
+      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
+    }
   },
   bee = {
     input = {

@@ -91,6 +91,30 @@ local stateBuilders = {
       setComponentAttribute(world, "collisionBox", entity, k, v)
     end
     createDefaultPosition(world, entity)
+  end,
+  animations = function (world, component, entity)
+    world.animations = world.animations or {}
+    for animationName, animation in pairs(component) do
+      local t = {
+        frames = {},
+        durations = {},
+        looping = false
+      }
+      for k, v in ipairs(animation) do
+        if type(v) == "boolean" then
+          t.looping = v
+          break
+        end
+        local i = math.ceil(k/2)
+        if k % 2 == 0 then
+          t.durations[i] = v
+        else
+          t.frames[i] = v
+        end
+      end
+      world.animations[animationName] = t
+    end
+    setComponentAttribute(world, "animation", entity, "frame", 1)
   end
 }
 

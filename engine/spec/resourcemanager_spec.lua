@@ -666,3 +666,44 @@ describe("loading spriteSheet and some sprites", function ()
     assert.are.same({x = 16, y = 16}, world.sprites[3].origin)
   end)
 end)
+
+describe("loading sprites and an entity with animations", function ()
+  local config, world
+
+  before_each(function ()
+    config = {
+      spriteSheet = "path/to/mySpriteSheet.png",
+      sprites = {
+        {1, 1, 32, 32, 16, 32},
+        {33, 1, 32, 32, 0, 0},
+        {1, 33, 32, 32, 16, 16}
+      },
+      entities = {
+        player = {
+          animations = {
+            standing = {1, 1},
+            walking = {2, 0.5, 3, 0.5, 4, 0.5, 3, 0.5, true}
+          }
+        }
+      }
+    }
+
+    world = resourcemanager.buildWorld(config)
+  end)
+
+  it ("should create an animations table", function ()
+    local standingAnimation = world.animations.standing
+    assert.are.same({1}, standingAnimation.frames)
+    assert.are.same({1}, standingAnimation.durations)
+    assert.is.falsy(standingAnimation.looping)
+    local walkingAnimation = world.animations.walking
+    assert.are.same({2, 3, 4, 3}, walkingAnimation.frames)
+    assert.are.same({0.5, 0.5, 0.5, 0.5}, walkingAnimation.durations)
+    assert.is.truthy(walkingAnimation.looping)
+  end)
+
+  it("should create an animation component", function ()
+    local playerId = taggerMock.getId("player")
+    assert.are.same(1, world.gameState.animation[playerId].frame)
+  end)
+end)
