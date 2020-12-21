@@ -8,12 +8,21 @@ M.keys = {
   start = "return",
 }
 
+M.spriteSheet = "resources/sprites/patato.png"
+
+M.sprites = {
+  {1, 1, 137, 266, 72.35, 256.5} -- {x, y, width, height, originX, originY}
+}
+
 M.entities = {
   patato = {
     input = {
     },
     collector = true,
     collisionBox = {15, 70, 30, 70},
+    -- animations = {
+    --   standing = {{{1, 1}}, false} -- {{{sprite, duration}, ...}, looping}
+    -- }
   },
   bee = {
     input = {

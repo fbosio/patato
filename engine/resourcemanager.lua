@@ -149,6 +149,21 @@ local function buildNonMenuIfInLevel(config, world, levelName, entityName,
   end
 end
 
+local function buildAssets(config, world)
+  if config.spriteSheet and config.sprites then
+    local spriteSheet = M.love.graphics.newImage(config.spriteSheet)
+    world.sprites = {}
+    for _, spriteData in ipairs(config.sprites) do
+      local x, y, w, h, originX, originY = unpack(spriteData)
+      local newSprite = {}
+      newSprite.quad = M.love.graphics.newQuad(x, y, w, h,
+                                               spriteSheet:getDimensions())
+      newSprite.origin = {x = originX, y = originY}
+      world.sprites[#world.sprites+1] = newSprite
+    end
+  end
+end
+
 function M.buildState(config, world, levelName)
   world.gameState = {garbage={}}
   if config.entities then
@@ -192,6 +207,7 @@ function M.buildWorld(config)
   world.keys.down = world.keys.down or "s"
   world.keys.start = world.keys.start or "return"
 
+  buildAssets(config, world)
   M.buildState(config, world)
 
   return world

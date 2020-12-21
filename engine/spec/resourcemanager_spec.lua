@@ -1,12 +1,18 @@
-local resourcemanager, taggerMock
+local resourcemanager, loveMock, taggerMock
 
 before_each(function ()
   resourcemanager = require "engine.resourcemanager"
 
-  local loveMock = {graphics = {}}
-  function loveMock.graphics.getDimensions()
+  local love = {graphics = {}}
+  function love.graphics.getDimensions()
     return 800, 600
   end
+  function love.graphics.newImage()
+    return {getDimensions = function () end}
+  end
+  function love.graphics.newQuad()
+  end
+  loveMock = mock(love)
 
   taggerMock = {}
   local id = 0
@@ -605,5 +611,58 @@ describe("loading a collision box", function ()
     local playerPosition = world.gameState.position[playerId]
     assert.are.same(400, playerPosition.x)
     assert.are.same(300, playerPosition.y)
+  end)
+end)
+
+describe("loading a config with a spriteSheet and no sprites", function ()
+  it("should not create a sprites table", function ()
+    local config = {
+      spriteSheet = "path/to/mySpriteSheet.png"
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    assert.are.falsy(world.sprites)
+  end)
+end)
+
+describe("loading spriteSheet and empty sprites table", function ()
+  it("should create a new image", function ()
+    local spriteSheetPath = "path/to/mySpriteSheet.png"
+    local config = {
+      spriteSheet = spriteSheetPath,
+      sprites = {}
+    }
+
+    resourcemanager.buildWorld(config)
+
+    assert.stub(loveMock.graphics.newImage).was.called_with(spriteSheetPath)
+  end)
+end)
+
+describe("loading spriteSheet and some sprites", function ()
+  local spriteSheetPath, config, world
+
+  before_each(function ()
+    spriteSheetPath = "path/to/mySpriteSheet.png"
+    config = {
+      spriteSheet = spriteSheetPath,
+      sprites = {
+        {1, 1, 32, 32, 16, 32},
+        {33, 1, 32, 32, 0, 0},
+        {1, 33, 32, 32, 16, 16}
+      }
+    }
+    world = resourcemanager.buildWorld(config)
+  end)
+
+  it("should create the same number of quads as sprites", function ()
+    assert.stub(loveMock.graphics.newQuad).was.called(#config.sprites)
+  end)
+
+  it("should create the sprites with their defined origins", function ()
+    assert.are.same({x = 16, y = 32}, world.sprites[1].origin)
+    assert.are.same({x = 0, y = 0}, world.sprites[2].origin)
+    assert.are.same({x = 16, y = 16}, world.sprites[3].origin)
   end)
 end)
