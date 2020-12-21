@@ -9,7 +9,7 @@ M.keys = {
 }
 
 M.spriteSheet = "resources/sprites/patato.png"
-
+M.spriteScale = 0.5
 M.sprites = {
   {1, 1, 137, 266, 72.35, 256.5} -- {x, y, width, height, originX, originY}
 }

@@ -1,3 +1,4 @@
+local config = require "config"
 local resourcemanager, loveMock, entityTagger
 
 before_each(function ()
@@ -14,7 +15,7 @@ before_each(function ()
   function love.graphics.newQuad()
   end
   loveMock = mock(love)
-  
+
   resourcemanager.load(loveMock, entityTagger)
 end)
 
@@ -597,28 +598,36 @@ describe("loading a collision box", function ()
 end)
 
 describe("loading a config with a spriteSheet and no sprites", function ()
-  it("should not create a sprites table", function ()
+  it("should not create a resources table", function ()
     local config = {
       spriteSheet = "path/to/mySpriteSheet.png"
     }
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.falsy(world.sprites)
+    assert.are.falsy(world.resources)
   end)
 end)
 
 describe("loading spriteSheet and empty sprites table", function ()
-  it("should create a new image", function ()
-    local spriteSheetPath = "path/to/mySpriteSheet.png"
-    local config = {
+  local spriteSheetPath, config, world
+
+  before_each(function ()
+    spriteSheetPath = "path/to/mySpriteSheet.png"
+    config = {
       spriteSheet = spriteSheetPath,
       sprites = {}
     }
 
-    resourcemanager.buildWorld(config)
+    world = resourcemanager.buildWorld(config)
+  end)
 
+  it("should create a new image", function ()
     assert.stub(loveMock.graphics.newImage).was.called_with(spriteSheetPath)
+  end)
+
+  it("should load a default sprite scale", function ()
+    assert.are.same(1, world.resources.spriteScale)
   end)
 end)
 
@@ -643,9 +652,9 @@ describe("loading spriteSheet and some sprites", function ()
   end)
 
   it("should create the sprites with their defined origins", function ()
-    assert.are.same({x = 16, y = 32}, world.sprites[1].origin)
-    assert.are.same({x = 0, y = 0}, world.sprites[2].origin)
-    assert.are.same({x = 16, y = 16}, world.sprites[3].origin)
+    assert.are.same({x = 16, y = 32}, world.resources.sprites[1].origin)
+    assert.are.same({x = 0, y = 0}, world.resources.sprites[2].origin)
+    assert.are.same({x = 16, y = 16}, world.resources.sprites[3].origin)
   end)
 end)
 
@@ -674,11 +683,12 @@ describe("loading sprites and an entity with animations", function ()
   end)
 
   it ("should create an animations table", function ()
-    local standingAnimation = world.animations.player.standing
+    local animations = world.resources.animations
+    local standingAnimation = animations.player.standing
     assert.are.same({1}, standingAnimation.frames)
     assert.are.same({1}, standingAnimation.durations)
     assert.is.falsy(standingAnimation.looping)
-    local walkingAnimation = world.animations.player.walking
+    local walkingAnimation = animations.player.walking
     assert.are.same({2, 3, 4, 3}, walkingAnimation.frames)
     assert.are.same({0.5, 0.5, 0.5, 0.5}, walkingAnimation.durations)
     assert.is.truthy(walkingAnimation.looping)
@@ -713,8 +723,22 @@ describe("loading entities with animations with the same name", function ()
     }
 
     local world = resourcemanager.buildWorld(config)
-    
-    assert.is.truthy(world.animations.coin.idle)
-    assert.is.truthy(world.animations.bottle.idle)
+
+    assert.is.truthy(world.resources.animations.coin.idle)
+    assert.is.truthy(world.resources.animations.bottle.idle)
+  end)
+end)
+
+describe("loading config with sprite scale", function ()
+  it("should store it in resources table", function ()
+    local config = {
+      spriteSheet = "path/to/mySpriteSheet.png",
+      spriteScale = 0.5,
+      sprites = {}
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    assert.are.same(0.5, world.resources.spriteScale)
   end)
 end)

@@ -95,8 +95,8 @@ local stateBuilders = {
   animations = function (world, component, entity)
     local entityName = M.entityTagger.getName(entity)
 
-    world.animations = world.animations or {}
-    world.animations[entityName] = world.animations[entityName] or {}
+    local animations = world.resources.animations or {}
+    animations[entityName] = animations[entityName] or {}
 
     for animationName, animation in pairs(component) do
       local t = {
@@ -116,9 +116,10 @@ local stateBuilders = {
           t.frames[i] = v
         end
       end
-      world.animations[entityName][animationName] = t
+      animations[entityName][animationName] = t
     end
     setComponentAttribute(world, "animation", entity, "frame", 1)
+    world.resources.animations = animations
   end
 }
 
@@ -177,18 +178,21 @@ local function buildNonMenuIfInLevel(config, world, levelName, entityName,
   end
 end
 
-local function buildAssets(config, world)
+local function buildResources(config, world)
   if config.spriteSheet and config.sprites then
     local spriteSheet = M.love.graphics.newImage(config.spriteSheet)
-    world.spriteSheet = spriteSheet
-    world.sprites = {}
+    world.resources = {
+      spriteSheet = spriteSheet,
+      spriteScale = config.spriteScale or 1,
+      sprites = {}
+    }
     for _, spriteData in ipairs(config.sprites) do
       local x, y, w, h, originX, originY = unpack(spriteData)
       local newSprite = {}
       newSprite.quad = M.love.graphics.newQuad(x, y, w, h,
                                                spriteSheet:getDimensions())
       newSprite.origin = {x = originX, y = originY}
-      world.sprites[#world.sprites+1] = newSprite
+      world.resources.sprites[#world.resources.sprites+1] = newSprite
     end
   end
 end
@@ -236,7 +240,7 @@ function M.buildWorld(config)
   world.keys.down = world.keys.down or "s"
   world.keys.start = world.keys.start or "return"
 
-  buildAssets(config, world)
+  buildResources(config, world)
   M.buildState(config, world)
 
   return world

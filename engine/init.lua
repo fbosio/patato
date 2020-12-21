@@ -46,7 +46,7 @@ function M.update(dt)
 end
 
 function M.draw()
-  renderer.draw(M)
+  renderer.draw(M.gameState, M.inMenu, M.resources)
 end
 
 function M.keypressed(key)

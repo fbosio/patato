@@ -6,10 +6,8 @@ function M.load(love, tagger)
   M.tagger = tagger
 end
 
-function M.draw(engine)
-  local st = engine.gameState
-
-  if engine.inMenu then
+function M.draw(st, inMenu, resources)
+  if inMenu then
     local width, height = M.love.graphics.getDimensions()
 
     for _, menu in pairs(st.menu) do
@@ -27,16 +25,18 @@ function M.draw(engine)
       M.love.graphics.rectangle("fill", box.x, box.y, box.width, box.height)
     end
 
-    if engine.sprites then
+    if resources.sprites then
       for entity, animation in pairs(st.animation or {}) do
         local position = (st.position or {})[entity]
+        local _, t = next(resources.animations[M.tagger.getName(entity)])
+        local sprite = resources.sprites[t.frames[animation.frame]]
         local x, y = position.x, position.y
-        local _, t = next(engine.animations[M.tagger.getName(entity)])
-        local sprite = engine.sprites[t.frames[animation.frame]]
-        love.graphics.draw(engine.spriteSheet, sprite.quad, x, y)
+        local scale = resources.spriteScale
+        love.graphics.draw(resources.spriteSheet, sprite.quad, x, y, 0,
+                           scale, scale, sprite.origin.x, sprite.origin.y)
       end
     end
-    
+
     for entity, position in pairs(st.position or {}) do
       local x, y = position.x, position.y
       M.love.graphics.points{{x, y, 1, 0, 0, 1}}
