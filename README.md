@@ -12,9 +12,10 @@ The engine API has **events** and **public functions**.
   - `update(dt)`
   - `draw()`
   - `keypressed(key)`
-* **Two public functions**
+* **Three public functions**
   - `startGame(levelName)`
   - `setMenuOption(entity, index, callback)`
+  - `setCollectableEffect(name, callback)`
 
 In its simplest form, the engine is used like follows.
 
@@ -280,8 +281,76 @@ function love.keypressed(key)
 end
 ```
 
-Since selecting the first menu option loads the first level, there is no need to pass `"quest"` to the `startGame` function explicitly (although is totally allowed).
-In the other case, `"minigame"` is required because that level is not declared as the first one by the `firstLevel` field in `config.lua`, and therefore, is not loaded by default.
+Selecting the first menu option loads the first level: there is no need to pass `"quest"` to the `startGame` function explicitly (although is totally allowed).
+On the other hand, since `"minigame"` is not declared as the first level by the `firstLevel` field in `config.lua`, it is not loaded by default, so `"minigame"` must be passed to `startGame` in that case.
+
+### Collectables
+There are four things needed in order to add this behavior to the game.
+
+1. A `collector` component.
+2. A `collectable` component.
+3. Two `collisionBox` components.
+4. A collectable "effect", i.e., a callback.
+
+The components are declared in `config.lua`.
+```lua
+local M = {}
+
+M.entities = {
+  player = {
+    input = {},
+    collector = true,
+    collisionBox = {15, 35, 30, 70}
+  },
+  coin = {
+    collectable = true,
+    collisionBox = {5, 5, 10, 10}
+  }
+}
+
+M.levels = {
+  level = {
+    player = {260, 300},
+    coin = {
+      {440, 300},
+      {460, 300},
+      {480, 300},
+      {500, 300},
+      {520, 300}
+    }
+  }
+}
+
+return M
+```
+
+The callbacks are defined in `main.lua`.
+```lua
+local engine = require "engine"
+local score
+
+
+function love.load()
+  engine.load()
+
+  score = 0
+  -- setCollectableEffect(name, callback)
+  engine.setCollectableEffect("coin", function ()
+    score = score + 1
+  end)
+end
+
+function love.update(dt)
+  engine.update(dt)
+end
+
+function love.draw()
+  engine.draw()
+
+  love.graphics.print(score, 0, 0)
+end
+```
+In this case, when each coin is _collected_ by the player, the `score` is increased by one.
 
 
 ## Specs
