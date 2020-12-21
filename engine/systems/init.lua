@@ -11,7 +11,7 @@ end
 
 function M.update(dt, keys, st)
   controller.update(keys, st.input, st.velocity, st.impulseSpeed, st.menu)
-  transporter.update(dt, st.velocity, st.position)
+  transporter.update(dt, st.velocity, st.position, st.collisionBox)
   messenger.update(st.collector, st.collectable, st.collisionBox, st.garbage)
   garbagecollector.update(st)
 end

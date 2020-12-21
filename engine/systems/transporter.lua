@@ -9,8 +9,8 @@ function M.update(dt, velocities, positions, collisionBoxes)
 
   for entity, collisionBox in pairs(collisionBoxes or {}) do
     local position = positions[entity]
-    collisionBox.x = collisionBox.origin.x + position.x
-    collisionBox.y = collisionBox.origin.y + position.y
+    collisionBox.x = position.x - collisionBox.origin.x
+    collisionBox.y = position.y - collisionBox.origin.y
   end
 end
 

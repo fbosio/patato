@@ -149,7 +149,7 @@ local function buildNonMenuIfInLevel(config, world, levelName, entityName,
 end
 
 function M.buildState(config, world, levelName)
-  world.gameState = {}
+  world.gameState = {garbage={}}
   if config.entities then
     local hasNoMenuComponents = buildMenu(config, world)
     if hasNoMenuComponents then

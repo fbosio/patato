@@ -43,6 +43,10 @@ describe("loading an empty config", function ()
     assert.are.same("w", emptyWorld.keys.up)
     assert.are.same("s", emptyWorld.keys.down)
   end)
+
+  it("should create a garbage component table", function ()
+    assert.are.truthy(emptyWorld.gameState.garbage)
+  end)
 end)
 
 describe("loading an empty physics table", function ()
@@ -137,19 +141,19 @@ describe("loading some keys that are not for movement", function ()
 end)
 
 describe("loading an empty entities list", function ()
-  it("should create an empty game state", function ()
+  it("should create a game state with a garbage table only", function ()
     local config = {
       entities = {}
     }
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same({}, world.gameState)
+    assert.are.same({garbage={}}, world.gameState)
   end)
 end)
 
 describe("loading an entity without components", function ()
-  it("should create an empty game state", function ()
+  it("should create a game state with a garbage table only", function ()
     local config = {
       entities = {
         player = {}
@@ -158,7 +162,7 @@ describe("loading an entity without components", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same({}, world.gameState)
+    assert.are.same({garbage = {}}, world.gameState)
   end)
 end)
 
@@ -308,7 +312,7 @@ describe("loading an entity with movement input and keys", function ()
 end)
 
 describe("loading an entity with only an empty speed list", function ()
-  it("should create an empty game state", function ()
+  it("should create a game state", function ()
     local config = {
       entities = {
         player = {
@@ -319,7 +323,7 @@ describe("loading an entity with only an empty speed list", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same({}, world.gameState)
+    assert.are.same({garbage = {}}, world.gameState)
   end)
 end)
 

@@ -2,6 +2,7 @@ local M = {}
 
 function M.load(love)
   M.love = love
+  M.love.graphics.setPointSize(5)
 end
 
 function M.draw(engine)
@@ -21,16 +22,14 @@ function M.draw(engine)
     end
 
   else
+    for _, box in pairs(st.collisionBox or {}) do
+      M.love.graphics.rectangle("fill", box.x, box.y, box.width, box.height)
+    end
+
     for entity, position in pairs(st.position or {}) do
       local x, y = position.x, position.y
-      M.love.graphics.points({x, y})
-
-      local box = (st.collisionBox or {})[entity]
+      M.love.graphics.points{{x, y, 1, 0, 0, 1}}
       M.love.graphics.print(tostring(entity), x, y - 50)
-      if box then
-        M.love.graphics.rectangle("fill", x+box.x, y+box.y, box.width,
-                                  box.height)
-      end
     end
   end
 end
