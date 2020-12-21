@@ -5,7 +5,7 @@ before_each(function ()
 end)
 
 after_each(function ()
-  package.loaded.controller = nil
+  package.loaded["engine.systems.controller"] = nil
 end)
 
 describe("with one player with AD as walking input", function ()

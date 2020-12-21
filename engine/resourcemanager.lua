@@ -77,7 +77,7 @@ local stateBuilders = {
   end,
   collectable = function (world, _, entity)
     setComponent(world, "collectable", entity,
-                 {name=M.tagger.getName(entity)})
+                 {name=M.entityTagger.getName(entity)})
   end,
   collisionBox = function (world, component, entity)
     local t = {
@@ -112,7 +112,7 @@ local stateBuilders = {
           t.frames[i] = v
         end
       end
-      world.animations[animationName] = t
+      world.animations[M.animationTagger.tag(animationName)] = t
     end
     setComponentAttribute(world, "animation", entity, "frame", 1)
   end
@@ -123,7 +123,7 @@ local function buildNonMenu(entityName, entityComponents, world)
   if not entityComponents.menu then
     for componentName, component in pairs(entityComponents) do
       if componentName ~= "menu" then
-        entity = entity or M.tagger.tag(entityName)
+        entity = entity or M.entityTagger.tag(entityName)
         assert(stateBuilders[componentName],
         "Entity " .. entityName .. " has a component named "
         .. componentName .. " that was not expected in config.lua")
@@ -139,7 +139,7 @@ local function buildMenu(config, world)
   for entityName, entityComponents in pairs(config.entities) do
     for componentName, component in pairs(entityComponents) do
       if componentName == "menu" and world.inMenu == nil then
-        local entity = M.tagger.tag(entityName)
+        local entity = M.entityTagger.tag(entityName)
         foundMenu = true
         copyMenuToState(world, component, entity)
         world.gameState.input = world.gameState.input or {}
@@ -213,9 +213,10 @@ function M.buildState(config, world, levelName)
   end
 end
 
-function M.load(love, tagger)
+function M.load(love, entityTagger, animationTagger)
   M.love = love
-  M.tagger = tagger
+  M.entityTagger = entityTagger
+  M.animationTagger = animationTagger
 end
 
 function M.buildWorld(config)

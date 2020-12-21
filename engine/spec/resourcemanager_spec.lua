@@ -1,4 +1,4 @@
-local resourcemanager, loveMock, taggerMock
+local resourcemanager, loveMock, entityTaggerMock, animationTaggerMock
 
 before_each(function ()
   resourcemanager = require "engine.resourcemanager"
@@ -14,31 +14,35 @@ before_each(function ()
   end
   loveMock = mock(love)
 
-  taggerMock = {}
-  local id = 0
-  local tags = {}
-  function taggerMock.tag(name)
-    id = id + 1
-    tags[name] = id
-    return id
-  end
-  function taggerMock.getId(name)
-    return tags[name]
-  end
-  function taggerMock.getName(entity)
-    for k, v in pairs(tags) do
-      if v == entity then
-        return k
-      end
-    end
-  end
+  local function newTagger()
+    local self = {id = 0, tags = {}}
 
-  resourcemanager.load(loveMock, taggerMock)
+    return {
+      tag = function (name)
+        self.id = self.id + 1
+        self.tags[name] = self.id
+        return self.id
+      end,
+      getId = function (name)
+        return self.tags[name]
+      end,
+      getName = function (entity)
+        for k, v in pairs(self.tags) do
+          if v == entity then
+            return k
+          end
+        end
+      end
+    }
+  end
+  entityTaggerMock = newTagger()
+  animationTaggerMock = newTagger()
+
+  resourcemanager.load(loveMock, entityTaggerMock, animationTaggerMock)
 end)
 
 after_each(function ()
-  package.loaded.resourcemanager = nil
-  package.loaded.tagger = nil
+  package.loaded["engine.resourcemanager"] = nil
 end)
 
 describe("loading an empty config", function ()
@@ -212,7 +216,7 @@ describe("loading an entity with an empty input", function ()
   it("should create game state with input as default keys", function ()
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     local playerInput = world.gameState.input[playerId]
     assert.are.same("left", playerInput.walkLeft)
     assert.are.same("right", playerInput.walkRight)
@@ -223,14 +227,14 @@ describe("loading an entity with an empty input", function ()
   it("should create game state with default walk speed", function ()
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     assert.are.same(400, world.gameState.impulseSpeed[playerId].walk)
   end)
 
   it("should create game state with default position", function ()
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     local playerPosition = world.gameState.position[playerId]
     assert.are.same(400, playerPosition.x)
     assert.are.same(300, playerPosition.y)
@@ -239,7 +243,7 @@ describe("loading an entity with an empty input", function ()
   it("should create game state with default velocity", function ()
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     local playerVelocity = world.gameState.velocity[playerId]
     assert.are.same(0, playerVelocity.x)
     assert.are.same(0, playerVelocity.y)
@@ -268,7 +272,7 @@ describe("loading an entity with movement input and lacking keys", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     local playerInput = world.gameState.input[playerId]
     assert.are.same("left2", playerInput.walkLeft)
     assert.are.same("right2", playerInput.walkRight)
@@ -291,7 +295,7 @@ describe("loading an entity with lacking movement input", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     assert.is.falsy(world.gameState.input[playerId].walkRight)
   end)
 end)
@@ -319,7 +323,7 @@ describe("loading an entity with movement input and keys", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     local playerInput = world.gameState.input[playerId]
     assert.are.same("left2", playerInput.walkLeft)
     assert.are.same("right2", playerInput.walkRight)
@@ -361,7 +365,7 @@ describe("loading an entity with impulse speeds", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     local playerSpeed = world.gameState.impulseSpeed[playerId]
     assert.are.same(400, playerSpeed.walk)
     assert.are.same(200, playerSpeed.crouchWalk)
@@ -384,7 +388,7 @@ describe("loading config with nonempty menu", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local mainMenuId = taggerMock.getId("mainMenu")
+    local mainMenuId = entityTaggerMock.getId("mainMenu")
     assert.are.same({"Start"}, world.gameState.menu[mainMenuId].options)
   end)
 
@@ -411,9 +415,9 @@ describe("loading config with nonempty menu and other entities", function ()
       }
     }
     world = resourcemanager.buildWorld(config)
-    mainMenuId = taggerMock.getId("mainMenu")
-    playerOneId = taggerMock.getId("playerOne")
-    playerTwoId = taggerMock.getId("playerTwo")
+    mainMenuId = entityTaggerMock.getId("mainMenu")
+    playerOneId = entityTaggerMock.getId("playerOne")
+    playerTwoId = entityTaggerMock.getId("playerTwo")
   end)
 
   it("should load components with menu entity", function ()
@@ -468,7 +472,7 @@ describe("loading a level with defined entity and position", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("sonic")
+    local playerId = entityTaggerMock.getId("sonic")
     assert.is.truthy(world.gameState.input[playerId])
     assert.are.same(200, world.gameState.position[playerId].x)
     assert.are.same(300, world.gameState.position[playerId].y)
@@ -496,7 +500,7 @@ describe("load two levels and the name of the first one", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("sonic")
+    local playerId = entityTaggerMock.getId("sonic")
     assert.is.truthy(world.gameState.input[playerId])
     assert.are.same(200, world.gameState.position[playerId].x)
     assert.are.same(300, world.gameState.position[playerId].y)
@@ -515,7 +519,7 @@ describe("loading a collector entity", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     assert.is.truthy(world.gameState.collector[playerId])
   end)
 end)
@@ -596,7 +600,7 @@ describe("loading a collision box", function ()
   it("should copy the component", function ()
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     local box = world.gameState.collisionBox[playerId]
     assert.are.same(15, box.origin.x)
     assert.are.same(35, box.origin.y)
@@ -607,7 +611,7 @@ describe("loading a collision box", function ()
   it("should create game state with default position", function ()
     local world = resourcemanager.buildWorld(config)
 
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     local playerPosition = world.gameState.position[playerId]
     assert.are.same(400, playerPosition.x)
     assert.are.same(300, playerPosition.y)
@@ -692,18 +696,20 @@ describe("loading sprites and an entity with animations", function ()
   end)
 
   it ("should create an animations table", function ()
-    local standingAnimation = world.animations.standing
+    local standingId = animationTaggerMock.getId("standing")
+    local walkingId = animationTaggerMock.getId("walking")
+    local standingAnimation = world.animations[standingId]
     assert.are.same({1}, standingAnimation.frames)
     assert.are.same({1}, standingAnimation.durations)
     assert.is.falsy(standingAnimation.looping)
-    local walkingAnimation = world.animations.walking
+    local walkingAnimation = world.animations[walkingId]
     assert.are.same({2, 3, 4, 3}, walkingAnimation.frames)
     assert.are.same({0.5, 0.5, 0.5, 0.5}, walkingAnimation.durations)
     assert.is.truthy(walkingAnimation.looping)
   end)
 
   it("should create an animation component", function ()
-    local playerId = taggerMock.getId("player")
+    local playerId = entityTaggerMock.getId("player")
     assert.are.same(1, world.gameState.animation[playerId].frame)
   end)
 end)

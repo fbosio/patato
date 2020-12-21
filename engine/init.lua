@@ -28,7 +28,7 @@ local M = {}
 -- Löve2D events
 function M.load()
   systems.load(love)
-  resourcemanager.load(love, tagger)
+  resourcemanager.load(love, tagger.newTagger(), tagger.newTagger())
   for k, v in pairs(resourcemanager.buildWorld(config)) do
     M[k] = v
   end

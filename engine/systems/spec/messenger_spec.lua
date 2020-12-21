@@ -5,7 +5,7 @@ before_each(function ()
 end)
 
 after_each(function ()
-  package.loaded.messenger = nil
+  package.loaded["engine.systems.messenger"] = nil
 end)
 
 describe("loading a collector that collides with a collectable", function ()

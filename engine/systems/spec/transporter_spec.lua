@@ -6,7 +6,7 @@ before_each(function ()
 end)
 
 after_each(function ()
-  package.loaded.transporter = nil
+  package.loaded["engine.systems.transporter"] = nil
 end)
 
 describe("with empty velocity, position and collision box tables", function ()

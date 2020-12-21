@@ -1,8 +1,10 @@
 describe("loading 3 levels with players, a menu with 4 options", function ()
-  local tagger, resourcemanager, controller, config, world, drankCoffee
+  local entityTagger, animationTagger
+  local resourcemanager, controller, config, world, drankCoffee
 
   before_each(function ()
-    tagger = require "engine.tagger"
+    entityTagger = require "engine.tagger.entity"
+    animationTagger = require "engine.tagger.animation"
     resourcemanager = require "engine.resourcemanager"
     controller = require "engine.systems.controller"
     config = {
@@ -42,10 +44,10 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
       return 800, 600
     end
     controller.load(loveMock)
-    resourcemanager.load(loveMock, tagger)
+    resourcemanager.load(loveMock, entityTagger, animationTagger)
     world = resourcemanager.buildWorld(config)
     drankCoffee = false
-    local mainMenuId = tagger.getId("mainMenu")
+    local mainMenuId = entityTagger.getId("mainMenu")
     world.gameState.menu[mainMenuId].callbacks = {
       function ()
         world.inMenu = false
@@ -66,8 +68,10 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
   end)
 
   after_each(function ()
-    package.loaded.controller = nil
-    package.loaded.resourcemanager = nil
+    package.loaded["engine.systems.controller"] = nil
+    package.loaded["engine.resourcemanager"] = nil
+    package.loaded["engine.tagger.entity"] = nil
+    package.loaded["engine.tagger.animation"] = nil
   end)
 
   describe("and selecting the 'go to first level' option", function ()
@@ -76,7 +80,7 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
                             world.gameState.menu, world.inMenu)
 
       local level = config.levels["green hill zone"]
-      local playerId = tagger.getId("sonic")
+      local playerId = entityTagger.getId("sonic")
       local playerPosition = world.gameState.position[playerId]
       assert.are.same(level.sonic[1], playerPosition.x)
       assert.are.same(level.sonic[2], playerPosition.y)
@@ -91,7 +95,7 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
                             world.gameState.menu, world.inMenu)
 
       local level = config.levels["hill top zone"]
-      local playerId = tagger.getId("sonic")
+      local playerId = entityTagger.getId("sonic")
       local playerPosition = world.gameState.position[playerId]
       assert.are.same(level.sonic[1], playerPosition.x)
       assert.are.same(level.sonic[2], playerPosition.y)
@@ -108,7 +112,7 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
                             world.gameState.menu, world.inMenu)
 
       local level = config.levels["metropolis zone"]
-      local playerId = tagger.getId("sonic")
+      local playerId = entityTagger.getId("sonic")
       local playerPosition = world.gameState.position[playerId]
       assert.are.same(level.sonic[1], playerPosition.x)
       assert.are.same(level.sonic[2], playerPosition.y)
