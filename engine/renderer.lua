@@ -29,7 +29,7 @@ function M.draw(engine)
     for entity, position in pairs(st.position or {}) do
       local x, y = position.x, position.y
       M.love.graphics.points{{x, y, 1, 0, 0, 1}}
-      M.love.graphics.print(tostring(entity), x, y - 50)
+      M.love.graphics.print({{1, 0, 0}, tostring(entity)}, x, y - 50)
     end
   end
 end
