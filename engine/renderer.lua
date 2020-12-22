@@ -31,7 +31,6 @@ function M.draw(st, inMenu, resources)
         local entityName = M.tagger.getName(entity)
         local entityAnimations = resources.animations[entityName]
         local t = entityAnimations[animation.name]
-        print(entityName, animation.name, animation.frame)
         local sprite = resources.sprites[t.frames[animation.frame]]
         local x, y = position.x, position.y
         local scale = resources.spriteScale

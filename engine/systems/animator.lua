@@ -14,7 +14,7 @@ function M.update(dt, animationComponents, animationResources)
       animation.time = remainingTime
       if animation.frame == #resource.frames then
         if resource.looping then
-          animation.frame = 0
+          animation.frame = 1
         else
           animation.ended = true
         end

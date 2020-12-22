@@ -35,6 +35,7 @@ describe("updating an animation with several frames", function ()
       }
     }
     dt = 2
+
     animator.update(dt, animationComponents, animationResources)
   end)
 
@@ -47,14 +48,59 @@ describe("updating an animation with several frames", function ()
   end)
 end)
 
--- describe("playing a looping animation until its end", function ()
---   it("should go back to its first frame", function ()
-    
---   end)
--- end)
+describe("playing a looping animation until its end", function ()
+  it("should go back to its first frame", function ()
+    local animationResources = {
+      player = {
+        standing = {
+          frames = {1, 2, 3},
+          durations = {5, 8, 10},
+          looping = true
+        }
+      }
+    }
+    local playerId = entityTagger.tag("player")
+    local animationComponents = {
+      [playerId] = {
+        name = "standing",
+        frame = 3,
+        time = 8,
+        ended = false
+      }
+    }
+    local dt = 2
 
--- describe("playing a nonlooping animation until its end", function ()
---   it("should stop the animation", function ()
-    
---   end)
--- end)
+    animator.update(dt, animationComponents, animationResources)
+
+    assert.are.same(1, animationComponents[playerId].frame)
+  end)
+end)
+
+describe("playing a nonlooping animation until its end", function ()
+  it("should stop the animation", function ()
+    local animationResources = {
+      player = {
+        standing = {
+          frames = {1, 2, 3},
+          durations = {5, 8, 10},
+          looping = false
+        }
+      }
+    }
+    local playerId = entityTagger.tag("player")
+    local animationComponents = {
+      [playerId] = {
+        name = "standing",
+        frame = 3,
+        time = 8,
+        ended = false
+      }
+    }
+    local dt = 2
+
+    animator.update(dt, animationComponents, animationResources)
+
+    assert.are.same(3, animationComponents[playerId].frame)
+    assert.is.truthy(animationComponents[playerId].ended)
+  end)
+end)
