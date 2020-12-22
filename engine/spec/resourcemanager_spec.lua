@@ -688,6 +688,7 @@ describe("loading sprites and an entity with animations", function ()
     assert.are.same({1}, standingAnimation.frames)
     assert.are.same({1}, standingAnimation.durations)
     assert.is.falsy(standingAnimation.looping)
+
     local walkingAnimation = animations.player.walking
     assert.are.same({2, 3, 4, 3}, walkingAnimation.frames)
     assert.are.same({0.5, 0.5, 0.5, 0.5}, walkingAnimation.durations)
@@ -696,7 +697,10 @@ describe("loading sprites and an entity with animations", function ()
 
   it("should create an animation component", function ()
     local playerId = entityTagger.getId("player")
-    assert.are.same(1, world.gameState.animation[playerId].frame)
+    local playerAnimation = world.gameState.animation[playerId]
+    assert.are.same(1, playerAnimation.frame)
+    assert.are.same(0, playerAnimation.time)
+    assert.are.falsy(playerAnimation.ended)
   end)
 end)
 

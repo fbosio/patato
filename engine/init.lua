@@ -27,7 +27,7 @@ local M = {}
 
 -- Löve2D events
 function M.load()
-  systems.load(love)
+  systems.load(love, entityTagger)
   resourcemanager.load(love, entityTagger)
   for k, v in pairs(resourcemanager.buildWorld(config)) do
     M[k] = v
@@ -42,7 +42,8 @@ function M.load()
 end
 
 function M.update(dt)
-  systems.update(dt, M.keys, M.gameState, M.collectableEffects)
+  systems.update(dt, M.keys, M.gameState, M.collectableEffects,
+                 M.resources.animations)
 end
 
 function M.draw()

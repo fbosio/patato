@@ -94,10 +94,9 @@ local stateBuilders = {
   end,
   animations = function (world, component, entity)
     local entityName = M.entityTagger.getName(entity)
-
     local animations = world.resources.animations or {}
     animations[entityName] = animations[entityName] or {}
-
+    local name
     for animationName, animation in pairs(component) do
       local t = {
         frames = {},
@@ -117,8 +116,12 @@ local stateBuilders = {
         end
       end
       animations[entityName][animationName] = t
+      name = name or animationName
     end
+    setComponentAttribute(world, "animation", entity, "name", name)
     setComponentAttribute(world, "animation", entity, "frame", 1)
+    setComponentAttribute(world, "animation", entity, "time", 0)
+    setComponentAttribute(world, "animation", entity, "ended", false)
     world.resources.animations = animations
   end
 }
