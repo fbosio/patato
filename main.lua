@@ -1,5 +1,5 @@
 local engine = require "engine"
-local elapsed, showingMessage, score
+local elapsed, message, score
 
 
 function love.load()
@@ -10,10 +10,15 @@ function love.load()
   end)
   engine.setMenuOption("mainMenu", 2, function ()
     elapsed = 0
-    showingMessage = true
+    message = "Hola, mundo"
   end)
   engine.setMenuOption("mainMenu", 3, function ()
     engine.startGame("secretLevel")
+  end)
+
+  engine.setAction("showCustomMessage", function ()
+    elapsed = 0
+    message = "Flashlight!"
   end)
 
   score = 0
@@ -29,7 +34,7 @@ function love.update(dt)
     elapsed = elapsed + dt
     if elapsed > 1 then
       elapsed = nil
-      showingMessage = false
+      message = nil
     end
   end
 end
@@ -37,8 +42,8 @@ end
 function love.draw()
   engine.draw()
 
-  if showingMessage then
-    love.graphics.print("Hola, mundo", 0, 0)
+  if message then
+    love.graphics.print(message, 0, 0)
   end
 
   if not engine.inMenu then

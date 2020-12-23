@@ -42,7 +42,7 @@ function M.load()
 end
 
 function M.update(dt)
-  systems.update(dt, M.keys, M.gameState, M.collectableEffects,
+  systems.update(dt, M.keys, M.control, M.gameState, M.collectableEffects,
                  M.resources.animations)
 end
 
@@ -51,8 +51,8 @@ function M.draw()
 end
 
 function M.keypressed(key)
-  systems.keypressed(key, M.keys, M.gameState.input, M.gameState.menu,
-                     M.inMenu)
+  systems.keypressed(key, M.keys, M.control, M.gameState.input,
+                     M.gameState.menu, M.inMenu)
 end
 
 -- API
@@ -69,6 +69,10 @@ end
 
 function M.setCollectableEffect(name, callback)
   M.collectableEffects[name] = callback
+end
+
+function M.setAction(action, callback)
+  M.control.actions[action] = callback
 end
 
 return M

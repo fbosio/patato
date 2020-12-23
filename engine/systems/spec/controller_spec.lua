@@ -1,7 +1,34 @@
-local controller
+local controller, control
 
 before_each(function ()
   controller = require "engine.systems.controller"
+  control = {
+    actions = {
+      walkLeft = function (t) t.velocity.x = -t.walkSpeed end,
+      walkRight = function (t) t.velocity.x = t.walkSpeed end,
+      walkUp = function (t) t.velocity.y = -t.walkSpeed end,
+      walkDown = function (t) t.velocity.y = t.walkSpeed end,
+      menuPrevious = function (t)
+        t.menu.selected = t.menu.selected - 1
+        if t.menu.selected == 0 then
+          t.menu.selected = #t.menu.options
+        end
+      end,
+      menuNext = function (t)
+        t.menu.selected = t.menu.selected + 1
+        if t.menu.selected == #t.menu.options + 1 then
+          t.menu.selected = 1
+        end
+      end,
+      menuSelect = function (t)
+        (t.menu.callbacks[t.menu.selected] or function () end)()
+      end,
+    },
+    omissions = {
+      [{"walkLeft", "walkRight"}] = function (v) v.x = 0 end,
+      [{"walkUp", "walkDown"}] = function (v) v.y = 0 end,
+    }
+  }
 end)
 
 after_each(function ()
@@ -40,7 +67,7 @@ describe("with one player with AD as walking input", function ()
     end)
 
     it("should set the velocity to zero", function ()
-      controller.update(keys, inputs, velocities, impulseSpeeds)
+      controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
       assert.are.same(0, velocities.playerOne.x)
     end)
@@ -57,14 +84,14 @@ describe("with one player with AD as walking input", function ()
     end)
 
     it("should set the velocity to negative walk speed", function ()
-      controller.update(keys, inputs, velocities, impulseSpeeds)
+      controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
       assert.are.same(-impulseSpeeds.playerOne.walk, velocities.playerOne.x)
     end)
 
     describe("and then leaving it", function ()
       before_each(function ()
-        controller.update(keys, inputs, velocities, impulseSpeeds)
+        controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -72,7 +99,7 @@ describe("with one player with AD as walking input", function ()
       end)
 
       it("should set the velocity to zero", function ()
-        controller.update(keys, inputs, velocities, impulseSpeeds)
+        controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
         assert.are.same(0, velocities.playerOne.x)
       end)
@@ -90,14 +117,14 @@ describe("with one player with AD as walking input", function ()
     end)
 
     it("should set the velocity to positive walk speed", function ()
-      controller.update(keys, inputs, velocities, impulseSpeeds)
+      controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
       assert.are.same(impulseSpeeds.playerOne.walk, velocities.playerOne.x)
     end)
 
     describe("and then leaving it", function ()
       before_each(function ()
-        controller.update(keys, inputs, velocities, impulseSpeeds)
+        controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -105,7 +132,7 @@ describe("with one player with AD as walking input", function ()
       end)
 
       it("should set the velocity to zero", function ()
-        controller.update(keys, inputs, velocities, impulseSpeeds)
+        controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
         assert.are.same(0, velocities.playerOne.x)
       end)
@@ -153,7 +180,7 @@ describe("with two players with AD and JL as walking input", function ()
     end)
 
     it("should set both velocities to zero", function ()
-      controller.update(keys, inputs, velocities, impulseSpeeds)
+      controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
       assert.are.same(0, velocities.playerOne.x)
       assert.are.same(0, velocities.playerTwo.x)
@@ -170,7 +197,7 @@ describe("with two players with AD and JL as walking input", function ()
     end)
 
     it("should set player one velocity to negative walk speed", function ()
-      controller.update(keys, inputs, velocities, impulseSpeeds)
+      controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
       assert.are.same(-impulseSpeeds.playerOne.walk, velocities.playerOne.x)
       assert.are.same(0, velocities.playerTwo.x)
@@ -187,7 +214,7 @@ describe("with two players with AD and JL as walking input", function ()
     end)
 
     it("should set player one velocity to positive walk speed", function ()
-      controller.update(keys, inputs, velocities, impulseSpeeds)
+      controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
       assert.are.same(impulseSpeeds.playerOne.walk, velocities.playerOne.x)
       assert.are.same(0, velocities.playerTwo.x)
@@ -205,7 +232,7 @@ describe("with two players with AD and JL as walking input", function ()
     end)
 
     it("should set player two velocity to negative walk speed", function ()
-      controller.update(keys, inputs, velocities, impulseSpeeds)
+      controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
       assert.are.same(0, velocities.playerOne.x)
       assert.are.same(-impulseSpeeds.playerTwo.walk, velocities.playerTwo.x)
@@ -213,7 +240,7 @@ describe("with two players with AD and JL as walking input", function ()
 
     describe("and then leaving it", function ()
       before_each(function ()
-        controller.update(keys, inputs, velocities, impulseSpeeds)
+        controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -221,7 +248,7 @@ describe("with two players with AD and JL as walking input", function ()
       end)
 
       it("should set player two velocity to zero", function ()
-        controller.update(keys, inputs, velocities, impulseSpeeds)
+        controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
         assert.are.same(0, velocities.playerTwo.x)
       end)
@@ -238,7 +265,7 @@ describe("with two players with AD and JL as walking input", function ()
     end)
 
     it("should set player two velocity to positive walk speed", function ()
-      controller.update(keys, inputs, velocities, impulseSpeeds)
+      controller.update(keys, control, inputs, velocities, impulseSpeeds)
 
       assert.are.same(0, velocities.playerOne.x)
       assert.are.same(impulseSpeeds.playerTwo.walk, velocities.playerTwo.x)
@@ -275,7 +302,7 @@ describe("with a menu", function ()
 
   describe("pressing S key", function ()
     it("should select the second menu option", function ()
-      controller.keypressed("s", keys, inputs, menus, true)
+      controller.keypressed("s", keys, control, inputs, menus, true)
 
       assert.are.same(2, menus.mainMenu.selected)
     end)
@@ -283,7 +310,7 @@ describe("with a menu", function ()
 
   describe("pressing W key", function ()
     it("should select the third menu option", function ()
-      controller.keypressed("w", keys, inputs, menus, true)
+      controller.keypressed("w", keys, control, inputs, menus, true)
 
       assert.are.same(3, menus.mainMenu.selected)
     end)
@@ -291,7 +318,7 @@ describe("with a menu", function ()
 
   describe("pressing RETURN key", function ()
     it("should run the callback of the first menu option", function ()
-      controller.keypressed("return", keys, inputs, menus, true)
+      controller.keypressed("return", keys, control, inputs, menus, true)
 
       assert.is.truthy(started)
     end)

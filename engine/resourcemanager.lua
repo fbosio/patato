@@ -181,6 +181,40 @@ local function buildNonMenuIfInLevel(config, world, levelName, entityName,
   end
 end
 
+local function buildActionsAndOmissions(world)
+  world.control = {}
+  world.control.actions = {
+    walkLeft = function (t) t.velocity.x = -t.walkSpeed end,
+    walkRight = function (t) t.velocity.x = t.walkSpeed end,
+    walkUp = function (t) t.velocity.y = -t.walkSpeed end,
+    walkDown = function (t) t.velocity.y = t.walkSpeed end,
+    menuPrevious = function (t)
+      t.menu.selected = t.menu.selected - 1
+      if t.menu.selected == 0 then
+        t.menu.selected = #t.menu.options
+      end
+    end,
+    menuNext = function (t)
+      t.menu.selected = t.menu.selected + 1
+      if t.menu.selected == #t.menu.options + 1 then
+        t.menu.selected = 1
+      end
+    end,
+    menuSelect = function (t)
+      (t.menu.callbacks[t.menu.selected] or function () end)()
+    end,
+  }
+  setmetatable(world.control.actions, {
+    __index = function ()
+      return function () end
+    end
+  })
+  world.control.omissions = {
+    [{"walkLeft", "walkRight"}] = function (v) v.x = 0 end,
+    [{"walkUp", "walkDown"}] = function (v) v.y = 0 end,
+  }
+end
+
 local function buildResources(config, world)
   if config.spriteSheet and config.sprites then
     local spriteSheet = M.love.graphics.newImage(config.spriteSheet)
@@ -243,6 +277,7 @@ function M.buildWorld(config)
   world.keys.down = world.keys.down or "s"
   world.keys.start = world.keys.start or "return"
 
+  buildActionsAndOmissions(world)
   buildResources(config, world)
   M.buildState(config, world)
 

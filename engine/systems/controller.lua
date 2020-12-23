@@ -1,38 +1,6 @@
 local M = {}
 
-local actions = {
-  walkLeft = function (t) t.velocity.x = -t.walkSpeed end,
-  walkRight = function (t) t.velocity.x = t.walkSpeed end,
-  walkUp = function (t) t.velocity.y = -t.walkSpeed end,
-  walkDown = function (t) t.velocity.y = t.walkSpeed end,
-  menuPrevious = function (t)
-    t.menu.selected = t.menu.selected - 1
-    if t.menu.selected == 0 then
-      t.menu.selected = #t.menu.options
-    end
-  end,
-  menuNext = function (t)
-    t.menu.selected = t.menu.selected + 1
-    if t.menu.selected == #t.menu.options + 1 then
-      t.menu.selected = 1
-    end
-  end,
-  menuSelect = function (t)
-    (t.menu.callbacks[t.menu.selected] or function () end)()
-  end,
-}
-setmetatable(actions, {
-  __index = function ()
-    return function () end
-  end
-})
-
-local omissions = {
-  [{"walkLeft", "walkRight"}] = function (v) v.x = 0 end,
-  [{"walkUp", "walkDown"}] = function (v) v.y = 0 end,
-}
-
-local function doActionIfKeyIsDown(keys, input, components, isMenu)
+local function doActionIfKeyIsDown(keys, actions, input, components, isMenu)
   local held = {}
 
   for virtualKey, physicalKey in pairs(keys) do
@@ -49,7 +17,7 @@ local function doActionIfKeyIsDown(keys, input, components, isMenu)
   return held
 end
 
-local function doOmissionIfKeyIsUp(pressed, input, velocity)
+local function doOmissionIfKeyIsUp(omissions, pressed, input, velocity)
   for omittedActions, omission in pairs(omissions) do
     local mustOmit = true
 
@@ -79,19 +47,20 @@ function M.load(love)
   M.love = love
 end
 
-function M.update(keys, inputs, velocities, impulseSpeeds, menus)
+function M.update(keys, control, inputs, velocities, impulseSpeeds, menus)
   for entity, input in pairs(inputs or {}) do
     local components = {
       velocity = (velocities or {})[entity],
       walkSpeed = ((impulseSpeeds or {})[entity] or {}).walk,
     }
     local isMenu = (menus or {})[entity]
-    local held = doActionIfKeyIsDown(keys, input, components, isMenu)
-    doOmissionIfKeyIsUp(held, input, components.velocity)
+    local held = doActionIfKeyIsDown(keys, control.actions, input, components,
+                                     isMenu)
+    doOmissionIfKeyIsUp(control.omissions, held, input, components.velocity)
   end
 end
 
-function M.keypressed(key, keys, inputs, menus, inMenu)
+function M.keypressed(key, keys, control, inputs, menus, inMenu)
   if inMenu then
     local pressedVirtualKey
     for virtualKey, physicalKey in pairs(keys) do
@@ -103,7 +72,7 @@ function M.keypressed(key, keys, inputs, menus, inMenu)
     for entity, menu in pairs(menus or {}) do
       for actionName, virtualKey in pairs(inputs[entity]) do
         if pressedVirtualKey == virtualKey then
-          actions[actionName]{menu=menu}
+          control.actions[actionName]{menu=menu}
         end
       end
     end
