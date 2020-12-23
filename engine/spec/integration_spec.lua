@@ -47,17 +47,17 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
     world = resourcemanager.buildWorld(config)
     drankCoffee = false
     local mainMenuId = entityTagger.getId("mainMenu")
-    world.gameState.menu[mainMenuId].callbacks = {
+    world.gameState.components.menu[mainMenuId].callbacks = {
       function ()
-        world.inMenu = false
+        world.gameState.inMenu = false
         resourcemanager.buildState(config, world)
       end,
       function ()
-        world.inMenu = false
+        world.gameState.inMenu = false
         resourcemanager.buildState(config, world, "hill top zone")
       end,
       function ()
-        world.inMenu = false
+        world.gameState.inMenu = false
         resourcemanager.buildState(config, world, "metropolis zone")
       end,
       function ()
@@ -74,13 +74,14 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
 
   describe("and selecting the 'go to first level' option", function ()
     it("should place the player according to the first level", function ()
-      controller.keypressed("return", world.keys, world.control,
-                            world.gameState.input, world.gameState.menu,
-                            world.inMenu)
+      controller.keypressed("return", world.hid.keys, world.hid,
+                            world.gameState.components.input,
+                            world.gameState.components.menu,
+                            world.gameState.inMenu)
 
       local level = config.levels["green hill zone"]
       local playerId = entityTagger.getId("sonic")
-      local playerPosition = world.gameState.position[playerId]
+      local playerPosition = world.gameState.components.position[playerId]
       assert.are.same(level.sonic[1], playerPosition.x)
       assert.are.same(level.sonic[2], playerPosition.y)
     end)
@@ -88,16 +89,18 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
 
   describe("and selecting the 'go to second level' option", function ()
     it("should place the player according to the second level", function ()
-      controller.keypressed("s", world.keys, world.control,
-                            world.gameState.input, world.gameState.menu,
-                            world.inMenu)
-      controller.keypressed("return", world.keys, world.control,
-                            world.gameState.input, world.gameState.menu,
-                            world.inMenu)
+      controller.keypressed("s", world.hid.keys, world.hid,
+                            world.gameState.components.input,
+                            world.gameState.components.menu,
+                            world.gameState.inMenu)
+      controller.keypressed("return", world.hid.keys, world.hid,
+                            world.gameState.components.input,
+                            world.gameState.components.menu,
+                            world.gameState.inMenu)
 
       local level = config.levels["hill top zone"]
       local playerId = entityTagger.getId("sonic")
-      local playerPosition = world.gameState.position[playerId]
+      local playerPosition = world.gameState.components.position[playerId]
       assert.are.same(level.sonic[1], playerPosition.x)
       assert.are.same(level.sonic[2], playerPosition.y)
     end)
@@ -105,19 +108,22 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
 
   describe("and selecting the 'go to third level' option", function ()
     it("should place the player according to the third level", function ()
-      controller.keypressed("s", world.keys, world.control,
-                            world.gameState.input, world.gameState.menu,
-                            world.inMenu)
-      controller.keypressed("s", world.keys, world.control,
-                            world.gameState.input, world.gameState.menu,
-                            world.inMenu)
-      controller.keypressed("return", world.keys, world.control,
-                            world.gameState.input, world.gameState.menu,
-                            world.inMenu)
+      controller.keypressed("s", world.hid.keys, world.hid,
+                            world.gameState.components.input,
+                            world.gameState.components.menu,
+                            world.gameState.inMenu)
+      controller.keypressed("s", world.hid.keys, world.hid,
+                            world.gameState.components.input,
+                            world.gameState.components.menu,
+                            world.gameState.inMenu)
+      controller.keypressed("return", world.hid.keys, world.hid,
+                            world.gameState.components.input,
+                            world.gameState.components.menu,
+                            world.gameState.inMenu)
 
       local level = config.levels["metropolis zone"]
       local playerId = entityTagger.getId("sonic")
-      local playerPosition = world.gameState.position[playerId]
+      local playerPosition = world.gameState.components.position[playerId]
       assert.are.same(level.sonic[1], playerPosition.x)
       assert.are.same(level.sonic[2], playerPosition.y)
     end)
@@ -125,18 +131,22 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
 
   describe("and selecting the 'drink coffee' option", function ()
     it("should show that the coffee was drunk", function ()
-      controller.keypressed("s", world.keys, world.control,
-                            world.gameState.input, world.gameState.menu,
-                            world.inMenu)
-      controller.keypressed("s", world.keys, world.control,
-                            world.gameState.input, world.gameState.menu,
-                            world.inMenu)
-      controller.keypressed("s", world.keys, world.control,
-                            world.gameState.input, world.gameState.menu,
-                            world.inMenu)
-      controller.keypressed("return", world.keys, world.control,
-                            world.gameState.input, world.gameState.menu,
-                            world.inMenu)
+      controller.keypressed("s", world.hid.keys, world.hid,
+                            world.gameState.components.input,
+                            world.gameState.components.menu,
+                            world.gameState.inMenu)
+      controller.keypressed("s", world.hid.keys, world.hid,
+                            world.gameState.components.input,
+                            world.gameState.components.menu,
+                            world.gameState.inMenu)
+      controller.keypressed("s", world.hid.keys, world.hid,
+                            world.gameState.components.input,
+                            world.gameState.components.menu,
+                            world.gameState.inMenu)
+      controller.keypressed("return", world.hid.keys, world.hid,
+                            world.gameState.components.input,
+                            world.gameState.components.menu,
+                            world.gameState.inMenu)
 
       assert.is.truthy(drankCoffee)
     end)

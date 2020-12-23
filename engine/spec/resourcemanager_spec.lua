@@ -1,4 +1,3 @@
-local config = require "config"
 local resourcemanager, loveMock, entityTagger
 
 before_each(function ()
@@ -38,14 +37,14 @@ describe("loading an empty config", function ()
   end)
 
   it("should map ASWD keys", function ()
-    assert.are.same("a", emptyWorld.keys.left)
-    assert.are.same("d", emptyWorld.keys.right)
-    assert.are.same("w", emptyWorld.keys.up)
-    assert.are.same("s", emptyWorld.keys.down)
+    assert.are.same("a", emptyWorld.hid.keys.left)
+    assert.are.same("d", emptyWorld.hid.keys.right)
+    assert.are.same("w", emptyWorld.hid.keys.up)
+    assert.are.same("s", emptyWorld.hid.keys.down)
   end)
 
   it("should create a garbage component table", function ()
-    assert.are.truthy(emptyWorld.gameState.garbage)
+    assert.are.truthy(emptyWorld.gameState.components.garbage)
   end)
 end)
 
@@ -79,10 +78,10 @@ describe("loading an empty keys structure", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same("a", world.keys.left)
-    assert.are.same("d", world.keys.right)
-    assert.are.same("w", world.keys.up)
-    assert.are.same("s", world.keys.down)
+    assert.are.same("a", world.hid.keys.left)
+    assert.are.same("d", world.hid.keys.right)
+    assert.are.same("w", world.hid.keys.up)
+    assert.are.same("s", world.hid.keys.down)
   end)
 end)
 
@@ -99,10 +98,10 @@ describe("loading all movement keys", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same("j", world.keys.left)
-    assert.are.same("l", world.keys.right)
-    assert.are.same("i", world.keys.up)
-    assert.are.same("k", world.keys.down)
+    assert.are.same("j", world.hid.keys.left)
+    assert.are.same("l", world.hid.keys.right)
+    assert.are.same("i", world.hid.keys.up)
+    assert.are.same("k", world.hid.keys.down)
   end)
 end)
 
@@ -117,10 +116,10 @@ describe("loading some movement keys", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same("j", world.keys.left)
-    assert.are.same("d", world.keys.right)
-    assert.are.same("w", world.keys.up)
-    assert.are.same("k", world.keys.down)
+    assert.are.same("j", world.hid.keys.left)
+    assert.are.same("d", world.hid.keys.right)
+    assert.are.same("w", world.hid.keys.up)
+    assert.are.same("k", world.hid.keys.down)
   end)
 end)
 
@@ -135,8 +134,8 @@ describe("loading some keys that are not for movement", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same("j", world.keys["super cool action 1"])
-    assert.are.same("k", world.keys["super cool action 2"])
+    assert.are.same("j", world.hid.keys["super cool action 1"])
+    assert.are.same("k", world.hid.keys["super cool action 2"])
   end)
 end)
 
@@ -148,7 +147,7 @@ describe("loading an empty entities list", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same({garbage={}}, world.gameState)
+    assert.are.same({garbage = {}}, world.gameState.components)
   end)
 end)
 
@@ -162,7 +161,7 @@ describe("loading an entity without components", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same({garbage = {}}, world.gameState)
+    assert.are.same({garbage = {}}, world.gameState.components)
   end)
 end)
 
@@ -196,7 +195,7 @@ describe("loading an entity with an empty input", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    local playerInput = world.gameState.input[playerId]
+    local playerInput = world.gameState.components.input[playerId]
     assert.are.same("left", playerInput.walkLeft)
     assert.are.same("right", playerInput.walkRight)
     assert.are.same("up", playerInput.walkUp)
@@ -207,14 +206,15 @@ describe("loading an entity with an empty input", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    assert.are.same(400, world.gameState.impulseSpeed[playerId].walk)
+    assert.are.same(400,
+                    world.gameState.components.impulseSpeed[playerId].walk)
   end)
 
   it("should create game state with default position", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    local playerPosition = world.gameState.position[playerId]
+    local playerPosition = world.gameState.components.position[playerId]
     assert.are.same(400, playerPosition.x)
     assert.are.same(300, playerPosition.y)
   end)
@@ -223,7 +223,7 @@ describe("loading an entity with an empty input", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    local playerVelocity = world.gameState.velocity[playerId]
+    local playerVelocity = world.gameState.components.velocity[playerId]
     assert.are.same(0, playerVelocity.x)
     assert.are.same(0, playerVelocity.y)
   end)
@@ -252,7 +252,7 @@ describe("loading an entity with movement input and lacking keys", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    local playerInput = world.gameState.input[playerId]
+    local playerInput = world.gameState.components.input[playerId]
     assert.are.same("left2", playerInput.walkLeft)
     assert.are.same("right2", playerInput.walkRight)
     assert.is.falsy(playerInput.walkUp)
@@ -275,7 +275,7 @@ describe("loading an entity with lacking movement input", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    assert.is.falsy(world.gameState.input[playerId].walkRight)
+    assert.is.falsy(world.gameState.components.input[playerId].walkRight)
   end)
 end)
 
@@ -303,7 +303,7 @@ describe("loading an entity with movement input and keys", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    local playerInput = world.gameState.input[playerId]
+    local playerInput = world.gameState.components.input[playerId]
     assert.are.same("left2", playerInput.walkLeft)
     assert.are.same("right2", playerInput.walkRight)
     assert.are.same("up2", playerInput.walkUp)
@@ -323,7 +323,7 @@ describe("loading an entity with only an empty speed list", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same({garbage = {}}, world.gameState)
+    assert.are.same({garbage = {}}, world.gameState.components)
   end)
 end)
 
@@ -345,7 +345,7 @@ describe("loading an entity with impulse speeds", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    local playerSpeed = world.gameState.impulseSpeed[playerId]
+    local playerSpeed = world.gameState.components.impulseSpeed[playerId]
     assert.are.same(400, playerSpeed.walk)
     assert.are.same(200, playerSpeed.crouchWalk)
     assert.are.same(1200, playerSpeed.jump)
@@ -368,7 +368,8 @@ describe("loading config with nonempty menu", function ()
     local world = resourcemanager.buildWorld(config)
 
     local mainMenuId = entityTagger.getId("mainMenu")
-    assert.are.same({"Start"}, world.gameState.menu[mainMenuId].options)
+    assert.are.same({"Start"},
+                    world.gameState.components.menu[mainMenuId].options)
   end)
 
 end)
@@ -400,20 +401,21 @@ describe("loading config with nonempty menu and other entities", function ()
   end)
 
   it("should load components with menu entity", function ()
-    assert.are.same({"Start"}, world.gameState.menu[mainMenuId].options)
-    assert.are.truthy(world.gameState.input[mainMenuId])
+    assert.are.same({"Start"},
+                    world.gameState.components.menu[mainMenuId].options)
+    assert.are.truthy(world.gameState.components.input[mainMenuId])
   end)
 
   it("should copy menu with default input", function ()
-    local menuInput = world.gameState.input[mainMenuId]
+    local menuInput = world.gameState.components.input[mainMenuId]
     assert.are.same("up", menuInput.menuPrevious)
     assert.are.same("down", menuInput.menuNext)
   end)
 
   it("should not copy entities that have not the menu component", function ()
-    assert.is.falsy(world.gameState.input[playerOneId])
-    assert.is.falsy(world.gameState.input[playerTwoId])
-    assert.is.falsy(world.gameState.position)
+    assert.is.falsy(world.gameState.components.input[playerOneId])
+    assert.is.falsy(world.gameState.components.input[playerTwoId])
+    assert.is.falsy(world.gameState.components.position)
   end)
 end)
 
@@ -430,7 +432,7 @@ describe("loading entities and an empty levels table", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.is.falsy(world.gameState.input)
+    assert.is.falsy(world.gameState.components.input)
   end)
 end)
 
@@ -452,9 +454,9 @@ describe("loading a level with defined entity and position", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("sonic")
-    assert.is.truthy(world.gameState.input[playerId])
-    assert.are.same(200, world.gameState.position[playerId].x)
-    assert.are.same(300, world.gameState.position[playerId].y)
+    assert.is.truthy(world.gameState.components.input[playerId])
+    assert.are.same(200, world.gameState.components.position[playerId].x)
+    assert.are.same(300, world.gameState.components.position[playerId].y)
   end)
 end)
 
@@ -480,9 +482,9 @@ describe("load two levels and the name of the first one", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("sonic")
-    assert.is.truthy(world.gameState.input[playerId])
-    assert.are.same(200, world.gameState.position[playerId].x)
-    assert.are.same(300, world.gameState.position[playerId].y)
+    assert.is.truthy(world.gameState.components.input[playerId])
+    assert.are.same(200, world.gameState.components.position[playerId].x)
+    assert.are.same(300, world.gameState.components.position[playerId].y)
   end)
 end)
 
@@ -499,7 +501,7 @@ describe("loading a collector entity", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    assert.is.truthy(world.gameState.collector[playerId])
+    assert.is.truthy(world.gameState.components.collector[playerId])
   end)
 end)
 
@@ -515,7 +517,7 @@ describe("loading a collectable entity that is not in any level", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.is.falsy(world.gameState.collectable)
+    assert.is.falsy(world.gameState.components.collectable)
   end)
 end)
 
@@ -540,7 +542,7 @@ describe("loading collectable entities that are in a level", function ()
   local world = resourcemanager.buildWorld(config)
 
   it("sould copy the collectable components with its name", function ()
-    local collectable = world.gameState.collectable
+    local collectable = world.gameState.components.collectable
     assert.are.same("bottle", collectable[1].name)
     assert.are.same("bottle", collectable[2].name)
     assert.are.same("bottle", collectable[3].name)
@@ -580,7 +582,7 @@ describe("loading a collision box", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    local box = world.gameState.collisionBox[playerId]
+    local box = world.gameState.components.collisionBox[playerId]
     assert.are.same(15, box.origin.x)
     assert.are.same(35, box.origin.y)
     assert.are.same(30, box.width)
@@ -591,7 +593,7 @@ describe("loading a collision box", function ()
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
-    local playerPosition = world.gameState.position[playerId]
+    local playerPosition = world.gameState.components.position[playerId]
     assert.are.same(400, playerPosition.x)
     assert.are.same(300, playerPosition.y)
   end)
@@ -697,7 +699,7 @@ describe("loading sprites and an entity with animations", function ()
 
   it("should create an animation component", function ()
     local playerId = entityTagger.getId("player")
-    local playerAnimation = world.gameState.animation[playerId]
+    local playerAnimation = world.gameState.components.animation[playerId]
     assert.are.same(1, playerAnimation.frame)
     assert.are.same(0, playerAnimation.time)
     assert.are.falsy(playerAnimation.ended)

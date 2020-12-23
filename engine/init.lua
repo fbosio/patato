@@ -42,28 +42,29 @@ function M.load()
 end
 
 function M.update(dt)
-  systems.update(dt, M.keys, M.control, M.gameState, M.collectableEffects,
-                 M.resources.animations)
+  systems.update(dt, M.hid.keys, M.hid, M.gameState.components,
+                 M.collectableEffects, M.resources.animations)
 end
 
 function M.draw()
-  renderer.draw(M.gameState, M.inMenu, M.resources)
+  renderer.draw(M.gameState.components, M.gameState.inMenu, M.resources)
 end
 
 function M.keypressed(key)
-  systems.keypressed(key, M.keys, M.control, M.gameState.input,
-                     M.gameState.menu, M.inMenu)
+  systems.keypressed(key, M.hid.keys, M.hid, M.gameState.components.input,
+                     M.gameState.components.menu, M.gameState.inMenu)
 end
 
 -- API
 function M.startGame(levelName)
-  M.inMenu = false
+  M.gameState.inMenu = false
   resourcemanager.buildState(config, M, levelName)
 end
 
 function M.setMenuOption(entity, index, callback)
-  if M.gameState.menu then
-    M.gameState.menu[entityTagger.getId(entity)].callbacks[index] = callback
+  local menu = M.gameState.components.menu
+  if menu then
+    menu[entityTagger.getId(entity)].callbacks[index] = callback
   end
 end
 
@@ -72,7 +73,7 @@ function M.setCollectableEffect(name, callback)
 end
 
 function M.setAction(action, callback)
-  M.control.actions[action] = callback
+  M.hid.actions[action] = callback
 end
 
 return M

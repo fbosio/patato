@@ -55,7 +55,7 @@ describe("receiving an entity with nonzero velocity", function ()
   end)
 
   it("should update its position", function ()
-    assert.are.same({x=-395, y=253}, positions.player)
+    assert.are.same({x = -395, y = 253}, positions.player)
   end)
 
   it("should update its collision box", function ()

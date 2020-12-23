@@ -11,18 +11,20 @@ function M.load(love, entityTagger)
   animator.load(entityTagger)
 end
 
-function M.update(dt, keys, control, st, collectableEffects, animations)
-  controller.update(keys, control, st.input, st.velocity, st.impulseSpeed,
-                    st.menu)
-  transporter.update(dt, st.velocity, st.position, st.collisionBox)
-  messenger.update(st.collector, st.collectable, collectableEffects,
-                   st.collisionBox, st.garbage)
-  animator.update(dt, st.animation, animations)
-  garbagecollector.update(st)
+function M.update(dt, keys, hid, components, collectableEffects, animations)
+  controller.update(keys, hid, components.input, components.velocity,
+                    components.impulseSpeed, components.menu)
+  transporter.update(dt, components.velocity, components.position,
+                     components.collisionBox)
+  messenger.update(components.collector, components.collectable,
+                   collectableEffects, components.collisionBox,
+                   components.garbage)
+  animator.update(dt, components.animation, animations)
+  garbagecollector.update(components)
 end
 
-function M.keypressed(key, keys, control, input, menu, inMenu)
-  controller.keypressed(key, keys, control, input, menu, inMenu)
+function M.keypressed(key, keys, hid, input, menu, inMenu)
+  controller.keypressed(key, keys, hid, input, menu, inMenu)
 end
 
 return M

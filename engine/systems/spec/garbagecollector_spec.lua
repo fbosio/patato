@@ -9,10 +9,10 @@ after_each(function ()
 end)
 
 describe("Loading an entity that is marked as garbage", function ()
-  local gameState
+  local components
 
   before_each(function ()
-    gameState = {
+    components = {
       garbage = {
         markedEntity = true
       },
@@ -53,18 +53,18 @@ describe("Loading an entity that is marked as garbage", function ()
       }
     }
 
-    garbagecollector.update(gameState)
+    garbagecollector.update(components)
   end)
 
   it("should remove all of its components", function ()
-    assert.is.falsy(gameState.garbage.markedEntity)
-    assert.is.falsy(gameState.position.markedEntity)
-    assert.is.falsy(gameState.collectable.markedEntity)
-    assert.is.falsy(gameState.collisionBox.markedEntity)
+    assert.is.falsy(components.garbage.markedEntity)
+    assert.is.falsy(components.position.markedEntity)
+    assert.is.falsy(components.collectable.markedEntity)
+    assert.is.falsy(components.collisionBox.markedEntity)
   end)
 
   it("should not remove components from other entities", function ()
-    assert.is.truthy(gameState.position.nonMarkedEntity)
-    assert.is.truthy(gameState.collisionBox.nonMarkedEntity)
+    assert.is.truthy(components.position.nonMarkedEntity)
+    assert.is.truthy(components.collisionBox.nonMarkedEntity)
   end)
 end)

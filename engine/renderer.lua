@@ -6,11 +6,11 @@ function M.load(love, tagger)
   M.tagger = tagger
 end
 
-function M.draw(st, inMenu, resources)
+function M.draw(components, inMenu, resources)
   if inMenu then
     local width, height = M.love.graphics.getDimensions()
 
-    for _, menu in pairs(st.menu) do
+    for _, menu in pairs(components.menu) do
       for i, option in ipairs(menu.options) do
         local font = M.love.graphics.getFont()
         local blue = menu.selected == i and 0 or 1
@@ -21,13 +21,13 @@ function M.draw(st, inMenu, resources)
     end
 
   else
-    for _, box in pairs(st.collisionBox or {}) do
+    for _, box in pairs(components.collisionBox or {}) do
       M.love.graphics.rectangle("fill", box.x, box.y, box.width, box.height)
     end
 
     if resources.sprites then
-      for entity, animation in pairs(st.animation or {}) do
-        local position = (st.position or {})[entity]
+      for entity, animation in pairs(components.animation or {}) do
+        local position = (components.position or {})[entity]
         local entityName = M.tagger.getName(entity)
         local entityAnimations = resources.animations[entityName]
         local t = entityAnimations[animation.name]
@@ -39,7 +39,7 @@ function M.draw(st, inMenu, resources)
       end
     end
 
-    for entity, position in pairs(st.position or {}) do
+    for entity, position in pairs(components.position or {}) do
       local x, y = position.x, position.y
       M.love.graphics.points{{x, y, 1, 0, 0, 1}}
       M.love.graphics.print({{1, 0, 0}, tostring(entity)}, x, y - 50)

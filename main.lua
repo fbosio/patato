@@ -4,7 +4,7 @@ local elapsed, message, score
 
 function love.load()
   engine.load()
-  
+
   engine.setMenuOption("mainMenu", 1, function ()
     engine.startGame()  -- changeScene (call automatically if there is no menu)
   end)

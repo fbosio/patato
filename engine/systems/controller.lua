@@ -47,20 +47,20 @@ function M.load(love)
   M.love = love
 end
 
-function M.update(keys, control, inputs, velocities, impulseSpeeds, menus)
+function M.update(keys, hid, inputs, velocities, impulseSpeeds, menus)
   for entity, input in pairs(inputs or {}) do
     local components = {
       velocity = (velocities or {})[entity],
       walkSpeed = ((impulseSpeeds or {})[entity] or {}).walk,
     }
     local isMenu = (menus or {})[entity]
-    local held = doActionIfKeyIsDown(keys, control.actions, input, components,
+    local held = doActionIfKeyIsDown(keys, hid.actions, input, components,
                                      isMenu)
-    doOmissionIfKeyIsUp(control.omissions, held, input, components.velocity)
+    doOmissionIfKeyIsUp(hid.omissions, held, input, components.velocity)
   end
 end
 
-function M.keypressed(key, keys, control, inputs, menus, inMenu)
+function M.keypressed(key, keys, hid, inputs, menus, inMenu)
   if inMenu then
     local pressedVirtualKey
     for virtualKey, physicalKey in pairs(keys) do
@@ -72,7 +72,7 @@ function M.keypressed(key, keys, control, inputs, menus, inMenu)
     for entity, menu in pairs(menus or {}) do
       for actionName, virtualKey in pairs(inputs[entity]) do
         if pressedVirtualKey == virtualKey then
-          control.actions[actionName]{menu=menu}
+          hid.actions[actionName]{menu = menu}
         end
       end
     end

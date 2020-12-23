@@ -1,16 +1,18 @@
 local M = {}
 
 local function setComponent(world, componentName, entity, value)
-  world.gameState[componentName] = world.gameState[componentName] or {}
-  world.gameState[componentName][entity] = value
+  world.gameState.components[componentName] =
+    world.gameState.components[componentName] or {}
+  world.gameState.components[componentName][entity] = value
 end
 
 local function setComponentAttribute(world, componentName, entity,
     attribute, value)
-  world.gameState[componentName] = world.gameState[componentName] or {}
-  world.gameState[componentName][entity] =
-    world.gameState[componentName][entity] or {}
-  world.gameState[componentName][entity][attribute] = value
+  world.gameState.components[componentName] =
+    world.gameState.components[componentName] or {}
+  world.gameState.components[componentName][entity] =
+    world.gameState.components[componentName][entity] or {}
+  world.gameState.components[componentName][entity][attribute] = value
 end
 
 local function copyInputToState(world, input, entity, foundMenu)
@@ -30,7 +32,7 @@ local function copyInputToState(world, input, entity, foundMenu)
     end
   end
   for actionName, virtualKey in pairs(input) do
-    if world.keys[virtualKey] then
+    if world.hid.keys[virtualKey] then
       setComponentAttribute(world, "input", entity, actionName,
                             virtualKey)
     end
@@ -58,7 +60,7 @@ local function copyMenuToState(world, menu, entity)
   setComponentAttribute(world, "menu", entity, "options", menuOptions)
   setComponentAttribute(world, "menu", entity, "callbacks", {})
   setComponentAttribute(world, "menu", entity, "selected", 1)
-  world.inMenu = true  -- cambiar por escena
+  world.gameState.inMenu = true  -- cambiar por escena
 end
 
 local stateBuilders = {
@@ -77,11 +79,11 @@ local stateBuilders = {
   end,
   collectable = function (world, _, entity)
     setComponent(world, "collectable", entity,
-                 {name=M.entityTagger.getName(entity)})
+                 {name = M.entityTagger.getName(entity)})
   end,
   collisionBox = function (world, component, entity)
     local t = {
-      origin = {x=component[1], y=component[2]},
+      origin = {x = component[1], y = component[2]},
       width = component[3],
       height = component[4],
       x = 0,
@@ -146,13 +148,14 @@ local function buildMenu(config, world)
   local foundMenu = false
   for entityName, entityComponents in pairs(config.entities) do
     for componentName, component in pairs(entityComponents) do
-      if componentName == "menu" and world.inMenu == nil then
+      if componentName == "menu" and world.gameState.inMenu == nil then
         local entity = M.entityTagger.tag(entityName)
         foundMenu = true
         copyMenuToState(world, component, entity)
-        world.gameState.input = world.gameState.input or {}
-        world.gameState.input[entity] = entityComponents.input
-        copyInputToState(world, world.gameState.input[entity] or {},
+        world.gameState.components.input =
+          world.gameState.components.input or {}
+        world.gameState.components.input[entity] = entityComponents.input
+        copyInputToState(world, world.gameState.components.input[entity] or {},
                          entity, true)
       end
     end
@@ -182,8 +185,7 @@ local function buildNonMenuIfInLevel(config, world, levelName, entityName,
 end
 
 local function buildActionsAndOmissions(world)
-  world.control = {}
-  world.control.actions = {
+  world.hid.actions = {
     walkLeft = function (t) t.velocity.x = -t.walkSpeed end,
     walkRight = function (t) t.velocity.x = t.walkSpeed end,
     walkUp = function (t) t.velocity.y = -t.walkSpeed end,
@@ -204,12 +206,12 @@ local function buildActionsAndOmissions(world)
       (t.menu.callbacks[t.menu.selected] or function () end)()
     end,
   }
-  setmetatable(world.control.actions, {
+  setmetatable(world.hid.actions, {
     __index = function ()
       return function () end
     end
   })
-  world.control.omissions = {
+  world.hid.omissions = {
     [{"walkLeft", "walkRight"}] = function (v) v.x = 0 end,
     [{"walkUp", "walkDown"}] = function (v) v.y = 0 end,
   }
@@ -235,7 +237,8 @@ local function buildResources(config, world)
 end
 
 function M.buildState(config, world, levelName)
-  world.gameState = {garbage={}}
+  world.gameState = world.gameState or {}
+  world.gameState.components = {garbage = {}}
   if config.entities then
     local hasNoMenuComponents = buildMenu(config, world)
     if hasNoMenuComponents then
@@ -265,17 +268,17 @@ function M.load(love, entityTagger)
 end
 
 function M.buildWorld(config)
-  local world = {}
+  local world = {hid = {}}
 
   world.physics = config.physics or {}
   world.physics.gravity = world.physics.gravity or 0
 
-  world.keys = config.keys or {}
-  world.keys.left = world.keys.left or "a"
-  world.keys.right = world.keys.right or "d"
-  world.keys.up = world.keys.up or "w"
-  world.keys.down = world.keys.down or "s"
-  world.keys.start = world.keys.start or "return"
+  world.hid.keys = config.keys or {}
+  world.hid.keys.left = world.hid.keys.left or "a"
+  world.hid.keys.right = world.hid.keys.right or "d"
+  world.hid.keys.up = world.hid.keys.up or "w"
+  world.hid.keys.down = world.hid.keys.down or "s"
+  world.hid.keys.start = world.hid.keys.start or "return"
 
   buildActionsAndOmissions(world)
   buildResources(config, world)
