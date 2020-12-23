@@ -17,13 +17,14 @@ local function doActionIfKeyIsDown(keys, actions, input, components, isMenu)
   return held
 end
 
-local function doOmissionIfKeyIsUp(omissions, pressed, input, velocity)
+-- hid.omissions, held, input, entityComponents
+local function doOmissionIfKeyIsUp(omissions, held, input, components)
   for omittedActions, omission in pairs(omissions) do
     local mustOmit = true
 
     for inputAction, inputKey in pairs(input) do
-      for _, omittedAction in ipairs(omittedActions) do
-        for _, pressedKey in ipairs(pressed) do
+      for _, pressedKey in ipairs(held) do
+        for _, omittedAction in ipairs(omittedActions) do
           if inputKey == pressedKey and omittedAction == inputAction then
             mustOmit = false
           end
@@ -35,7 +36,7 @@ local function doOmissionIfKeyIsUp(omissions, pressed, input, velocity)
       for inputAction, _ in pairs(input) do
         for _, omittedAction in ipairs(omittedActions) do
           if omittedAction == inputAction then
-            omission(velocity)
+            omission(components)
           end
         end
       end
@@ -47,16 +48,34 @@ function M.load(love)
   M.love = love
 end
 
-function M.update(hid, inputs, velocities, impulseSpeeds, menus)
-  for entity, input in pairs(inputs or {}) do
-    local components = {
-      velocity = (velocities or {})[entity],
-      walkSpeed = ((impulseSpeeds or {})[entity] or {}).walk,
-    }
-    local isMenu = (menus or {})[entity]
-    local held = doActionIfKeyIsDown(hid.keys, hid.actions, input, components,
-                                     isMenu)
-    doOmissionIfKeyIsUp(hid.omissions, held, input, components.velocity)
+function M.update(hid, components)
+  for entity, input in pairs(components.input or {}) do
+    local isMenu = (components.menu or {})[entity]
+    local entityComponents = {}
+    for componentName, component in pairs(components) do
+      for k, v in pairs(component) do
+        if k == entity then
+          if componentName == "animation" then
+            local proxy = {}
+            setmetatable(proxy, {
+              __newindex = function (_, attr, newName)
+                if attr == "name" and v.name ~= newName then
+                  v.name = newName
+                  v.frame = 1
+                  v.time = 0
+                end
+              end
+            })
+            entityComponents[componentName] = proxy
+          else
+            entityComponents[componentName] = v
+          end
+        end
+      end
+    end
+    local held = doActionIfKeyIsDown(hid.keys, hid.actions, input,
+                                     entityComponents, isMenu)
+    doOmissionIfKeyIsUp(hid.omissions, held, input, entityComponents)
   end
 end
 

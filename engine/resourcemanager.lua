@@ -124,6 +124,7 @@ local stateBuilders = {
     setComponentAttribute(world, "animation", entity, "frame", 1)
     setComponentAttribute(world, "animation", entity, "time", 0)
     setComponentAttribute(world, "animation", entity, "ended", false)
+
     world.resources.animations = animations
   end
 }
@@ -186,24 +187,24 @@ end
 
 local function buildActionsAndOmissions(world)
   world.hid.actions = {
-    walkLeft = function (t) t.velocity.x = -t.walkSpeed end,
-    walkRight = function (t) t.velocity.x = t.walkSpeed end,
-    walkUp = function (t) t.velocity.y = -t.walkSpeed end,
-    walkDown = function (t) t.velocity.y = t.walkSpeed end,
-    menuPrevious = function (t)
-      t.menu.selected = t.menu.selected - 1
-      if t.menu.selected == 0 then
-        t.menu.selected = #t.menu.options
+    walkLeft = function (c) c.velocity.x = -c.impulseSpeed.walk end,
+    walkRight = function (c) c.velocity.x = c.impulseSpeed.walk end,
+    walkUp = function (c) c.velocity.y = -c.impulseSpeed.walk end,
+    walkDown = function (c) c.velocity.y = c.impulseSpeed.walk end,
+    menuPrevious = function (c)
+      c.menu.selected = c.menu.selected - 1
+      if c.menu.selected == 0 then
+        c.menu.selected = #c.menu.options
       end
     end,
-    menuNext = function (t)
-      t.menu.selected = t.menu.selected + 1
-      if t.menu.selected == #t.menu.options + 1 then
-        t.menu.selected = 1
+    menuNext = function (c)
+      c.menu.selected = c.menu.selected + 1
+      if c.menu.selected == #c.menu.options + 1 then
+        c.menu.selected = 1
       end
     end,
-    menuSelect = function (t)
-      (t.menu.callbacks[t.menu.selected] or function () end)()
+    menuSelect = function (c)
+      (c.menu.callbacks[c.menu.selected] or function () end)()
     end,
   }
   setmetatable(world.hid.actions, {
@@ -211,9 +212,15 @@ local function buildActionsAndOmissions(world)
       return function () end
     end
   })
+  local function defaultHorizontalOmission(c)
+    c.velocity.x = 0
+  end
+  local function defaultVerticalOmission(c)
+    c.velocity.y = 0
+  end
   world.hid.omissions = {
-    [{"walkLeft", "walkRight"}] = function (v) v.x = 0 end,
-    [{"walkUp", "walkDown"}] = function (v) v.y = 0 end,
+    [{"walkLeft", "walkRight"}] = defaultHorizontalOmission,
+    [{"walkUp", "walkDown"}] = defaultVerticalOmission,
   }
 end
 

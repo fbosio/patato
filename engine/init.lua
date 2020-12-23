@@ -76,4 +76,8 @@ function M.setAction(action, callback)
   M.hid.actions[action] = callback
 end
 
+function M.setOmissions(actions, callback)
+  M.hid.omissions[actions] = callback
+end
+
 return M

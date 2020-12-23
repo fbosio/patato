@@ -17,9 +17,33 @@ function love.load()
   end)
 
   engine.setAction("showCustomMessage", function ()
-    elapsed = 0
     message = "Flashlight!"
   end)
+  engine.setOmissions({"showCustomMessage"}, function ()
+    message = ""
+  end)
+
+  engine.setAction("walkLeft", function (c)
+    c.velocity.x = -c.impulseSpeed.walk
+    c.animation.name = "walking"
+  end)
+  engine.setAction("walkRight", function (c)
+    c.velocity.x = c.impulseSpeed.walk
+    c.animation.name = "walking"
+  end)
+  engine.setAction("walkUp", function (c)
+    c.velocity.y = -c.impulseSpeed.walk
+    c.animation.name = "walking"
+  end)
+  engine.setAction("walkDown", function (c)
+    c.velocity.y = c.impulseSpeed.walk
+    c.animation.name = "walking"
+  end)
+  engine.setOmissions({"walkLeft", "walkRight", "walkUp", "walkDown"},
+    function (c)
+      c.animation.name = "standing"
+    end
+  )
 
   score = 0
   engine.setCollectableEffect("bottle", function ()
