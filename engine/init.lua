@@ -42,8 +42,8 @@ function M.load()
 end
 
 function M.update(dt)
-  systems.update(dt, M.hid.keys, M.hid, M.gameState.components,
-                 M.collectableEffects, M.resources.animations)
+  systems.update(dt, M.hid, M.gameState.components, M.collectableEffects,
+                 M.resources.animations)
 end
 
 function M.draw()
@@ -51,7 +51,7 @@ function M.draw()
 end
 
 function M.keypressed(key)
-  systems.keypressed(key, M.hid.keys, M.hid, M.gameState.components.input,
+  systems.keypressed(key, M.hid, M.gameState.components.input,
                      M.gameState.components.menu, M.gameState.inMenu)
 end
 

@@ -1,8 +1,17 @@
-local controller, control
+local controller, hid
 
 before_each(function ()
   controller = require "engine.systems.controller"
-  control = {
+  hid = {
+    keys = {
+      left = "a",
+      right = "d",
+      left2 = "j",
+      right2 = "l",
+      up = "w",
+      down = "s",
+      start = "return"
+    },
     actions = {
       walkLeft = function (t) t.velocity.x = -t.walkSpeed end,
       walkRight = function (t) t.velocity.x = t.walkSpeed end,
@@ -36,13 +45,9 @@ after_each(function ()
 end)
 
 describe("with one player with AD as walking input", function ()
-  local keys, inputs, velocities, impulseSpeeds
+  local inputs, velocities, impulseSpeeds
 
   before_each(function ()
-    keys = {
-      left = "a",
-      right = "d"
-    }
     inputs = {
       playerOne = {
         walkLeft = "left",
@@ -67,7 +72,7 @@ describe("with one player with AD as walking input", function ()
     end)
 
     it("should set the velocity to zero", function ()
-      controller.update(keys, control, inputs, velocities, impulseSpeeds)
+      controller.update(hid, inputs, velocities, impulseSpeeds)
 
       assert.are.same(0, velocities.playerOne.x)
     end)
@@ -84,14 +89,14 @@ describe("with one player with AD as walking input", function ()
     end)
 
     it("should set the velocity to negative walk speed", function ()
-      controller.update(keys, control, inputs, velocities, impulseSpeeds)
+      controller.update(hid, inputs, velocities, impulseSpeeds)
 
       assert.are.same(-impulseSpeeds.playerOne.walk, velocities.playerOne.x)
     end)
 
     describe("and then leaving it", function ()
       before_each(function ()
-        controller.update(keys, control, inputs, velocities, impulseSpeeds)
+        controller.update(hid, inputs, velocities, impulseSpeeds)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -99,7 +104,7 @@ describe("with one player with AD as walking input", function ()
       end)
 
       it("should set the velocity to zero", function ()
-        controller.update(keys, control, inputs, velocities, impulseSpeeds)
+        controller.update(hid, inputs, velocities, impulseSpeeds)
 
         assert.are.same(0, velocities.playerOne.x)
       end)
@@ -117,14 +122,14 @@ describe("with one player with AD as walking input", function ()
     end)
 
     it("should set the velocity to positive walk speed", function ()
-      controller.update(keys, control, inputs, velocities, impulseSpeeds)
+      controller.update(hid, inputs, velocities, impulseSpeeds)
 
       assert.are.same(impulseSpeeds.playerOne.walk, velocities.playerOne.x)
     end)
 
     describe("and then leaving it", function ()
       before_each(function ()
-        controller.update(keys, control, inputs, velocities, impulseSpeeds)
+        controller.update(hid, inputs, velocities, impulseSpeeds)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -132,7 +137,7 @@ describe("with one player with AD as walking input", function ()
       end)
 
       it("should set the velocity to zero", function ()
-        controller.update(keys, control, inputs, velocities, impulseSpeeds)
+        controller.update(hid, inputs, velocities, impulseSpeeds)
 
         assert.are.same(0, velocities.playerOne.x)
       end)
@@ -141,15 +146,9 @@ describe("with one player with AD as walking input", function ()
 end)
 
 describe("with two players with AD and JL as walking input", function ()
-  local keys, inputs, velocities, impulseSpeeds
+  local inputs, velocities, impulseSpeeds
 
   before_each(function ()
-    keys = {
-      left = "a",
-      right = "d",
-      left2 = "j",
-      right2 = "l"
-    }
     inputs = {
       playerOne = {
         walkLeft = "left",
@@ -180,7 +179,7 @@ describe("with two players with AD and JL as walking input", function ()
     end)
 
     it("should set both velocities to zero", function ()
-      controller.update(keys, control, inputs, velocities, impulseSpeeds)
+      controller.update(hid, inputs, velocities, impulseSpeeds)
 
       assert.are.same(0, velocities.playerOne.x)
       assert.are.same(0, velocities.playerTwo.x)
@@ -197,7 +196,7 @@ describe("with two players with AD and JL as walking input", function ()
     end)
 
     it("should set player one velocity to negative walk speed", function ()
-      controller.update(keys, control, inputs, velocities, impulseSpeeds)
+      controller.update(hid, inputs, velocities, impulseSpeeds)
 
       assert.are.same(-impulseSpeeds.playerOne.walk, velocities.playerOne.x)
       assert.are.same(0, velocities.playerTwo.x)
@@ -214,7 +213,7 @@ describe("with two players with AD and JL as walking input", function ()
     end)
 
     it("should set player one velocity to positive walk speed", function ()
-      controller.update(keys, control, inputs, velocities, impulseSpeeds)
+      controller.update(hid, inputs, velocities, impulseSpeeds)
 
       assert.are.same(impulseSpeeds.playerOne.walk, velocities.playerOne.x)
       assert.are.same(0, velocities.playerTwo.x)
@@ -232,7 +231,7 @@ describe("with two players with AD and JL as walking input", function ()
     end)
 
     it("should set player two velocity to negative walk speed", function ()
-      controller.update(keys, control, inputs, velocities, impulseSpeeds)
+      controller.update(hid, inputs, velocities, impulseSpeeds)
 
       assert.are.same(0, velocities.playerOne.x)
       assert.are.same(-impulseSpeeds.playerTwo.walk, velocities.playerTwo.x)
@@ -240,7 +239,7 @@ describe("with two players with AD and JL as walking input", function ()
 
     describe("and then leaving it", function ()
       before_each(function ()
-        controller.update(keys, control, inputs, velocities, impulseSpeeds)
+        controller.update(hid, inputs, velocities, impulseSpeeds)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -248,7 +247,7 @@ describe("with two players with AD and JL as walking input", function ()
       end)
 
       it("should set player two velocity to zero", function ()
-        controller.update(keys, control, inputs, velocities, impulseSpeeds)
+        controller.update(hid, inputs, velocities, impulseSpeeds)
 
         assert.are.same(0, velocities.playerTwo.x)
       end)
@@ -265,7 +264,7 @@ describe("with two players with AD and JL as walking input", function ()
     end)
 
     it("should set player two velocity to positive walk speed", function ()
-      controller.update(keys, control, inputs, velocities, impulseSpeeds)
+      controller.update(hid, inputs, velocities, impulseSpeeds)
 
       assert.are.same(0, velocities.playerOne.x)
       assert.are.same(impulseSpeeds.playerTwo.walk, velocities.playerTwo.x)
@@ -274,14 +273,9 @@ describe("with two players with AD and JL as walking input", function ()
 end)
 
 describe("with a menu", function ()
-  local keys, inputs, menus, started
+  local inputs, menus, started
 
   before_each(function ()
-    keys = {
-      up = "w",
-      down = "s",
-      start = "return"
-    }
     inputs = {
       mainMenu = {
         menuPrevious = "up",
@@ -302,7 +296,7 @@ describe("with a menu", function ()
 
   describe("pressing S key", function ()
     it("should select the second menu option", function ()
-      controller.keypressed("s", keys, control, inputs, menus, true)
+      controller.keypressed("s", hid, inputs, menus, true)
 
       assert.are.same(2, menus.mainMenu.selected)
     end)
@@ -310,7 +304,7 @@ describe("with a menu", function ()
 
   describe("pressing W key", function ()
     it("should select the third menu option", function ()
-      controller.keypressed("w", keys, control, inputs, menus, true)
+      controller.keypressed("w", hid, inputs, menus, true)
 
       assert.are.same(3, menus.mainMenu.selected)
     end)
@@ -318,7 +312,7 @@ describe("with a menu", function ()
 
   describe("pressing RETURN key", function ()
     it("should run the callback of the first menu option", function ()
-      controller.keypressed("return", keys, control, inputs, menus, true)
+      controller.keypressed("return", hid, inputs, menus, true)
 
       assert.is.truthy(started)
     end)
