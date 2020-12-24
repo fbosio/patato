@@ -44,6 +44,17 @@ function love.load()
       c.animation.name = "standing"
     end
   )
+  engine.setOmissions({"walkLeft", "walkRight"}, function ()
+    print("Sliding")
+  end)
+  for k, v in pairs(engine.hid.omissions) do
+    local text = "[{"
+    for _, name in ipairs(k) do
+      text = text .. '"' .. name .. '", '
+    end
+    text = text .. "}] = " .. tostring(v)
+    print(text)
+  end
 
   score = 0
   engine.setCollectableEffect("bottle", function ()

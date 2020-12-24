@@ -76,8 +76,35 @@ function M.setAction(action, callback)
   M.hid.actions[action] = callback
 end
 
+local function isIncluded(t1, t2)
+  for _, v1 in ipairs(t1) do
+    local hasValue = false
+    for _, v2 in ipairs(t2) do
+      if v1 == v2 then
+        hasValue = true
+        break
+      end
+    end
+    if not hasValue then
+      return false
+    end
+  end
+  return true
+end
+
 function M.setOmissions(actions, callback)
-  M.hid.omissions[actions] = callback
+  local areActionsNew = true
+  for t, _ in pairs(M.hid.omissions) do
+    if isIncluded(t, actions) and isIncluded(actions, t) then
+      M.hid.omissions[t] = callback
+      areActionsNew = false
+      break
+    end
+  end
+
+  if areActionsNew then
+    M.hid.omissions[actions] = callback
+  end
 end
 
 return M
