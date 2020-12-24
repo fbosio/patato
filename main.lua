@@ -70,7 +70,7 @@ function love.draw()
     love.graphics.print(message, 0, 0)
   end
 
-  if not engine.inMenu then
+  if not engine.gameState.inMenu then
     love.graphics.print(score, 0, 0)
   end
 end

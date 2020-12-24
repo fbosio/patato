@@ -34,12 +34,12 @@ M.entities = {
       standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
     }
   },
-  -- bee = {
-  --   input = {
-  --     walkLeft = "left2",
-  --     walkRight = "right2",
-  --   }
-  -- },
+   bee = {
+     input = {
+       walkLeft = "left2",
+       walkRight = "right2",
+     }
+   },
   bottle = {
     collectable = true,
     collisionBox = {5, 5, 10, 10}
