@@ -73,7 +73,9 @@ function M.update(hid, components)
         end
       end
     end
-    entityComponents.animation = entityComponents.animation or {}
+    if components.animation then
+      entityComponents.animation = entityComponents.animation or {}
+    end
     local held = doActionIfKeyIsDown(hid.keys, hid.actions, input,
                                      entityComponents, isMenu)
     doOmissionIfKeyIsUp(hid.omissions, held, input, entityComponents)

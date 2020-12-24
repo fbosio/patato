@@ -23,20 +23,23 @@ before_each(function ()
       walkRight = function (c) c.velocity.x = c.impulseSpeed.walk end,
       walkUp = function (c) c.velocity.y = -c.impulseSpeed.walk end,
       walkDown = function (c) c.velocity.y = c.impulseSpeed.walk end,
-      menuPrevious = function (t)
-        t.menu.selected = t.menu.selected - 1
-        if t.menu.selected == 0 then
-          t.menu.selected = #t.menu.options
+      menuPrevious = function (c)
+        c.menu.selected = c.menu.selected - 1
+        if c.menu.selected == 0 then
+          c.menu.selected = #c.menu.options
         end
       end,
-      menuNext = function (t)
-        t.menu.selected = t.menu.selected + 1
-        if t.menu.selected == #t.menu.options + 1 then
-          t.menu.selected = 1
+      menuNext = function (c)
+        c.menu.selected = c.menu.selected + 1
+        if c.menu.selected == #c.menu.options + 1 then
+          c.menu.selected = 1
         end
       end,
-      menuSelect = function (t)
-        (t.menu.callbacks[t.menu.selected] or function () end)()
+      menuSelect = function (c)
+        (c.menu.callbacks[c.menu.selected] or function () end)()
+      end,
+      changeAnimationToWalking = function (c)
+        c.animation.name = "walking"
       end,
     },
     omissions = {
@@ -330,6 +333,42 @@ describe("with a menu", function ()
       controller.keypressed("return", hid, inputs, menus, true)
 
       assert.is.truthy(started)
+    end)
+  end)
+end)
+
+describe("loading a player wih animation and one without it", function ()
+  local components
+
+  before_each(function ()
+    components = {
+      input = {
+        playerOne = {
+          changeAnimationToWalking = "right"
+        },
+        playerTwo = {
+          changeAnimationToWalking = "right"
+        },
+      },
+      animation = {
+        playerOne = {name = "idle"}
+      },
+    }
+  end)
+
+  describe("and pressing D key", function ()
+    before_each(function ()
+      local loveMock = {keyboard = {}}
+      loveMock.keyboard.isDown = function (key)
+        return key == "d"
+      end
+      controller.load(loveMock)
+    end)
+
+    it("should change player one animation", function ()
+      controller.update(hid, components)
+
+      assert.are.same("walking", components.animation.playerOne.name)
     end)
   end)
 end)
