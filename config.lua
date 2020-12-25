@@ -1,3 +1,4 @@
+local animation = require "systems.animation"
 local M = {}
 
 M.keys = {
@@ -15,7 +16,8 @@ M.sprites = {
   {1, 1, 137, 266, 72.35, 256.5}, -- {x, y, width, height, originX, originY}
   {138, 1, 205, 251, 96.35, 251.5},
   {343, 1, 134, 282, 55.349999999999994, 271.5},
-  {477, 1, 190, 264, 101.35, 259.5}
+  {477, 1, 190, 264, 101.35, 259.5},
+  {917, 833, 61, 83, 28.349999999999994, 80.5}
 }
 
 M.entities = {
@@ -42,7 +44,10 @@ M.entities = {
    },
   bottle = {
     collectable = true,
-    collisionBox = {5, 5, 10, 10}
+    collisionBox = {5, 10, 10, 10},
+    animations = {
+      idle = {5, 1, false}
+    }
   },
   mainMenu = {
     input = {},
