@@ -5,17 +5,19 @@ A platform adventure video game, ported with [Löve2D](https://love2d.org/).
 
 
 ## Engine
-The engine API has **events** and **public functions**.
+The engine has **events** and **public functions**.
 
 * **Four events**, similar to those in [Löve2D](https://love2d.org/).
   - `load()`
   - `update(dt)`
   - `draw()`
   - `keypressed(key)`
-* **Three public functions**
+* **Engine-specific functions**
   - `startGame(levelName)`
-  - `setMenuOption(entity, index, callback)`
+  - `setMenuOptionEffect(entity, index, callback)`
   - `setCollectableEffect(name, callback)`
+  - `setAction(action, callback)`
+  - `setOmissions(actions, callback)`
 
 In its simplest form, the engine is used like follows.
 
@@ -92,11 +94,15 @@ The engine displays an error if `config.lua` is empty or lacks a `return M` stat
   return M
   ```
   Now the game is loaded with two players in it.
-  - `playerOne` is moved by pressing the AWSD keys, because that is what the engine does by default.
-  - `playerTwo` is moved only in the horizontal direction by pressing the `"left2"` and `"right2"` keys, which are mapped to the J and L physical keys of the keyboard by the `keys` table, defined above.
+  - `playerOne` is moved by pressing the AWSD keys, because that is what the engine does by default when an empty `input` table is declared.
+  - `playerTwo` may be moved only in the horizontal direction because its `input` table has only the fields `walkLeft` and `walkRight` in it. This player is moved in the horizontal direction by pressing the `"left2"` and `"right2"` keys, which are mapped to the J and L physical keys of the keyboard by the `keys` table, defined above.
   - `impulseSpeed` defines how fast each player moves when the corresponding keys are pressed.
     + `playerOne` walk speed is implicitly defined by the engine.
     + `playerTwo` walk speed is explicitly defined as `100` by the `walk` field in the `impulseSpeed` table.
+
+In `config.lua`, each field of the `entities` table is the name of what will be referred here as an **entity**.
+In turn, each entity has tables associated to it, that will be called **components**.
+So, in the latter case above, `playerOne` and `playerTwo` are entities, while `input`, and `impulseSpeed` are its components. 
 
 ### Menu
 For the engine, a menu is just another entity with a `menu` component attached to it.
@@ -123,6 +129,8 @@ M.entities = {
 return M
 ```
 
+The `input` component is obviously mandatory for the `mainMenu` entity: its options need to be selected through user input.
+
 In order for the menu to do actually _something_, a more elaborated `main.lua` is required.
 ```lua
 local engine = require "engine"
@@ -132,11 +140,11 @@ local elapsed, showingMessage
 function love.load()
   engine.load()
 
-  -- setMenuOption(entity, index, callback)
-  engine.setMenuOption("mainMenu", 1, function ()
+  -- setMenuOptionEffect(entity, index, callback)
+  engine.setMenuOptionEffect("mainMenu", 1, function ()
     engine.startGame()
   end)
-  engine.setMenuOption("mainMenu", 2, function ()
+  engine.setMenuOptionEffect("mainMenu", 2, function ()
     elapsed = 0
     showingMessage = true
   end)
@@ -167,7 +175,18 @@ function love.keypressed(key)
 end
 ```
 
-An option may be now selected by pressing the Return/Enter key.
+An option may be now selected by pressing the W, S and Return/Enter keys.
+These are the default keys.
+Note that the `keypressed` callback is needed for navigating through the menu options: _omitting it, user input is not detected_.
+
+Option effects are declared inside the `love.load` callback by using `setMenuOptionEffect`. It receives three arguments.
+
+1. The menu entity name: `"mainMenu"`, in this case.
+2. The option number, in the order stated in `config.lua`.
+   In this case, `1` represents the `"Start"` option, and `2`, the `"Show message"` option.
+3. A function that is called when the given option is chosen in the menu.
+
+The example `main.lua` file has two effects declared.
 
 1. The first option _starts_ the game, i.e., it hides the menu and shows the `player` that you can move.
 2. The other option shows a message and hides it after one second.
@@ -259,11 +278,11 @@ local engine = require "engine"
 function love.load()
   engine.load()
 
-  -- setMenuOption(entity, index, callback)
-  engine.setMenuOption("mainMenu", 1, function ()
+  -- setMenuOptionEffect(entity, index, callback)
+  engine.setMenuOptionEffect("mainMenu", 1, function ()
     engine.startGame()
   end)
-  engine.setMenuOption("mainMenu", 2, function ()
+  engine.setMenuOptionEffect("mainMenu", 2, function ()
     engine.startGame("minigame")
   end)
 end
@@ -309,7 +328,7 @@ M.entities = {
 }
 
 M.levels = {
-  level = {
+  myLevel = {
     player = {260, 300},
     coin = {
       {440, 300},
@@ -353,20 +372,7 @@ end
 In this case, when each coin is _collected_ by the player, the `score` is increased by one.
 
 
-## Specs
-| Game | Engine  |
-|------|---------|
-| Specific | General |
-| Definitions | Statements |
-| Keys | Actions |
-|      | Controller |
-| Entities | State |
-| Speed impulses | Physics |
-| "Hanging" components |  Required components |
-| Levels | Load and use of resources |
-| Sprites | Screen painting |
-| Animations |  |
-| | TEST |
+### Architecture
 
 [![Modules Diagram](http://www.plantuml.com/plantuml/png/VOvH2i9034J_znHxWXwXz2fX7PTYavGaAuXuTnLRsYhucNdXpGmUPD5uIaLvLe54dlIAtLbKpcDDCvKBLMH87GNvdlBsuZSFiEyZWskp0YQX2ZiYES6EML1zVprIMbovw_hFaY_JVx2C_K7zsh2MRvhXbJIUdW00)](http://www.plantuml.com/plantuml/uml/VOvH2i9034J_znHxWXwXz2fX7PTYavGaAuXuTnLRsYhucNdXpGmUPD5uIaLvLe54dlIAtLbKpcDDCvKBLMH87GNvdlBsuZSFiEyZWskp0YQX2ZiYES6EML1zVprIMbovw_hFaY_JVx2C_K7zsh2MRvhXbJIUdW00)
 

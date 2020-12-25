@@ -110,11 +110,11 @@ end
  @tparam number index Number of option in the `options` table of the menu
  @tparam function callback What the option does when selected
  @usage
-  engine.setMenuOption("mainMenu", 2, function ()
+  engine.setMenuOptionEffect("mainMenu", 2, function ()
     print("Selected option 2!")
   end)
 ]]
-function M.setMenuOption(entity, index, callback)
+function M.setMenuOptionEffect(entity, index, callback)
   local menu = M.gameState.components.menu
   if menu then
     menu[entityTagger.getId(entity)].callbacks[index] = callback
@@ -135,7 +135,7 @@ function M.setCollectableEffect(name, callback)
   M.collectableEffects[name] = callback
 end
 
---[[--
+--[=[--
  Associate a callback to an action.
 
  An _action_ is triggered when some key is held down by the user.
@@ -144,18 +144,31 @@ end
  @tparam string action
   The identifier of the input event, as defined in `config.lua`
  @tparam function callback What the event triggers.
-  The callback receives a table `c` that has the components associated with the
-  entity that triggered the input event in the first place.
+  The callback receives a table `c` that has the components associated with
+  the entity that triggered the input event in the first place.
  @usage
-  engine.setAction("walkRight", function (c)
+ engine.setAction("walkRight", function (c)
+    --[[
+      "walkRight" is a field of the input table of an entity in `config.lua`,
+       `c` is the components table of that entity.
+       In this case, `c` has at least three fields:
+       1. `velocity`
+       2. `impulseSpeed`
+       3. `animation`
+       which are tables themselves that have respectively the fields
+       1. `x`
+       2. `walk`
+       3. `name`
+    ]]
     c.velocity.x = c.impulseSpeed.walk
     c.animation.name = "walking"
   end)
-]]
+]=]
 function M.setAction(action, callback)
   M.hid.actions[action] = callback
 end
 
+-- Check that all values of table t1 are in table t2.
 local function isIncluded(t1, t2)
   for _, v1 in ipairs(t1) do
     local hasValue = false
