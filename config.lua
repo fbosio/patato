@@ -1,4 +1,3 @@
-local animation = require "systems.animation"
 local M = {}
 
 M.keys = {
