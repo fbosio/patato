@@ -1,3 +1,9 @@
+--[[--
+ The engine itself.
+ Contains callbacks and functions that constitute its API.
+ @module engine
+]]
+
 local config
 if not pcall(function() config = require "config" end) then
   config = {
@@ -25,7 +31,19 @@ local renderer = require "engine.renderer"
 
 local M = {}
 
--- Löve2D events
+
+--[[--
+ Callbacks.
+
+ Similar to those in [Löve2D](https://love2d.org/wiki/love).
+
+ Call them inside the [Löve2D](https://love2d.org/wiki/love) callbacks of
+ the same name.
+
+ @section callbacks
+]]
+
+--- Should be called exactly once inside [love.load](https://love2d.org/wiki/love.load)
 function M.load()
   systems.load(love, entityTagger)
   resourcemanager.load(love, entityTagger)
@@ -41,26 +59,61 @@ function M.load()
   renderer.load(love, entityTagger)
 end
 
+--- Should be called inside [love.update](https://love2d.org/wiki/love.update)
+-- @tparam number dt Time since the last update in seconds.
 function M.update(dt)
   systems.update(dt, M.hid, M.gameState.components, M.collectableEffects,
                  M.resources.animations)
 end
 
+--- Should be called inside [love.draw](https://love2d.org/wiki/love.draw)
 function M.draw()
   renderer.draw(M.gameState.components, M.gameState.inMenu, M.resources)
 end
 
+--[[--
+ Add it inside [love.keypressed](https://love2d.org/wiki/love.keypressed)
+
+ Triggered just when a key is pressed.
+
+ It is not called after, while the key is held down.
+ Ideal for selecting the options in the menu.
+ @tparam string key Character of the pressed key.
+]]
 function M.keypressed(key)
   systems.keypressed(key, M.hid, M.gameState.components.input,
                      M.gameState.components.menu, M.gameState.inMenu)
 end
 
--- API
+
+--[[--
+ API
+
+ Engine-specific functions
+
+ @section api
+]]
+
+--- Hide menu and load a specific level of the game.
+-- @tparam[opt=config.firstLevel] string levelName
+--  Name of the level, as defined in `config.lua`.
 function M.startGame(levelName)
   M.gameState.inMenu = false
   resourcemanager.buildState(config, M, levelName)
 end
 
+
+--[[--
+ Associate a callback to an option of a menu.
+ @tparam string entity
+  The identifier of the menu, as defined in `config.lua`
+ @tparam number index Number of option in the `options` table of the menu
+ @tparam function callback What the option does when selected
+ @usage
+  engine.setMenuOption("mainMenu", 2, function ()
+    print("Selected option 2!")
+  end)
+]]
 function M.setMenuOption(entity, index, callback)
   local menu = M.gameState.components.menu
   if menu then
@@ -68,10 +121,37 @@ function M.setMenuOption(entity, index, callback)
   end
 end
 
+--[[--
+ Associate a callback to a collectable.
+ @tparam string name
+  The identifier of the collectable, as defined in `config.lua`
+ @tparam function callback What the collectable does when collected
+ @usage
+  engine.setCollectableEffect("healthPotion", function ()
+    health = health + 1  -- defined in outer scope
+  end)
+]]
 function M.setCollectableEffect(name, callback)
   M.collectableEffects[name] = callback
 end
 
+--[[--
+ Associate a callback to an action.
+
+ An _action_ is triggered when some key is held down by the user.
+ The action is identified for an entity by a unique name in its `input`
+ component which is defined in `config.lua`
+ @tparam string action
+  The identifier of the input event, as defined in `config.lua`
+ @tparam function callback What the event triggers.
+  The callback receives a table `c` that has the components associated with the
+  entity that triggered the input event in the first place.
+ @usage
+  engine.setAction("walkRight", function (c)
+    c.velocity.x = c.impulseSpeed.walk
+    c.animation.name = "walking"
+  end)
+]]
 function M.setAction(action, callback)
   M.hid.actions[action] = callback
 end
@@ -92,6 +172,23 @@ local function isIncluded(t1, t2)
   return true
 end
 
+--[[--
+ Associate a callback to an omission.
+
+ An _omission_ is triggered when none of the keys associated with it are
+ pressed. It is identified by a table of action names.
+ @tparam table actions
+  The identifiers of the actions that will trigger the callback when inactive.
+ @tparam function callback What the event triggers.
+  The callback receives a table `c` that has the components associated with the
+  entity that triggered the input event in the first place.
+ @usage
+  engine.setOmissions({"walkLeft", "walkRight", "walkUp", "walkDown"},
+    function (c)
+      c.animation.name = "standing"
+    end
+  )
+]]
 function M.setOmissions(actions, callback)
   local areActionsNew = true
   for t, _ in pairs(M.hid.omissions) do
