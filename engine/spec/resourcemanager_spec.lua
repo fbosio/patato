@@ -600,14 +600,14 @@ describe("loading a collision box", function ()
 end)
 
 describe("loading a config with a spriteSheet and no sprites", function ()
-  it("should not create a resources table", function ()
+  it("should create an empty resources table", function ()
     local config = {
       spriteSheet = "path/to/mySpriteSheet.png"
     }
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.falsy(world.resources)
+    assert.are.same({}, world.resources)
   end)
 end)
 

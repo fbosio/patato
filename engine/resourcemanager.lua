@@ -225,6 +225,7 @@ local function buildActionsAndOmissions(world)
 end
 
 local function buildResources(config, world)
+  world.resources = {}
   if config.spriteSheet and config.sprites then
     local spriteSheet = M.love.graphics.newImage(config.spriteSheet)
     world.resources = {
