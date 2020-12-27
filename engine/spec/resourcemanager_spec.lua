@@ -748,3 +748,45 @@ describe("loading config with sprite scale", function ()
     assert.are.same(0.5, world.resources.spriteScale)
   end)
 end)
+
+describe("loading a collideable entity that is not in any level", function ()
+  it("should not copy the component", function ()
+    local config = {
+      entities = {
+        surface = {
+          collideable = true
+        }
+      }
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    assert.is.falsy(world.gameState.components.collideable)
+  end)
+end)
+
+describe("loading collideable entities that are in a level", function ()
+  local config = {
+    entities = {
+      surfaces = {
+        collideable = true
+      }
+    },
+    levels = {
+      garden = {
+        surfaces = {
+          {400, 50, 700, 200},
+          {400, 400, 700, 550},
+        }
+      }
+    }
+  }
+
+  local world = resourcemanager.buildWorld(config)
+
+  it("sould copy the collideable components with its name", function ()
+    local collideable = world.gameState.components.collideable
+    assert.are.same("surfaces", collideable[1].name)
+    assert.are.same("surfaces", collideable[2].name)
+  end)
+end)

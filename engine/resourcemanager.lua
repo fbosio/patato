@@ -126,6 +126,10 @@ local stateBuilders = {
     setComponentAttribute(world, "animation", entity, "ended", false)
 
     world.resources.animations = animations
+  end,
+  collideable = function (world, _, entity)
+    setComponent(world, "collideable", entity,
+                 {name = M.entityTagger.getName(entity)})
   end
 }
 
@@ -261,7 +265,8 @@ function M.buildState(config, world, levelName)
                  "Entities must not be collectables and collectors at the "
                  .. "same time, but entity " .. entityName .. " has both "
                  .. "components declared in config.lua")
-          if isNotCollectable then
+          local isNotCollideable = not config.entities[entityName].collideable
+          if isNotCollectable and isNotCollideable then
             buildNonMenu(entityName, entityComponents, world)
           end
         end
