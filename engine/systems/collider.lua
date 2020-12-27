@@ -1,4 +1,3 @@
-local box = require "components.box"
 local M = {}
 
 function M.update(dt, solids, collideables, collisionBoxes, positions,
