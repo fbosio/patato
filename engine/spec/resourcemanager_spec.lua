@@ -749,6 +749,23 @@ describe("loading config with sprite scale", function ()
   end)
 end)
 
+describe("loading a solid entity", function ()
+  it("should copy the component", function ()
+    local config = {
+      entities = {
+        player = {
+          solid = true
+        }
+      }
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    local playerId = entityTagger.getId("player")
+    assert.is.truthy(world.gameState.components.solid[playerId])
+  end)
+end)
+
 describe("loading a collideable entity that is not in any level", function ()
   it("should not copy the component", function ()
     local config = {
@@ -788,5 +805,20 @@ describe("loading collideable entities that are in a level", function ()
     local collideable = world.gameState.components.collideable
     assert.are.same("surfaces", collideable[1].name)
     assert.are.same("surfaces", collideable[2].name)
+  end)
+end)
+
+describe("loading an entity that is both collideable and solid", function ()
+  it("should throw an error", function ()
+    local config = {
+      entities = {
+        absurdSpecimen = {
+          collideable = true,
+          solid = true
+        }
+      }
+    }
+
+    assert.has_error(function () resourcemanager.buildWorld(config) end)
   end)
 end)

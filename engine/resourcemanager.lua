@@ -127,6 +127,9 @@ local stateBuilders = {
 
     world.resources.animations = animations
   end,
+  solid = function (world, component, entity)
+    setComponent(world, "solid", entity, component)
+  end,
   collideable = function (world, _, entity)
     setComponent(world, "collideable", entity,
                  {name = M.entityTagger.getName(entity)})
@@ -140,8 +143,8 @@ local function buildNonMenu(entityName, entityComponents, world)
       if componentName ~= "menu" then
         entity = entity or M.entityTagger.tag(entityName)
         assert(stateBuilders[componentName],
-        "Entity " .. entityName .. " has a component named "
-        .. componentName .. " that was not expected in config.lua")
+        "Entity \"" .. entityName .. "\" has a component named \""
+        .. componentName .. "\" that was not expected in config.lua")
         stateBuilders[componentName](world, component, entity)
       end
     end
@@ -248,6 +251,23 @@ local function buildResources(config, world)
   end
 end
 
+local function checkComponentsCompatibility(config, entityName)
+  local isNotCollectable = not config.entities[entityName].collectable
+  local isNotCollector = not config.entities[entityName].collector
+  assert(isNotCollectable or isNotCollector,
+          "Entities must not be collectables and collectors at the "
+          .. "same time, but entity \"" .. entityName .. "\" has both "
+          .. "components declared in config.lua")
+  local isNotCollideable = not config.entities[entityName].collideable
+  local isNotSolid = not config.entities[entityName].solid
+  assert(isNotCollideable or isNotSolid,
+          "Entities must not be collideables and solids at the "
+          .. "same time, but entity \"" .. entityName .. "\" has both "
+          .. "components declared in config.lua")
+
+  return isNotCollectable and isNotCollideable
+end
+
 function M.buildState(config, world, levelName)
   world.gameState = world.gameState or {}
   world.gameState.components = {garbage = {}}
@@ -259,14 +279,8 @@ function M.buildState(config, world, levelName)
           buildNonMenuIfInLevel(config, world, levelName, entityName,
                                 entityComponents)
         else
-          local isNotCollectable = not config.entities[entityName].collectable
-          local isNotCollector = not config.entities[entityName].collector
-          assert(isNotCollectable or isNotCollector,
-                 "Entities must not be collectables and collectors at the "
-                 .. "same time, but entity " .. entityName .. " has both "
-                 .. "components declared in config.lua")
-          local isNotCollideable = not config.entities[entityName].collideable
-          if isNotCollectable and isNotCollideable then
+          local canBeBuilt = checkComponentsCompatibility(config, entityName)
+          if canBeBuilt then
             buildNonMenu(entityName, entityComponents, world)
           end
         end
