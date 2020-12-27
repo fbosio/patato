@@ -547,6 +547,16 @@ describe("loading collectable entities that are in a level", function ()
     assert.are.same("bottle", collectable[2].name)
     assert.are.same("bottle", collectable[3].name)
   end)
+
+  it("should copy the positions of the collectable components", function ()
+    local position = world.gameState.components.position
+    assert.are.same(0, position[1].x)
+    assert.are.same(10, position[1].y)
+    assert.are.same(10, position[2].x)
+    assert.are.same(10, position[2].y)
+    assert.are.same(20, position[3].x)
+    assert.are.same(0, position[3].y)
+  end)
 end)
 
 
