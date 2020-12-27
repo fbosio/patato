@@ -19,17 +19,23 @@ describe("loading a collector that collides with a collectable", function ()
     local collisionBoxes = {
       mario = {
         origin = {x = 16, y = 64},
-        x = 100,
-        y = 300,
         width = 32,
         height = 64
       },
       coin = {
         origin = {x = 16, y = 32},
-        x = 108,
-        y = 300,
         width = 32,
         height = 32
+      }
+    }
+    local positions = {
+      mario = {
+        x = 100,
+        y = 300
+      },
+      coin = {
+        x = 108,
+        y = 300
       }
     }
     local collectableEffects = {
@@ -38,7 +44,7 @@ describe("loading a collector that collides with a collectable", function ()
     local garbage = {}
 
     messenger.update(collectors, collectables, collectableEffects,
-                     collisionBoxes, garbage)
+                     collisionBoxes, positions, garbage)
 
     assert.are.truthy(garbage.coin)
   end)
