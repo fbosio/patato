@@ -45,3 +45,27 @@ describe("receiving an entity with nonzero velocity", function ()
   end)
 
 end)
+
+describe("receiving gravity and a gravitational entity", function ()
+  it("should upate the velocity of the entity", function ()
+    local velocities = {
+      anvil = {
+        x = 0,
+        y = 0
+      }
+    }
+    local positions = {
+      anvil = {
+        x = 0,
+        y = 0
+      }
+    }
+    local gravity = 7000
+    local gravitationals = {
+      anvil = true
+    }
+    transporter.update(dt, velocities, positions, gravity, gravitationals)
+
+    assert.are.same(100, velocities.anvil.y)
+  end)
+end)
