@@ -245,7 +245,9 @@ local function buildActionsAndOmissions(world)
     c.velocity.x = 0
   end
   local function defaultVerticalOmission(c)
-    c.velocity.y = 0
+    if not c.gravitational then
+      c.velocity.y = 0
+    end
   end
   world.hid.omissions = {
     [{"walkLeft", "walkRight"}] = defaultHorizontalOmission,
