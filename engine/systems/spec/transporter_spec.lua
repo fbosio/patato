@@ -14,7 +14,7 @@ describe("with empty velocity and position tables", function ()
     local velocities = {}
     local positions = {}
 
-    transporter.update(dt, velocities, positions)
+    transporter.move(dt, velocities, positions)
 
     assert.are.same(velocities, {})
     assert.are.same(positions, {})
@@ -37,7 +37,7 @@ describe("receiving an entity with nonzero velocity", function ()
         y = 254
       }
     }
-    transporter.update(dt, velocities, positions)
+    transporter.move(dt, velocities, positions)
   end)
 
   it("should update its position", function ()
@@ -64,7 +64,7 @@ describe("receiving gravity and a gravitational entity", function ()
     local gravitationals = {
       anvil = true
     }
-    transporter.update(dt, velocities, positions, gravity, gravitationals)
+    transporter.drag(dt, velocities, gravitationals, gravity)
 
     assert.are.same(100, velocities.anvil.y)
   end)
