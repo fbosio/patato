@@ -15,12 +15,16 @@ local function setComponentAttribute(world, componentName, entity,
   world.gameState.components[componentName][entity][attribute] = value
 end
 
-local function copyInputToState(world, input, entity, foundMenu)
+local function copyInputToState(world, input, entity, foundMenu,
+                                isGravitational)
   if not next(input) then  -- check that input (non-boolean) is an empty table
     local defaultInput = foundMenu and {
       menuPrevious = "up",
       menuNext = "down",
       menuSelect = "start"
+    } or isGravitational and {
+      walkLeft = "left",
+      walkRight = "right",
     } or {
       walkLeft = "left",
       walkRight = "right",
@@ -165,6 +169,10 @@ local function buildNonMenu(entityName, entityComponents, world)
     for componentName, component in pairs(entityComponents) do
       if componentName ~= "menu" then
         entity = entity or M.entityTagger.tag(entityName)
+        if componentName == "input" and entityComponents.gravitational then
+          copyInputToState(world, component, entity, false, true)
+          createDefaults(world, entity)
+        end
         assert(stateBuilders[componentName],
         "Entity \"" .. entityName .. "\" has a component named \""
         .. componentName .. "\" that was not expected in config.lua")

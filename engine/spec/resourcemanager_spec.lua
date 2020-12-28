@@ -861,3 +861,22 @@ describe("loading a gravitational entity", function ()
     assert.is.truthy(world.gameState.components.gravitational[anvilId])
   end)
 end)
+
+describe("loading a gravitational entity with an empty input", function ()
+  it("should not copy walkUp and walkDown to input")
+
+  local config = {
+    entities = {
+      mario = {
+        gravitational = true,
+        input = {}
+      }
+    }
+  }
+
+  local world = resourcemanager.buildWorld(config)
+
+  local marioId = entityTagger.getId("mario")
+  assert.is.falsy(world.gameState.components.input[marioId].walkUp)
+  assert.is.falsy(world.gameState.components.input[marioId].walkDown)
+end)
