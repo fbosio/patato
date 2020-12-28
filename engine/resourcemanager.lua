@@ -49,11 +49,15 @@ local function createDefaultPosition(world, entity)
   setComponentAttribute(world, "position", entity, "y", height/2)
 end
 
+local function createDefaultVelocity(world, entity)
+  setComponentAttribute(world, "velocity", entity, "x", 0)
+  setComponentAttribute(world, "velocity", entity, "y", 0)
+end
+
 local function createDefaults(world, entity)
   setComponentAttribute(world, "impulseSpeed", entity, "walk", 400)
   createDefaultPosition(world, entity)
-  setComponentAttribute(world, "velocity", entity, "x", 0)
-  setComponentAttribute(world, "velocity", entity, "y", 0)
+  createDefaultVelocity(world, entity)
 end
 
 local function copyMenuToState(world, menu, entity)
@@ -131,6 +135,8 @@ local stateBuilders = {
   end,
   solid = function (world, component, entity)
     setComponent(world, "solid", entity, component)
+    createDefaultPosition(world, entity)
+    createDefaultVelocity(world, entity)
   end,
   collideable = function (world, _, entity)
     setComponent(world, "collideable", entity,
@@ -138,6 +144,8 @@ local stateBuilders = {
   end,
   gravitational = function (world, component, entity)
     setComponent(world, "gravitational", entity, component)
+    createDefaultPosition(world, entity)
+    createDefaultVelocity(world, entity)
   end,
 }
 
@@ -174,9 +182,9 @@ local function buildNonMenu(entityName, entityComponents, world)
           createDefaults(world, entity)
         end
         assert(stateBuilders[componentName],
-        "Entity \"" .. entityName .. "\" has a component named \""
-        .. componentName .. "\" that was not expected in config.lua")
-        stateBuilders[componentName](world, component, entity)
+               "Entity \"" .. entityName .. "\" has a component named \""
+               .. componentName .. "\" that was not expected in config.lua")
+               stateBuilders[componentName](world, component, entity)
       end
     end
   end
