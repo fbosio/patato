@@ -844,3 +844,21 @@ describe("loading an entity that is both collideable and solid", function ()
     assert.has_error(function () resourcemanager.buildWorld(config) end)
   end)
 end)
+
+describe("loading a gravitational entity", function ()
+  it("should copy the component", function ()
+    local config = {
+      entities = {
+        anvil = {
+          gravitational = true
+        }
+      }
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    local anvilId = entityTagger.getId("anvil")
+
+    assert.is.truthy(world.gameState.components.gravitational[anvilId])
+  end)
+end)

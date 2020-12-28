@@ -131,7 +131,10 @@ local stateBuilders = {
   collideable = function (world, _, entity)
     setComponent(world, "collideable", entity,
                  {name = M.entityTagger.getName(entity)})
-  end
+  end,
+  gravitational = function (world, component, entity)
+    setComponent(world, "gravitational", entity, component)
+  end,
 }
 
 local function buildFromVertex(entity, entityComponents, vertex, world)

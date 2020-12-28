@@ -63,7 +63,7 @@ end
 -- @tparam number dt Time since the last update in seconds.
 function M.update(dt)
   systems.update(dt, M.hid, M.gameState.components, M.collectableEffects,
-                 M.resources.animations)
+                 M.resources.animations, M.physics)
 end
 
 --- Should be called inside [love.draw](https://love2d.org/wiki/love.draw)
