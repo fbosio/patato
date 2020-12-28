@@ -811,10 +811,22 @@ describe("loading collideable entities that are in a level", function ()
 
   local world = resourcemanager.buildWorld(config)
 
-  it("sould copy the collideable components with its name", function ()
+  it("should copy the collideable components with its name", function ()
     local collideable = world.gameState.components.collideable
     assert.are.same("surfaces", collideable[1].name)
     assert.are.same("surfaces", collideable[2].name)
+  end)
+
+  it("should create collision boxes for each entity", function ()
+    local collisionBox = world.gameState.components.collisionBox
+    assert.are.same(150, collisionBox[1].origin.x)
+    assert.are.same(75, collisionBox[1].origin.y)
+    assert.are.same(300, collisionBox[1].width)
+    assert.are.same(150, collisionBox[1].height)
+    assert.are.same(150, collisionBox[2].origin.x)
+    assert.are.same(75, collisionBox[2].origin.y)
+    assert.are.same(300, collisionBox[2].width)
+    assert.are.same(150, collisionBox[2].height)
   end)
 end)
 
