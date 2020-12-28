@@ -63,17 +63,6 @@ local function copyMenuToState(world, menu, entity)
   world.gameState.inMenu = true  -- cambiar por escena
 end
 
-local function createCollisionBox(world, component, entity)
-  local t = {
-    origin = {x = component[1], y = component[2]},
-    width = component[3],
-    height = component[4],
-  }
-  for k, v in pairs(t) do
-    setComponentAttribute(world, "collisionBox", entity, k, v)
-  end
-end
-
 local stateBuilders = {
   input = function (world, component, entity)
     copyInputToState(world, component, entity)
@@ -93,7 +82,14 @@ local stateBuilders = {
                  {name = M.entityTagger.getName(entity)})
   end,
   collisionBox = function (world, component, entity)
-    createCollisionBox(world, component, entity)
+    local t = {
+      origin = {x = component[1], y = component[2]},
+      width = component[3],
+      height = component[4],
+    }
+    for k, v in pairs(t) do
+      setComponentAttribute(world, "collisionBox", entity, k, v)
+    end
     createDefaultPosition(world, entity)
   end,
   animations = function (world, component, entity)
@@ -138,6 +134,28 @@ local stateBuilders = {
   end
 }
 
+local function buildFromVertex(entity, entityComponents, vertex, world)
+  if entityComponents.collideable then
+    local x1 = math.min(vertex[1], vertex[3])
+    local x2 = math.max(vertex[1], vertex[3])
+    local y1 = math.min(vertex[2], vertex[4])
+    local y2 = math.max(vertex[2], vertex[4])
+    setComponentAttribute(world, "position", entity, "x", (x1+x2)/2)
+    setComponentAttribute(world, "position", entity, "y", (y1+y2)/2)
+    local width = x2 - x1
+    local height = y2 - y1
+    setComponentAttribute(world, "collisionBox", entity, "origin",
+                          {x = width/2, y = height/2})
+    setComponentAttribute(world, "collisionBox", entity, "width",
+                          width)
+    setComponentAttribute(world, "collisionBox", entity, "height",
+                          height)
+  else
+    setComponentAttribute(world, "position", entity, "x", vertex[1])
+    setComponentAttribute(world, "position", entity, "y", vertex[2])
+  end
+end
+
 local function buildNonMenu(entityName, entityComponents, world)
   local entity = nil
   if not entityComponents.menu then
@@ -179,33 +197,15 @@ local function buildNonMenuIfInLevel(config, world, levelName, entityName,
   local firstLevelName = config.firstLevel or next(config.levels)
   levelName = levelName or firstLevelName
   local level = config.levels[levelName] or {}
-  local positions = level[entityName]
-  if positions then
-    if type(positions[1]) == "number" then
-      positions = {positions}
+  local vertices = level[entityName]
+  if vertices then
+    if type(vertices[1]) == "number" then
+      vertices = {vertices}
     end
-    for _, position in ipairs(positions) do
+    for _, vertex in ipairs(vertices) do
       local entity = buildNonMenu(entityName, entityComponents, world)
       if entity then
-        if #position == 2 then
-          setComponentAttribute(world, "position", entity, "x", position[1])
-          setComponentAttribute(world, "position", entity, "y", position[2])
-        elseif entityComponents.collideable then
-          local x1 = math.min(position[1], position[3])
-          local x2 = math.max(position[1], position[3])
-          local y1 = math.min(position[2], position[4])
-          local y2 = math.max(position[2], position[4])
-          setComponentAttribute(world, "position", entity, "x", (x1+x2)/2)
-          setComponentAttribute(world, "position", entity, "y", (y1+y2)/2)
-          local width = x2 - x1
-          local height = y2 - y1
-          setComponentAttribute(world, "collisionBox", entity, "origin",
-                                {x = width/2, y = height/2})
-          setComponentAttribute(world, "collisionBox", entity, "width",
-                                width)
-          setComponentAttribute(world, "collisionBox", entity, "height",
-                                height)
-        end
+        buildFromVertex(entity, entityComponents, vertex, world)
       end
     end
   end

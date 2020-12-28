@@ -15,7 +15,8 @@ end
 function M.update(dt, hid, components, collectableEffects, animationResources)
   controller.update(hid, components)
   collider.update(dt, components.solid, components.collideable,
-                  components.collisionBox, components.position)
+                  components.collisionBox, components.position,
+                  components.velocity)
   transporter.update(dt, components.velocity, components.position,
                      components.collisionBox)
   messenger.update(components.collector, components.collectable,
