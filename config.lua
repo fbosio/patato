@@ -1,5 +1,9 @@
 local M = {}
 
+M.physics = {
+  gravity = 5000
+}
+
 M.keys = {
   left2 = "j",
   right2 = "l",
@@ -34,7 +38,8 @@ M.entities = {
       walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
       standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
     },
-    solid = true
+    solid = true,
+    gravitational = true
   },
    bee = {
      input = {
@@ -72,7 +77,10 @@ M.levels = {
       {565, 360},
       {600, 500},
     },
-    surface = {300, 30, 700, 130}
+    surface = {
+      {300, 30, 700, 130},
+      {60, 330, 140, 380}
+    }
   },
   secretLevel = {
     patato = {200, 500},

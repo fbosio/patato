@@ -858,7 +858,6 @@ describe("loading a gravitational entity", function ()
     local world = resourcemanager.buildWorld(config)
 
     local anvilId = entityTagger.getId("anvil")
-
     assert.is.truthy(world.gameState.components.gravitational[anvilId])
   end)
 end)

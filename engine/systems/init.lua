@@ -15,11 +15,12 @@ end
 function M.update(dt, hid, components, collectableEffects, animationResources,
                   physics)
   controller.update(hid, components)
+  transporter.drag(dt, components.velocity, components.gravitational,
+                   physics.gravity)
   collider.update(dt, components.solid, components.collideable,
                   components.collisionBox, components.position,
                   components.velocity)
-  transporter.update(dt, components.velocity, components.position,
-                     physics.gravity, components.gravitational)
+  transporter.move(dt, components.velocity, components.position)
   messenger.update(components.collector, components.collectable,
                    collectableEffects, components.collisionBox,
                    components.position, components.garbage)
