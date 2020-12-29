@@ -82,8 +82,8 @@ local stateBuilders = {
                             speed)
     end
   end,
-  collector = function (world, component, entity)
-    setComponent(world, "collector", entity, component)
+  collector = function (world, isCollector, entity)
+    setComponent(world, "collector", entity, isCollector)
   end,
   collectable = function (world, _, entity)
     setComponent(world, "collectable", entity,
@@ -133,17 +133,20 @@ local stateBuilders = {
 
     world.resources.animations = animations
   end,
-  solid = function (world, component, entity)
-    setComponent(world, "solid", entity, component)
+  solid = function (world, isSolid, entity)
+    setComponent(world, "solid", entity, isSolid)
     createDefaultPosition(world, entity)
     createDefaultVelocity(world, entity)
   end,
-  collideable = function (world, _, entity)
-    setComponent(world, "collideable", entity,
-                 {name = M.entityTagger.getName(entity)})
+  collideable = function (world, type, entity)
+    local name = M.entityTagger.getName(entity)
+    setComponentAttribute(world, "collideable", entity, "name", name)
+    assert(type == "rectangle" or type == "triangle",
+           "Unexpected collideable type \"" .. type .. "\" for entity \""
+           .. name .. "\"")
   end,
-  gravitational = function (world, component, entity)
-    setComponent(world, "gravitational", entity, component)
+  gravitational = function (world, isGravitational, entity)
+    setComponent(world, "gravitational", entity, isGravitational)
     createDefaultPosition(world, entity)
     createDefaultVelocity(world, entity)
   end,
@@ -165,6 +168,14 @@ local function buildFromVertex(entity, entityComponents, vertex, world)
                           width)
     setComponentAttribute(world, "collisionBox", entity, "height",
                           height)
+    if entityComponents.collideable == "triangle"
+        and vertex[2] ~= vertex[4] then
+      setComponentAttribute(world, "collideable", entity, "normalPointingUp",
+                            vertex[2] > vertex[4])
+      local rising = (vertex[1]-vertex[3]) * (vertex[2]-vertex[4]) < 0
+      setComponentAttribute(world, "collideable", entity, "rising",
+                            rising)
+    end
   else
     setComponentAttribute(world, "position", entity, "x", vertex[1])
     setComponentAttribute(world, "position", entity, "y", vertex[2])

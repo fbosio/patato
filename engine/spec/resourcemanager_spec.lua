@@ -781,7 +781,7 @@ describe("loading a collideable entity that is not in any level", function ()
     local config = {
       entities = {
         surface = {
-          collideable = true
+          collideable = "rectangle"
         }
       }
     }
@@ -799,7 +799,7 @@ describe("loading surface entities that are in a level", function ()
     config = {
       entities = {
         surfaces = {
-          collideable = true
+          collideable = "rectangle"
         }
       },
       levels = {
@@ -822,26 +822,19 @@ describe("loading surface entities that are in a level", function ()
   end)
 
   it("should create collision boxes for each entity", function ()
-    local collisionBox = world.gameState.components.collisionBox
-    assert.are.same(150, collisionBox[1].origin.x)
-    assert.are.same(75, collisionBox[1].origin.y)
-    assert.are.same(300, collisionBox[1].width)
-    assert.are.same(150, collisionBox[1].height)
-    assert.are.same(150, collisionBox[2].origin.x)
-    assert.are.same(75, collisionBox[2].origin.y)
-    assert.are.same(300, collisionBox[2].width)
-    assert.are.same(150, collisionBox[2].height)
+    assert.are.same({
+      {origin = {x = 150, y = 75}, width = 300, height = 150},
+      {origin = {x = 150, y = 75}, width = 300, height = 150},
+    }, world.gameState.components.collisionBox)
   end)
 end)
 
 describe("loading cloud entities that are in a level", function ()
-  local config, world
-
-  before_each(function ()
-    config = {
+  it("should create collision lines for each entity", function ()
+    local config = {
       entities = {
         clouds = {
-          collideable = true
+          collideable = "rectangle"
         }
       },
       levels = {
@@ -854,19 +847,82 @@ describe("loading cloud entities that are in a level", function ()
       }
     }
   
+    local world = resourcemanager.buildWorld(config)
+    
+    local collisionBox = world.gameState.components.collisionBox
+    assert.are.same({
+      {origin = {x = 150, y = 0}, width = 300, height = 0},
+      {origin = {x = 150, y = 0}, width = 300, height = 0},
+    }, collisionBox)
+  end)
+end)
+
+describe("loading slope entities that are in a level", function ()
+  local config, world
+
+  before_each(function ()
+    config = {
+      entities = {
+        slopes = {
+          collideable = "triangle"
+        }
+      },
+      levels = {
+        garden = {
+          slopes = {
+            {10, 10, 0, 0},
+            {20, 10, 30, 0},
+            {10, 20, 0, 30},
+            {20, 20, 30, 30},
+          }
+        }
+      }
+    }
+  
     world = resourcemanager.buildWorld(config)
   end)
 
-  it("should create collision lines for each entity", function ()
-    local collisionBox = world.gameState.components.collisionBox
-    assert.are.same(150, collisionBox[1].origin.x)
-    assert.are.same(0, collisionBox[1].origin.y)
-    assert.are.same(300, collisionBox[1].width)
-    assert.are.same(0, collisionBox[1].height)
-    assert.are.same(150, collisionBox[2].origin.x)
-    assert.are.same(0, collisionBox[2].origin.y)
-    assert.are.same(300, collisionBox[2].width)
-    assert.are.same(0, collisionBox[2].height)
+  it("should create collision boxes for each entity", function ()
+    assert.are.same({
+      {origin = {x = 5, y = 5}, width = 10, height = 10},
+      {origin = {x = 5, y = 5}, width = 10, height = 10},
+      {origin = {x = 5, y = 5}, width = 10, height = 10},
+      {origin = {x = 5, y = 5}, width = 10, height = 10},
+    }, world.gameState.components.collisionBox)
+  end)
+
+  it("should create a collideable with slope attributes", function ()
+    local collideable = world.gameState.components.collideable
+    assert.is.truthy(collideable[1].normalPointingUp)
+    assert.is.falsy(collideable[1].rising)
+    assert.is.truthy(collideable[2].normalPointingUp)
+    assert.is.truthy(collideable[2].rising)
+    assert.is.falsy(collideable[3].normalPointingUp)
+    assert.is.truthy(collideable[3].rising)
+    assert.is.falsy(collideable[4].normalPointingUp)
+    assert.is.falsy(collideable[4].rising)
+  end)
+end)
+
+describe("loading an entity that has a wrong collideable type", function ()
+  it("should throw an error", function ()
+    local config = {
+      entities = {
+        surfaceWithTypo = {
+          collideable = "rectanlgbe"
+        }
+      },
+      levels = {
+        garden = {
+          surfaceWithTypo = {
+            {400, 50, 700},
+            {400, 400, 700},
+          }
+        }
+      }
+    }
+
+    assert.has_error(function () resourcemanager.buildWorld(config) end)
   end)
 end)
 
@@ -875,7 +931,7 @@ describe("loading an entity that is both collideable and solid", function ()
     local config = {
       entities = {
         absurdSpecimen = {
-          collideable = true,
+          collideable = "rectangle",
           solid = true
         }
       }
