@@ -154,6 +154,134 @@ describe("with a player touching the top of a block", function ()
   end)
 end)
 
+describe("with a player touching the top left corner of a block", function ()
+  it("should stop the player and push it to that corner", function ()
+    local positions = {
+      mario = {
+        x = 400,
+        y = 300
+      },
+      block = {
+        x = 440,
+        y = 348
+      }
+    }
+    local velocities = {
+      mario = {
+        x = 1400,
+        y = 2800
+      }
+    }
+    local collideables = {
+      block = {name = "block"}
+    }
+
+    collider.update(dt, solids, collideables, collisionBoxes, positions,
+                    velocities)
+
+    assert.are.same(408, positions.mario.x)
+    assert.are.same(316, positions.mario.y)
+    assert.are.same(0, velocities.mario.x)
+    assert.are.same(0, velocities.mario.y)
+  end)
+end)
+
+describe("with a player touching the top right corner of a block", function ()
+  it("should stop the player and push it to that corner", function ()
+    local positions = {
+      mario = {
+        x = 480,
+        y = 300
+      },
+      block = {
+        x = 440,
+        y = 348
+      }
+    }
+    local velocities = {
+      mario = {
+        x = -1400,
+        y = 2800
+      }
+    }
+    local collideables = {
+      block = {name = "block"}
+    }
+
+    collider.update(dt, solids, collideables, collisionBoxes, positions,
+                    velocities)
+
+    assert.are.same(472, positions.mario.x)
+    assert.are.same(316, positions.mario.y)
+    assert.are.same(0, velocities.mario.x)
+    assert.are.same(0, velocities.mario.y)
+  end)
+end)
+
+describe("with a player touching the bottom left corner of a block", function ()
+  it("should stop the player and push it to that corner", function ()
+    local positions = {
+      mario = {
+        x = 400,
+        y = 460
+      },
+      block = {
+        x = 440,
+        y = 348
+      }
+    }
+    local velocities = {
+      mario = {
+        x = 1400,
+        y = -2800
+      }
+    }
+    local collideables = {
+      block = {name = "block"}
+    }
+
+    collider.update(dt, solids, collideables, collisionBoxes, positions,
+                    velocities)
+
+    assert.are.same(408, positions.mario.x)
+    assert.are.same(444, positions.mario.y)
+    assert.are.same(0, velocities.mario.x)
+    assert.are.same(0, velocities.mario.y)
+  end)
+end)
+
+describe("with a player touching the bottom right corner of a block", function ()
+  it("should stop the player and push it to that corner", function ()
+    local positions = {
+      mario = {
+        x = 480,
+        y = 460
+      },
+      block = {
+        x = 440,
+        y = 348
+      }
+    }
+    local velocities = {
+      mario = {
+        x = -1400,
+        y = -2800
+      }
+    }
+    local collideables = {
+      block = {name = "block"}
+    }
+
+    collider.update(dt, solids, collideables, collisionBoxes, positions,
+                    velocities)
+
+    assert.are.same(472, positions.mario.x)
+    assert.are.same(444, positions.mario.y)
+    assert.are.same(0, velocities.mario.x)
+    assert.are.same(0, velocities.mario.y)
+  end)
+end)
+
 describe("with a player touching the left side of a cloud", function ()
   it("should remain the player velocity unchanged", function ()
     local positions = {
