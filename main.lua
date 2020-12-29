@@ -16,6 +16,11 @@ function love.load()
     engine.startGame("secretLevel")
   end)
 
+  engine.setAction("jump", function (c)
+    if c.velocity.y == 0 then
+      c.velocity.y = -c.impulseSpeed.jump
+    end
+  end)
   engine.setAction("showCustomMessage", function ()
     message = "Flashlight!"
   end)
@@ -81,7 +86,7 @@ function love.draw()
   if not engine.gameState.inMenu then
     love.graphics.print(score, 0, 0)
   end
-  
+
 
   local mouseX, mouseY = love.mouse.getPosition()
   love.graphics.print(tostring(mouseX) .. ", " .. tostring(mouseY),

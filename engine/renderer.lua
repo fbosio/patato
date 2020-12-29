@@ -59,7 +59,7 @@ function M.draw(components, inMenu, resources)
     for entity, position in pairs(components.position or {}) do
       local x, y = position.x, position.y
       M.love.graphics.points{{x, y, 1, 0, 0, 1}}
-      M.love.graphics.print({{1, 0, 0}, tostring(entity)}, x, y - 50)
+      M.love.graphics.print({{1, 0, 0}, tostring(entity)}, x, y - 20)
     end
   end
 end
