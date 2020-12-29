@@ -1,5 +1,31 @@
 local M = {}
 
+local function checkSurfaceYCollisions(top1, bottom1, position1, velocity1,
+                                       box1, top2, bottom2, verticalCenter2,
+                                       dt)
+  if top1 >= bottom2 and top1 + velocity1.y*dt < bottom2 then
+    velocity1.y = 0
+    position1.y = bottom2 + box1.origin.y
+  elseif bottom1 > top2 and bottom1 < verticalCenter2 then
+    velocity1.y = 0
+    position1.y = top2
+  elseif top1 < bottom2 and top1 > verticalCenter2 then
+    velocity1.y = 0
+    position1.y = bottom2 + box1.height
+  end
+end
+
+local function checkSurfaceXCollisions(left1, right1, position1, velocity1,
+                                       box1, left2, right2, dt)
+  if left1 >= right2 and left1 + velocity1.x*dt < right2 then
+    velocity1.x = 0
+    position1.x = right2 + box1.origin.x
+  elseif right1 <= left2 and right1 + velocity1.x*dt > left2 then
+    velocity1.x = 0
+    position1.x = left2 - box1.width + box1.origin.x
+  end
+end
+
 local function checkRectangleCollisions(x1, y1, x2, y2, box1, box2, velocity1,
                                         position1, dt)
   local left1 = x1
@@ -12,30 +38,13 @@ local function checkRectangleCollisions(x1, y1, x2, y2, box1, box2, velocity1,
   local verticalCenter2 = y2 + box2.height/2
   local bottom2 = y2 + box2.height
 
-  local newVelocity1 = {
-    x = velocity1.x,
-    y = velocity1.y
-  }
   if box2.height > 0 then  -- not a cloud
     if left1 < right2 and right1 > left2 then
-      if top1 >= bottom2 and top1 + velocity1.y*dt < bottom2 then
-        velocity1.y = 0
-        position1.y = bottom2 + box1.origin.y
-      elseif bottom1 > top2 and bottom1 < verticalCenter2 then
-        velocity1.y = 0
-        position1.y = top2
-      elseif top1 < bottom2 and top1 > verticalCenter2 then
-        velocity1.y = 0
-        position1.y = bottom2 + box1.height
-      end
+      checkSurfaceYCollisions(top1, bottom1, position1, velocity1, box1,
+                                top2, bottom2, verticalCenter2, dt)
     elseif top1 < bottom2 and bottom1 > top2 then
-      if left1 >= right2 and left1 + velocity1.x*dt < right2 then
-        velocity1.x = 0
-        position1.x = right2 + box1.origin.x
-      elseif right1 <= left2 and right1 + velocity1.x*dt > left2 then
-        velocity1.x = 0
-        position1.x = left2 - box1.width + box1.origin.x
-      end
+      checkSurfaceXCollisions(left1, right1, position1, velocity1, box1,
+                                left2, right2, dt)
     end
   end
   if bottom1 <= top2 and bottom1 + velocity1.y*dt > top2
