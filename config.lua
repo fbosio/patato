@@ -1,7 +1,7 @@
 local M = {}
 
 M.physics = {
-  gravity = 0 --5000
+  gravity = 5000
 }
 
 M.keys = {
@@ -39,7 +39,7 @@ M.entities = {
       standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
     },
     solid = true,
-    gravitational = true
+    -- gravitational = true
   },
    bee = {
      input = {
@@ -55,7 +55,10 @@ M.entities = {
     }
   },
   surface = {
-    collideable = true
+    collideable = "rectangle"
+  },
+  slope = {
+    collideable = "triangle"
   },
   mainMenu = {
     input = {},
@@ -81,6 +84,10 @@ M.levels = {
       {300, 30, 700, 130},  -- block: x1, y1, x2, y2
       {60, 380, 140, 400},
       {30, 100, 200}  -- cloud: x1, y1, x2
+    },
+    slope = {
+      {300, 500, 400, 400},
+      {500, 500, 400, 400},
     }
   },
   secretLevel = {

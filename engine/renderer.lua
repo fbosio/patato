@@ -27,7 +27,18 @@ function M.draw(components, inMenu, resources)
       if box.height == 0 then
         M.love.graphics.line(x, y, x+box.width, y)
       else
-        M.love.graphics.rectangle("fill", x, y, box.width, box.height)
+        local collideable = (components.collideable or {})[entity] or {}
+        if collideable.normalPointingUp ~= nil
+            and collideable.rising ~= nil then
+          local y1 = collideable.normalPointingUp and y+box.height or y
+          local x3 = ((collideable.normalPointingUp and not collideable.rising)
+                      or (not collideable.normalPointingUp and collideable.rising))
+                     and x or x+box.width
+          local y3 = collideable.normalPointingUp and y or y+box.height
+          M.love.graphics.polygon("fill", {x, y1, x+box.width, y1, x3, y3})
+        else
+          M.love.graphics.rectangle("fill", x, y, box.width, box.height)
+        end
       end
     end
 
