@@ -153,8 +153,8 @@ local function buildFromVertex(entity, entityComponents, vertex, world)
   if entityComponents.collideable then
     local x1 = math.min(vertex[1], vertex[3])
     local x2 = math.max(vertex[1], vertex[3])
-    local y1 = math.min(vertex[2], vertex[4])
-    local y2 = math.max(vertex[2], vertex[4])
+    local y1 = math.min(vertex[2], vertex[4] or vertex[2])
+    local y2 = math.max(vertex[2], vertex[4] or vertex[2])
     setComponentAttribute(world, "position", entity, "x", (x1+x2)/2)
     setComponentAttribute(world, "position", entity, "y", (y1+y2)/2)
     local width = x2 - x1
@@ -175,17 +175,15 @@ local function buildNonMenu(entityName, entityComponents, world)
   local entity = nil
   if not entityComponents.menu then
     for componentName, component in pairs(entityComponents) do
-      if componentName ~= "menu" then
-        entity = entity or M.entityTagger.tag(entityName)
-        if componentName == "input" and entityComponents.gravitational then
-          copyInputToState(world, component, entity, false, true)
-          createDefaults(world, entity)
-        end
-        assert(stateBuilders[componentName],
-               "Entity \"" .. entityName .. "\" has a component named \""
-               .. componentName .. "\" that was not expected in config.lua")
-               stateBuilders[componentName](world, component, entity)
+      entity = entity or M.entityTagger.tag(entityName)
+      if componentName == "input" and entityComponents.gravitational then
+        copyInputToState(world, component, entity, false, true)
+        createDefaults(world, entity)
       end
+      assert(stateBuilders[componentName],
+              "Entity \"" .. entityName .. "\" has a component named \""
+              .. componentName .. "\" that was not expected in config.lua")
+              stateBuilders[componentName](world, component, entity)
     end
   end
   return entity

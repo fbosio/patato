@@ -24,7 +24,11 @@ function M.draw(components, inMenu, resources)
     for entity, box in pairs(components.collisionBox or {}) do
       local position = components.position[entity]
       local x, y = position.x - box.origin.x, position.y - box.origin.y
-      M.love.graphics.rectangle("fill", x, y, box.width, box.height)
+      if box.height == 0 then
+        M.love.graphics.line(x, y, x+box.width, y)
+      else
+        M.love.graphics.rectangle("fill", x, y, box.width, box.height)
+      end
     end
 
     if resources.sprites then

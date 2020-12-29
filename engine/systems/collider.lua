@@ -22,20 +22,22 @@ function M.update(dt, solids, collideables, collisionBoxes, positions,
       local top2 = y2
       local bottom2 = y2 + box2.height
 
-      if right1 <= left2 and right1 + velocity1.x*dt > left2
-          and top1 < bottom2 and bottom1 > top2 then
-        velocity1.x = 0
-        position1.x = left2 - box1.width + box1.origin.x
-      end
-      if left1 >= right2 and left1 + velocity1.x*dt < right2
-          and top1 < bottom2 and bottom1 > top2 then
-        velocity1.x = 0
-        position1.x = right2 + box1.origin.x
-      end
-      if top1 >= bottom2 and top1 + velocity1.y*dt < bottom2
-          and left1 < right2 and right1 > left2 then
-        velocity1.y = 0
-        position1.y = bottom2 + box1.origin.y
+      if box2.height > 0 then
+        if right1 <= left2 and right1 + velocity1.x*dt > left2
+            and top1 < bottom2 and bottom1 > top2 then
+          velocity1.x = 0
+          position1.x = left2 - box1.width + box1.origin.x
+        end
+        if left1 >= right2 and left1 + velocity1.x*dt < right2
+            and top1 < bottom2 and bottom1 > top2 then
+          velocity1.x = 0
+          position1.x = right2 + box1.origin.x
+        end
+        if top1 >= bottom2 and top1 + velocity1.y*dt < bottom2
+            and left1 < right2 and right1 > left2 then
+          velocity1.y = 0
+          position1.y = bottom2 + box1.origin.y
+        end
       end
       if bottom1 <= top2 and bottom1 + velocity1.y*dt > top2
           and left1 < right2 and right1 > left2 then

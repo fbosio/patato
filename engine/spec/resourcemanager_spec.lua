@@ -792,24 +792,28 @@ describe("loading a collideable entity that is not in any level", function ()
   end)
 end)
 
-describe("loading collideable entities that are in a level", function ()
-  local config = {
-    entities = {
-      surfaces = {
-        collideable = true
-      }
-    },
-    levels = {
-      garden = {
+describe("loading surface entities that are in a level", function ()
+  local config, world
+
+  before_each(function ()
+    config = {
+      entities = {
         surfaces = {
-          {400, 50, 700, 200},
-          {400, 400, 700, 550},
+          collideable = true
+        }
+      },
+      levels = {
+        garden = {
+          surfaces = {
+            {400, 50, 700, 200},
+            {400, 400, 700, 550},
+          }
         }
       }
     }
-  }
-
-  local world = resourcemanager.buildWorld(config)
+  
+    world = resourcemanager.buildWorld(config)
+  end)
 
   it("should copy the collideable components with its name", function ()
     local collideable = world.gameState.components.collideable
@@ -827,6 +831,42 @@ describe("loading collideable entities that are in a level", function ()
     assert.are.same(75, collisionBox[2].origin.y)
     assert.are.same(300, collisionBox[2].width)
     assert.are.same(150, collisionBox[2].height)
+  end)
+end)
+
+describe("loading cloud entities that are in a level", function ()
+  local config, world
+
+  before_each(function ()
+    config = {
+      entities = {
+        clouds = {
+          collideable = true
+        }
+      },
+      levels = {
+        garden = {
+          clouds = {
+            {400, 50, 700},
+            {400, 400, 700},
+          }
+        }
+      }
+    }
+  
+    world = resourcemanager.buildWorld(config)
+  end)
+
+  it("should create collision lines for each entity", function ()
+    local collisionBox = world.gameState.components.collisionBox
+    assert.are.same(150, collisionBox[1].origin.x)
+    assert.are.same(0, collisionBox[1].origin.y)
+    assert.are.same(300, collisionBox[1].width)
+    assert.are.same(0, collisionBox[1].height)
+    assert.are.same(150, collisionBox[2].origin.x)
+    assert.are.same(0, collisionBox[2].origin.y)
+    assert.are.same(300, collisionBox[2].width)
+    assert.are.same(0, collisionBox[2].height)
   end)
 end)
 

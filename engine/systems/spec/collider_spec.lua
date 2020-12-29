@@ -1,26 +1,28 @@
 local dt = 1 / 70
-local collider
-local solids = {
-  mario = true
-}
-local collideables = {
-  block = {name = "block"}
-}
-local collisionBoxes = {
-  mario = {
-    origin = {x = 16, y = 64},
-    width = 32,
-    height = 64
-  },
-  block = {
-    origin = {x = 16, y = 32},
-    width = 32,
-    height = 64
-  }
-}
+local collider, solids, collisionBoxes
 
 before_each(function ()
   collider = require "engine.systems.collider"
+  solids = {
+    mario = true
+  }
+  collisionBoxes = {
+    mario = {
+      origin = {x = 16, y = 64},
+      width = 32,
+      height = 64
+    },
+    block = {
+      origin = {x = 16, y = 32},
+      width = 32,
+      height = 64
+    },
+    cloud = {
+      origin = {x = 16, y = 0},
+      width = 32,
+      height = 0
+    },
+  }
 end)
 
 after_each(function ()
@@ -44,6 +46,9 @@ describe("with a player touching the left side of a block", function ()
         x = 1400,
         y = 0
       }
+    }
+    local collideables = {
+      block = {name = "block"}
     }
 
     collider.update(dt, solids, collideables, collisionBoxes, positions,
@@ -72,6 +77,9 @@ describe("with a player touching the right side of a block", function ()
         y = 0
       }
     }
+    local collideables = {
+      block = {name = "block"}
+    }
 
     collider.update(dt, solids, collideables, collisionBoxes, positions,
                     velocities)
@@ -98,6 +106,9 @@ describe("with a player touching the bottom of a block", function ()
         x = 0,
         y = -1400
       }
+    }
+    local collideables = {
+      block = {name = "block"}
     }
 
     collider.update(dt, solids, collideables, collisionBoxes, positions,
@@ -126,6 +137,9 @@ describe("with a player touching the top of a block", function ()
         y = 1400
       }
     }
+    local collideables = {
+      block = {name = "block"}
+    }
 
     collider.update(dt, solids, collideables, collisionBoxes, positions,
                     velocities)
@@ -134,3 +148,124 @@ describe("with a player touching the top of a block", function ()
     assert.are.same(0, velocities.mario.y)
   end)
 end)
+
+describe("with a player touching the left side of a cloud", function ()
+  it("should remain the player velocity unchanged", function ()
+    local positions = {
+      mario = {
+        x = 280,
+        y = 380
+      },
+      cloud = {
+        x = 320,
+        y = 348
+      }
+    }
+    local velocities = {
+      mario = {
+        x = 1400,
+        y = 0
+      }
+    }
+    local collideables = {
+      cloud = {name = "cloud"}
+    }
+
+    collider.update(dt, solids, collideables, collisionBoxes, positions,
+                    velocities)
+
+    assert.are.same(280, positions.mario.x)
+    assert.are.same(1400, velocities.mario.x)
+  end)
+end)
+
+describe("with a player touching the right side of a cloud", function ()
+  it("should remain the player velocity unchanged", function ()
+    local positions = {
+      mario = {
+        x = 366,
+        y = 380
+      },
+      cloud = {
+        x = 320,
+        y = 348
+      }
+    }
+    local velocities = {
+      mario = {
+        x = -1400,
+        y = 0
+      }
+    }
+    local collideables = {
+      cloud = {name = "cloud"}
+    }
+
+    collider.update(dt, solids, collideables, collisionBoxes, positions,
+                    velocities)
+
+    assert.are.same(366, positions.mario.x)
+    assert.are.same(-1400, velocities.mario.x)
+  end)
+end)
+
+describe("with a player touching the bottom of a cloud", function ()
+  it("should remain the player velocity unchanged", function ()
+    local positions = {
+      mario = {
+        x = 346,
+        y = 486
+      },
+      cloud = {
+        x = 320,
+        y = 380
+      }
+    }
+    local velocities = {
+      mario = {
+        x = 0,
+        y = -1400
+      }
+    }
+    local collideables = {
+      cloud = {name = "cloud"}
+    }
+
+    collider.update(dt, solids, collideables, collisionBoxes, positions,
+                    velocities)
+
+    assert.are.same(486, positions.mario.y)
+    assert.are.same(-1400, velocities.mario.y)
+  end)
+end)
+
+describe("with a player touching the top of a cloud", function ()
+  it("should stop the player and push it to the top", function ()
+    local positions = {
+      mario = {
+        x = 346,
+        y = 370
+      },
+      cloud = {
+        x = 320,
+        y = 380
+      }
+    }
+    local velocities = {
+      mario = {
+        x = 0,
+        y = 1400
+      }
+    }
+    local collideables = {
+      cloud = {name = "cloud"}
+    }
+
+    collider.update(dt, solids, collideables, collisionBoxes, positions,
+                    velocities)
+
+    assert.are.same(380, positions.mario.y)
+    assert.are.same(0, velocities.mario.y)
+  end)
+end)
+
