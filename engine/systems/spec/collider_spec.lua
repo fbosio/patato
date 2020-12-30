@@ -395,8 +395,9 @@ describe("with a player touching the top of a cloud", function ()
 end)
 
 describe("with a player touching the bottom of an upward slope", function ()
-  it("should stop the player and push it to the bottom", function ()
-    local positions = {
+  local positions, velocities
+  before_each(function ()
+    positions = {
       mario = {
         x = 346,
         y = 486
@@ -406,57 +407,43 @@ describe("with a player touching the bottom of an upward slope", function ()
         y = 380
       }
     }
-    local velocities = {
+    velocities = {
       mario = {
         x = 0,
         y = -1400
       }
     }
-    local collideables = {
-      slope = {name = "slope", normalPointingUp = true, rising = true}
-    }
+  end)
+  describe("that is rising from left to right", function ()
+    it("should push the player to the bottom", function ()
+      local collideables = {
+        slope = {name = "slope", normalPointingUp = true, rising = true}
+      }
 
-    collider.update(dt, solids, collideables, collisionBoxes, positions,
-                    velocities)
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                      velocities)
 
-    assert.are.same(476, positions.mario.y)
-    assert.are.same(0, velocities.mario.y)
+      assert.are.same(476, positions.mario.y)
+    end)
+  end)
+  describe("that is falling from left to right", function ()
+    it("should push the player to the bottom", function ()
+      local collideables = {
+        slope = {name = "slope", normalPointingUp = true, rising = false}
+      }
+
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                      velocities)
+
+      assert.are.same(476, positions.mario.y)
+    end)
   end)
 end)
 
-describe("with a player touching the top of a downward slope", function ()
-  it("should stop the player and push it to the top", function ()
-    local positions = {
-      mario = {
-        x = 346,
-        y = 338
-      },
-      slope = {
-        x = 320,
-        y = 380
-      }
-    }
-    local velocities = {
-      mario = {
-        x = 0,
-        y = 1400
-      }
-    }
-    local collideables = {
-      slope = {name = "slope", normalPointingUp = false, rising = true}
-    }
-
-    collider.update(dt, solids, collideables, collisionBoxes, positions,
-                    velocities)
-
-    assert.are.same(348, positions.mario.y)
-    assert.are.same(0, velocities.mario.y)
-  end)
-end)
-
- describe("with a player touching the vertical side of a slope", function ()
-  it("should stop the player and push it to that side", function ()
-    local positions = {
+describe("with a player touching the side of an unward slope", function ()
+  local positions, velocities
+  before_each(function ()
+    positions = {
       mario = {
        x = 360,
        y = 432
@@ -466,27 +453,46 @@ end)
        y = 380
       }
       }
-    local velocities = {
+    velocities = {
      mario = {
        x = -1400,
        y = -700
      }
     }
-    local collideables = {
-     slope = {name = "slope", normalPointingUp = true, rising = true}
-    }
+  end)
+  describe("that is rising from left to right", function ()
+    it("should stop the player and push it to that side", function ()
+      local collideables = {
+       slope = {name = "slope", normalPointingUp = true, rising = true}
+      }
 
-    collider.update(dt, solids, collideables, collisionBoxes, positions,
-                   velocities)
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                     velocities)
 
-    assert.are.same(352, positions.mario.x)
-    assert.are.same(0, velocities.mario.x)
-   end)
- end)
+      assert.are.same(352, positions.mario.x)
+      assert.are.same(0, velocities.mario.x)
+    end)
+  end)
+  describe("that is falling from left to right", function ()
+    it("should stop the player and push it to that side", function ()
+      local collideables = {
+       slope = {name = "slope", normalPointingUp = true, rising = false}
+      }
 
-describe("with a player touching the edge of a slope", function ()
-  it("should stop the player and push it away", function ()
-    local positions = {
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                     velocities)
+
+      assert.are.same(352, positions.mario.x)
+      assert.are.same(0, velocities.mario.x)
+    end)
+  end)
+end)
+
+
+describe("with a player touching the edge of an unward slope", function ()
+  local positions, velocities
+  before_each(function ()
+    positions = {
       mario = {
        x = 278,
        y = 448
@@ -496,49 +502,131 @@ describe("with a player touching the edge of a slope", function ()
        y = 380
       }
       }
-    local velocities = {
+    velocities = {
      mario = {
        x = 1400,
        y = 0
      }
     }
-    local collideables = {
-     slope = {name = "slope", normalPointingUp = true, rising = true}
-    }
+  end)
+  describe("that is rising from left to right", function ()
+    it("should stop the player and push it away", function ()
+      local collideables = {
+       slope = {name = "slope", normalPointingUp = true, rising = true}
+      }
 
-    collider.update(dt, solids, collideables, collisionBoxes, positions,
-                   velocities)
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                     velocities)
 
-    assert.are.same(288, positions.mario.x)
-    assert.are.same(0, velocities.mario.x)
+      assert.are.same(288, positions.mario.x)
+      assert.are.same(0, velocities.mario.x)
+    end)
+  end)
+  describe("that is falling from left to right", function ()
+    it("should stop the player and push it away", function ()
+      local collideables = {
+       slope = {name = "slope", normalPointingUp = true, rising = false}
+      }
+
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                     velocities)
+
+      assert.are.same(288, positions.mario.x)
+      assert.are.same(0, velocities.mario.x)
+    end)
   end)
 end)
 
-describe("with a player overlapping a slope", function ()
-  it("should put the player exactly on the slope", function ()
-    local positions = {
+describe("with a player falling on an upward slope", function ()
+  local positions, velocities
+  before_each(function ()
+    positions = {
       mario = {
        x = 320,
-       y = 400
+       y = 370
       },
       slope = {
        x = 320,
        y = 380
       }
     }
-    local velocities = {
+    velocities = {
      mario = {
-       x = 1400,
-       y = 0
+       x = 0,
+       y = 1400
      }
     }
-    local collideables = {
-     slope = {name = "slope", normalPointingUp = true, rising = true}
+  end)
+  describe("that is rising from left to right", function ()
+    it("should put the player exactly on the slope", function ()
+      local collideables = {
+       slope = {name = "slope", normalPointingUp = true, rising = true}
+      }
+
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                     velocities)
+
+      assert.are.same(380, positions.mario.y)
+    end)
+  end)
+  describe("that is falling from left to right", function ()
+    it("should put the player exactly on the slope", function ()
+      local collideables = {
+       slope = {name = "slope", normalPointingUp = true, rising = false}
+      }
+
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                     velocities)
+
+      assert.are.same(380, positions.mario.y)
+    end)
+  end)
+end)
+
+describe("with a player touching the top of a downward slope", function ()
+  local positions, velocities
+  before_each(function ()
+    positions = {
+      mario = {
+        x = 346,
+        y = 338
+      },
+      slope = {
+        x = 320,
+        y = 380
+      }
     }
+    velocities = {
+      mario = {
+        x = 0,
+        y = 1400
+      }
+    }
+  end)
+  describe("that is rising from left to right", function ()
+    it("should stop the player and push it to the top", function ()
+      local collideables = {
+        slope = {name = "slope", normalPointingUp = false, rising = true}
+      }
 
-    collider.update(dt, solids, collideables, collisionBoxes, positions,
-                   velocities)
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                      velocities)
 
-    assert.are.same(380, positions.mario.y)
+      assert.are.same(348, positions.mario.y)
+      assert.are.same(0, velocities.mario.y)
+    end)
+  end)
+  describe("that is falling from left to right", function ()
+    it("should stop the player and push it to the top", function ()
+      local collideables = {
+        slope = {name = "slope", normalPointingUp = false, rising = false}
+      }
+
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                      velocities)
+
+      assert.are.same(348, positions.mario.y)
+      assert.are.same(0, velocities.mario.y)
+    end)
   end)
 end)
