@@ -87,10 +87,9 @@ local function collideTriangle(normalPointingUp, rising, box1, box2,
     if p1.x >= box2.left and p1.x <= box2.right and box1.bottom >= box2.top
         and box1.bottom <= box2.bottom then
       if box1.bottom + v1.y*dt >= ySlope then
-        p1.y = ySlope
         v1.y = 0
+        p1.y = ySlope
       end
-
     end
   else
     if box1.left < box2.right and box1.right > box2.left and box1.bottom <= box2.top and box1.bottom + v1.y*dt > box2.top then
@@ -98,6 +97,7 @@ local function collideTriangle(normalPointingUp, rising, box1, box2,
       p1.y = box2.top - box1.height + box1.origin.y
     end
     if rising then
+      m = m * (-1)
       if box1.top < box2.top and box1.bottom > box2.top and box1.left >= box2.right and box1.left + v1.x*dt < box2.right then
         v1.x = 0
         p1.x = box2.right + box1.origin.x
@@ -107,7 +107,6 @@ local function collideTriangle(normalPointingUp, rising, box1, box2,
         p1.x = box2.left - box1.width + box1.origin.x
       end
     else
-      m = m * (-1)
       if box1.top < box2.bottom and box1.bottom > box2.top and box1.left >= box2.right and box1.left + v1.x*dt < box2.right then
         v1.x = 0
         p1.x = box2.right + box1.origin.x
@@ -118,6 +117,13 @@ local function collideTriangle(normalPointingUp, rising, box1, box2,
       end
     end
     local ySlope = m*(p1.x-box2.horizontalCenter) + box2.verticalCenter
+    if p1.x >= box2.left and p1.x <= box2.right and box1.top <= box2.bottom
+        and box1.top >= box2.top then
+      if box1.top + v1.y*dt <= ySlope then
+        v1.y = 0
+        p1.y = ySlope + box1.height
+      end
+    end
   end
 end
 
