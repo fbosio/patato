@@ -1,58 +1,126 @@
 local M = {}
 
-local function checkSurfaceYCollisions(top1, bottom1, position1, velocity1,
-                                       box1, top2, bottom2, verticalCenter2,
-                                       dt)
-  if top1 >= bottom2 and top1 + velocity1.y*dt < bottom2 then
-    velocity1.y = 0
-    position1.y = bottom2 + box1.origin.y
-  elseif bottom1 > top2 and bottom1 < verticalCenter2 then
-    velocity1.y = 0
-    position1.y = top2
-  elseif top1 < bottom2 and top1 > verticalCenter2 then
-    velocity1.y = 0
-    position1.y = bottom2 + box1.height
+local function getTranslatedBox(position, box)
+  local x = position.x - box.origin.x
+  local y = position.y - box.origin.y
+  return {
+    origin = {x = box.origin.x, y = box.origin.y},
+    width = box.width,
+    height = box.height,
+    left = x,
+    right = x + box.width,
+    top = y,
+    bottom = y + box.height,
+    horizontalCenter = x + box.width/2,
+    verticalCenter = y + box.height/2
+  }
+end
+
+local function collideSurfaceX(box1, box2, v1, p1, dt)
+  if box1.left >= box2.right and box1.left + v1.x*dt < box2.right then
+    v1.x = 0
+    p1.x = box2.right + box1.origin.x
+  elseif box1.right <= box2.left and box1.right + v1.x*dt > box2.left then
+    v1.x = 0
+    p1.x = box2.left - box1.width + box1.origin.x
   end
 end
 
-local function checkSurfaceXCollisions(left1, right1, position1, velocity1,
-                                       box1, left2, right2, dt)
-  if left1 >= right2 and left1 + velocity1.x*dt < right2 then
-    velocity1.x = 0
-    position1.x = right2 + box1.origin.x
-  elseif right1 <= left2 and right1 + velocity1.x*dt > left2 then
-    velocity1.x = 0
-    position1.x = left2 - box1.width + box1.origin.x
+local function collideSurfaceY(box1, box2, v1, p1, dt)
+  if box1.top >= box2.bottom and box1.top + v1.y*dt < box2.bottom then
+    v1.y = 0
+    p1.y = box2.bottom + box1.origin.y
+  elseif box1.bottom > box2.top and box1.bottom < box2.verticalCenter then
+    v1.y = 0
+    p1.y = box2.top
+  elseif box1.top < box2.bottom and box1.top > box2.verticalCenter then
+    v1.y = 0
+    p1.y = box2.bottom + box1.height
   end
 end
 
-local function checkRectangleCollisions(x1, y1, x2, y2, box1, box2, velocity1,
-                                        position1, dt)
-  local left1 = x1
-  local right1 = x1 + box1.width
-  local top1 = y1
-  local bottom1 = y1 + box1.height
-  local left2 = x2
-  local right2 = x2 + box2.width
-  local top2 = y2
-  local verticalCenter2 = y2 + box2.height/2
-  local bottom2 = y2 + box2.height
+local function collideCloud(box1, box2, v1, p1, dt)
+  if box1.bottom <= box2.top and box1.bottom + v1.y*dt > box2.top
+      and box1.left < box2.right and box1.right > box2.left then
+    v1.y = 0
+    p1.y = box2.top - box1.height + box1.origin.y
+  end
+end
 
-  if box2.height > 0 then  -- not a cloud
-    if left1 < right2 and right1 > left2 then
-      checkSurfaceYCollisions(top1, bottom1, position1, velocity1, box1,
-                                top2, bottom2, verticalCenter2, dt)
-    elseif top1 < bottom2 and bottom1 > top2 then
-      checkSurfaceXCollisions(left1, right1, position1, velocity1, box1,
-                                left2, right2, dt)
+local function collideRectangle(box1, box2, v1, p1, dt)
+  if box1.left < box2.right and box1.right > box2.left then
+    collideSurfaceY(box1, box2, v1, p1, dt)
+  elseif box1.top < box2.bottom and box1.bottom > box2.top then
+    collideSurfaceX(box1, box2, v1, p1, dt)
+  end
+end
+
+local function collideTriangle(normalPointingUp, rising, box1, box2,
+                                       v1, p1, dt)
+  local m = box2.height / box2.width
+  if normalPointingUp then
+    if box1.left < box2.right and box1.right > box2.left and box1.top >= box2.bottom and box1.top + v1.y*dt < box2.bottom then
+      v1.y = 0
+      p1.y = box2.bottom + box1.origin.y
     end
-  end
-  if bottom1 <= top2 and bottom1 + velocity1.y*dt > top2
-      and left1 < right2 and right1 > left2 then
-    velocity1.y = 0
-    position1.y = top2 - box1.height + box1.origin.y
+    if rising then
+      m = m * (-1)
+      if box1.top < box2.bottom and box1.bottom > box2.top and box1.left >= box2.right and box1.left + v1.x*dt < box2.right then
+        v1.x = 0
+        p1.x = box2.right + box1.origin.x
+      end
+      if box1.top < box2.bottom and box1.bottom > box2.bottom and box1.right <= box2.left and box1.right + v1.x*dt > box2.left then
+        v1.x = 0
+        p1.x = box2.left - box1.width + box1.origin.x
+      end
+    else
+      if box1.top < box2.bottom and box1.bottom > box2.bottom and box1.left >= box2.right and box1.left + v1.x*dt < box2.right then
+        v1.x = 0
+        p1.x = box2.right + box1.origin.x
+      end
+      if box1.top < box2.bottom and box1.bottom > box2.top and box1.right <= box2.left and box1.right + v1.x*dt > box2.left then
+        v1.x = 0
+        p1.x = box2.left - box1.width + box1.origin.x
+      end
+    end
+    local ySlope = m*(p1.x-box2.horizontalCenter) + box2.verticalCenter
+    if p1.x >= box2.left and p1.x <= box2.right and box1.bottom >= box2.top
+        and box1.bottom <= box2.bottom then
+      if box1.bottom + v1.y*dt >= ySlope then
+        p1.y = ySlope
+        v1.y = 0
+      end
+
+    end
+  else
+    if box1.left < box2.right and box1.right > box2.left and box1.bottom <= box2.top and box1.bottom + v1.y*dt > box2.top then
+      v1.y = 0
+      p1.y = box2.top - box1.height + box1.origin.y
+    end
+    if rising then
+      if box1.top < box2.top and box1.bottom > box2.top and box1.left >= box2.right and box1.left + v1.x*dt < box2.right then
+        v1.x = 0
+        p1.x = box2.right + box1.origin.x
+      end
+      if box1.top < box2.bottom and box1.bottom > box2.top and box1.right <= box2.left and box1.right + v1.x*dt > box2.left then
+        v1.x = 0
+        p1.x = box2.left - box1.width + box1.origin.x
+      end
+    else
+      m = m * (-1)
+      if box1.top < box2.bottom and box1.bottom > box2.top and box1.left >= box2.right and box1.left + v1.x*dt < box2.right then
+        v1.x = 0
+        p1.x = box2.right + box1.origin.x
+      end
+      if box1.top < box2.top and box1.bottom > box2.top and box1.right <= box2.left and box1.right + v1.x*dt > box2.left then
+        v1.x = 0
+        p1.x = box2.left - box1.width + box1.origin.x
+      end
+    end
+    local ySlope = m*(p1.x-box2.horizontalCenter) + box2.verticalCenter
   end
 end
+
 
 function M.update(dt, solids, collideables, collisionBoxes, positions,
                   velocities)
@@ -60,15 +128,25 @@ function M.update(dt, solids, collideables, collisionBoxes, positions,
     local box1 = collisionBoxes[solidEntity]
     local position1 = positions[solidEntity]
     local velocity1 = velocities[solidEntity]
-    local x1, y1 = position1.x - box1.origin.x, position1.y - box1.origin.y
+    local translatedBox1 = getTranslatedBox(position1, box1)
 
-    for collideableEntity, _ in pairs(collideables or {}) do
+    for collideableEntity, collideable in pairs(collideables or {}) do
       local box2 = collisionBoxes[collideableEntity]
       local position2 = positions[collideableEntity]
-      local x2, y2 = position2.x - box2.origin.x, position2.y - box2.origin.y
+      local translatedBox2 = getTranslatedBox(position2, box2)
 
-      checkRectangleCollisions(x1, y1, x2, y2, box1, box2, velocity1,
-                               position1, dt)
+      if collideable.normalPointingUp == nil or collideable.rising == nil then
+        if box2.height > 0 then
+            collideRectangle(translatedBox1, translatedBox2, velocity1,
+                                     position1, dt)
+        end
+        collideCloud(translatedBox1, translatedBox2, velocity1,
+                            position1, dt)
+      else
+        collideTriangle(collideable.normalPointingUp,
+                                collideable.rising, translatedBox1,
+                                translatedBox2, velocity1, position1, dt)
+      end
     end
   end
 end
