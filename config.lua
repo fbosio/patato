@@ -61,7 +61,11 @@ M.entities = {
     collideable = "triangle"
   },
   mainMenu = {
-    input = {},
+    input = {
+      menuPrevious = "up",
+      menuNext = "down",
+      menuSelect = "start"
+    },
     menu = {
       options = {"Start", "Show message", "Secret level"},
     },

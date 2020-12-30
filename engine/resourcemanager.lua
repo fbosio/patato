@@ -15,26 +15,7 @@ local function setComponentAttribute(world, componentName, entity,
   world.gameState.components[componentName][entity][attribute] = value
 end
 
-local function copyInputToState(world, input, entity, foundMenu,
-                                isGravitational)
-  if not next(input) then  -- check that input (non-boolean) is an empty table
-    local defaultInput = foundMenu and {
-      menuPrevious = "up",
-      menuNext = "down",
-      menuSelect = "start"
-    } or isGravitational and {
-      walkLeft = "left",
-      walkRight = "right",
-    } or {
-      walkLeft = "left",
-      walkRight = "right",
-      walkUp = "up",
-      walkDown = "down"
-    }
-    for actionName, defaultKey in pairs(defaultInput) do
-      input[actionName] = input[actionName] or defaultKey
-    end
-  end
+local function copyInputToState(world, input, entity)
   for actionName, virtualKey in pairs(input) do
     if world.hid.keys[virtualKey] then
       setComponentAttribute(world, "input", entity, actionName,
@@ -188,7 +169,7 @@ local function buildNonMenu(entityName, entityComponents, world)
     for componentName, component in pairs(entityComponents) do
       entity = entity or M.entityTagger.tag(entityName)
       if componentName == "input" and entityComponents.gravitational then
-        copyInputToState(world, component, entity, false, true)
+        copyInputToState(world, component, entity)
         createDefaults(world, entity)
       end
       assert(stateBuilders[componentName],
@@ -212,7 +193,7 @@ local function buildMenu(config, world)
           world.gameState.components.input or {}
         world.gameState.components.input[entity] = entityComponents.input
         copyInputToState(world, world.gameState.components.input[entity] or {},
-                         entity, true)
+                         entity)
       end
     end
   end

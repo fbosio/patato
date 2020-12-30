@@ -12,9 +12,19 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
       },
       entities = {
         sonic = {
-          input = {}
+          input = {
+            walkLeft = "left",
+            walkRight = "right",
+            walkUp = "up",
+            walkDown = "down"
+          }
         },
         mainMenu = {
+          input = {
+            menuPrevious = "up",
+            menuNext = "down",
+            menuSelect = "start"
+          },
           menu = {
             options = {
               "Go to Green hill zone",

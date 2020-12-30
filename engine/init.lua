@@ -9,7 +9,12 @@ if not pcall(function() config = require "config" end) then
   config = {
     entities = {
       player = {
-        input = {}
+        input = {
+          walkLeft = "left",
+          walkRight = "right",
+          walkUp = "up",
+          walkDown = "down"
+        }
       }
     }
   }

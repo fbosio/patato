@@ -73,7 +73,7 @@ describe("loading gravity", function ()
 end)
 
 describe("loading an empty keys structure", function ()
-  it("should load a physics with default movement keys", function ()
+  it("should load a world with default movement keys", function ()
     local config = {keys = {}}
 
     local world = resourcemanager.buildWorld(config)
@@ -180,18 +180,36 @@ describe("loading an entity with a nonexistent component", function ()
 end)
 
 describe("loading an entity with an empty input", function ()
-  local config
-  before_each(function ()
-    config = {
+  it("should not create an input component", function ()
+    local config = {
       entities = {
         player = {
           input = {}
         }
       }
     }
-  end)
 
-  it("should create game state with input as default keys", function ()
+    local world = resourcemanager.buildWorld(config)
+
+    assert.is.falsy(world.gameState.components.input)
+  end)
+end)
+
+describe("loading an entity with an input mapping default keys", function ()
+  it("should copy the component", function ()
+    local config = {
+      entities = {
+        player = {
+          input = {
+            walkLeft = "left",
+            walkRight = "right",
+            walkUp = "up",
+            walkDown = "down"
+          }
+        }
+      }
+    }
+
     local world = resourcemanager.buildWorld(config)
 
     local playerId = entityTagger.getId("player")
@@ -200,32 +218,6 @@ describe("loading an entity with an empty input", function ()
     assert.are.same("right", playerInput.walkRight)
     assert.are.same("up", playerInput.walkUp)
     assert.are.same("down", playerInput.walkDown)
-  end)
-
-  it("should create game state with default walk speed", function ()
-    local world = resourcemanager.buildWorld(config)
-
-    local playerId = entityTagger.getId("player")
-    assert.are.same(400,
-                    world.gameState.components.impulseSpeed[playerId].walk)
-  end)
-
-  it("should create game state with default position", function ()
-    local world = resourcemanager.buildWorld(config)
-
-    local playerId = entityTagger.getId("player")
-    local playerPosition = world.gameState.components.position[playerId]
-    assert.are.same(400, playerPosition.x)
-    assert.are.same(300, playerPosition.y)
-  end)
-
-  it("should create game state with default velocity", function ()
-    local world = resourcemanager.buildWorld(config)
-
-    local playerId = entityTagger.getId("player")
-    local playerVelocity = world.gameState.components.velocity[playerId]
-    assert.are.same(0, playerVelocity.x)
-    assert.are.same(0, playerVelocity.y)
   end)
 end)
 
@@ -381,13 +373,23 @@ describe("loading config with nonempty menu and other entities", function ()
     config = {
       entities = {
         playerOne = {
-          input = {}
+          input = {
+            walkLeft = "left",
+            walkRight = "right"
+          }
         },
         playerTwo = {
-          input = {}
+          input = {
+            walkUp = "up",
+            walkDown = "down"
+          }
         },
         mainMenu = {
-          input = {},
+          input = {
+            menuPrevious = "up",
+            menuNext = "down",
+            menuSelect = "start"
+          },
           menu = {
             options = {"Start"}
           }
@@ -406,10 +408,11 @@ describe("loading config with nonempty menu and other entities", function ()
     assert.are.truthy(world.gameState.components.input[mainMenuId])
   end)
 
-  it("should copy menu with default input", function ()
+  it("should copy menu with its input", function ()
     local menuInput = world.gameState.components.input[mainMenuId]
     assert.are.same("up", menuInput.menuPrevious)
     assert.are.same("down", menuInput.menuNext)
+    assert.are.same("start", menuInput.menuSelect)
   end)
 
   it("should not copy entities that have not the menu component", function ()
@@ -424,7 +427,10 @@ describe("loading entities and an empty levels table", function ()
     local config = {
       entities = {
         player = {
-          input = {}
+          input = {
+            walkLeft = "left",
+            walkRight = "right"
+          }
         }
       },
       levels = {}
@@ -441,7 +447,10 @@ describe("loading a level with defined entity and position", function ()
     local config = {
       entities = {
         sonic = {
-          input = {}
+          input = {
+            walkLeft = "left",
+            walkRight = "right"
+          }
         }
       },
       levels = {
@@ -465,7 +474,10 @@ describe("load two levels and the name of the first one", function ()
     local config = {
       entities = {
         sonic = {
-          input = {}
+          input = {
+            walkLeft = "left",
+            walkRight = "right"
+          }
         }
       },
       levels = {
@@ -956,23 +968,4 @@ describe("loading a gravitational entity", function ()
     local anvilId = entityTagger.getId("anvil")
     assert.is.truthy(world.gameState.components.gravitational[anvilId])
   end)
-end)
-
-describe("loading a gravitational entity with an empty input", function ()
-  it("should not copy walkUp and walkDown to input")
-
-  local config = {
-    entities = {
-      mario = {
-        gravitational = true,
-        input = {}
-      }
-    }
-  }
-
-  local world = resourcemanager.buildWorld(config)
-
-  local marioId = entityTagger.getId("mario")
-  assert.is.falsy(world.gameState.components.input[marioId].walkUp)
-  assert.is.falsy(world.gameState.components.input[marioId].walkDown)
 end)
