@@ -33,7 +33,7 @@ M.entities = {
       showCustomMessage = "message"
     },
     collector = true,
-    collisionBox = {20, 120, 40, 120},
+    collisionBox = {22, 63, 40, 120},
 --    animations = {
 --      walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
 --      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
@@ -91,6 +91,9 @@ M.levels = {
       {400, 300, 300, 200},
       {100, 400, 200, 500},
       {400, 400, 300, 500},
+
+      {580, 200, 480, 300},
+
       {620, 230, 680, 170},
       {740, 230, 680, 170},
       {620, 230, 680, 290},

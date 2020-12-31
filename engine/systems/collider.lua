@@ -101,11 +101,11 @@ local function collideRectangleCorners(sb, cb, sv, sp)
     -- Top
     if sb.bottom > cb.top and sb.bottom < cb.verticalCenter then
       sv.y = 0
-      sp.y = cb.top
+      sp.y = cb.top + sb.origin.y - sb.height
     -- Bottom
     elseif sb.top < cb.bottom and sb.top > cb.verticalCenter then
       sv.y = 0
-      sp.y = cb.bottom + sb.height
+      sp.y = cb.bottom + sb.origin.y
     end
   end
 end
@@ -120,6 +120,21 @@ local function collideRectangle(collideables, collisionBoxes, positions,
   end
 end
 
+local function collideRightTriangleCorner(sb, cb, sv, sp, dt)
+  if (sb.left >= cb.right and sb.left + sv.x*dt < cb.right)
+      or (sb.left < cb.right and sb.left > cb.horizontalCenter) then
+    sv.x = 0
+    sp.x = cb.right + sb.origin.x
+  end
+end
+
+local function collideTopTriangleCorner(sb, cb, sv, sp, dt)
+  if sb.bottom >= cb.top and sb.bottom <= cb.bottom then
+    sv.y = 0
+    sp.y = cb.top - sb.height + sb.origin.y
+  end
+end
+
 local function collideLeftTriangleCorner(sb, cb, sv, sp, dt)
   if (sb.right <= cb.left and sb.right + sv.x*dt > cb.left)
       or (sb.right > cb.left and sb.right < cb.horizontalCenter) then
@@ -128,11 +143,10 @@ local function collideLeftTriangleCorner(sb, cb, sv, sp, dt)
   end
 end
 
-local function collideRightTriangleCorner(sb, cb, sv, sp, dt)
-  if (sb.left >= cb.right and sb.left + sv.x*dt < cb.right)
-      or (sb.left < cb.right and sb.left > cb.horizontalCenter) then
-    sv.x = 0
-    sp.x = cb.right + sb.origin.x
+local function collideBottomTriangleCorner(sb, cb, sv, sp, dt)
+  if sb.top >= cb.top and sb.top <= cb.bottom then
+    sv.y = 0
+    sp.y = cb.bottom + sb.origin.y
   end
 end
 
@@ -148,6 +162,9 @@ local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
     if sb.top < cb.bottom and sb.bottom > cb.bottom then
       collideLeftTriangleCorner(sb, cb, sv, sp, dt)
     end
+    if sb.left < cb.right and sb.horizontalCenter > cb.right then
+      collideTopTriangleCorner(sb, cb, sv, sp, dt)
+    end
   else
     if mustCollideLeft then
       collideLeft(sb, cb, sv, sp, dt)
@@ -155,17 +172,20 @@ local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
     if sb.top < cb.bottom and sb.bottom > cb.bottom then
       collideRightTriangleCorner(sb, cb, sv, sp, dt)
     end
+    if sb.right > cb.left and sb.horizontalCenter < cb.left then
+      collideTopTriangleCorner(sb, cb, sv, sp, dt)
+    end
   end
   local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
-  if sp.x >= cb.left and sp.x <= cb.right and sb.bottom >= cb.top
-      and sb.bottom <= cb.bottom then
+  if sb.horizontalCenter >= cb.left and sb.horizontalCenter <= cb.right
+      and sb.bottom >= cb.top and sb.bottom <= cb.bottom then
     if sb.bottom + sv.y*dt >= ySlope then
       sv.y = 0
-      sp.y = ySlope
+      sp.y = ySlope - sb.height + sb.origin.y
       solid.slope = slopeEntity
     end
   elseif solid.slope == slopeEntity then
-    solid.slope = nil
+      solid.slope = nil
   end
 end
 
@@ -181,6 +201,9 @@ local function collideDownwardTriangle(mustCollideLeft, mustCollideRight, m,
     if sb.top < cb.top and sb.bottom > cb.top then
       collideRightTriangleCorner(sb, cb, sv, sp, dt)
     end
+    if sb.right > cb.left and sb.horizontalCenter < cb.left then
+      collideBottomTriangleCorner(sb, cb, sv, sp, dt)
+    end
   else
     if mustCollideRight then
       collideRight(sb, cb, sv, sp, dt)
@@ -188,13 +211,16 @@ local function collideDownwardTriangle(mustCollideLeft, mustCollideRight, m,
     if sb.top < cb.top and sb.bottom > cb.top then
       collideLeftTriangleCorner(sb, cb, sv, sp, dt)
     end
+    if sb.left < cb.right and sb.horizontalCenter > cb.right then
+      collideBottomTriangleCorner(sb, cb, sv, sp, dt)
+    end
   end
   local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
-  if sp.x >= cb.left and sp.x <= cb.right and sb.top <= cb.bottom
-      and sb.top >= cb.top then
+  if sb.horizontalCenter >= cb.left and sb.horizontalCenter <= cb.right
+      and sb.top <= cb.bottom and sb.top >= cb.top then
     if sb.top + sv.y*dt <= ySlope then
       sv.y = 0
-      sp.y = ySlope + sb.height
+      sp.y = ySlope + sb.origin.y
       solid.slope = slopeEntity
     end
   elseif solid.slope == slopeEntity then

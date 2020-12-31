@@ -504,6 +504,27 @@ describe("with a slope", function ()
           assert.are.same(420, positions.mario.y)
         end)
       end)
+      describe("and a player overlapping the right side", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 344,
+            y = 380
+          }
+          velocities = {
+            mario = {
+              x = 0,
+              y = 0
+            }
+          }
+        end)
+        it("should push the player to the top", function()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+
+          assert.are.same(344, positions.mario.x)
+          assert.are.same(348, positions.mario.y)
+        end)
+      end)
     end)
 
     describe("with its normal vector pointing down", function ()
@@ -611,6 +632,27 @@ describe("with a slope", function ()
 
           assert.are.same(352, positions.mario.x)
           assert.are.same(404, positions.mario.y)
+        end)
+      end)
+      describe("and a player overlapping the left side", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 296,
+            y = 444
+          }
+          velocities = {
+            mario = {
+              x = 0,
+              y = 0
+            }
+          }
+        end)
+        it("should push the player to the bottom", function()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+
+          assert.are.same(296, positions.mario.x)
+          assert.are.same(476, positions.mario.y)
         end)
       end)
     end)
@@ -728,6 +770,27 @@ describe("with a slope", function ()
           assert.are.same(420, positions.mario.y)
         end)
       end)
+      describe("and a player overlapping the left side", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 296,
+            y = 380
+          }
+          velocities = {
+            mario = {
+              x = 0,
+              y = 0
+            }
+          }
+        end)
+        it("should push the player to the top", function()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+
+          assert.are.same(296, positions.mario.x)
+          assert.are.same(348, positions.mario.y)
+        end)
+      end)
     end)
 
     describe("with its normal vector pointing down", function ()
@@ -835,6 +898,27 @@ describe("with a slope", function ()
 
           assert.are.same(288, positions.mario.x)
           assert.are.same(404, positions.mario.y)
+        end)
+      end)
+      describe("and a player overlapping the right side", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 344,
+            y = 444
+          }
+          velocities = {
+            mario = {
+              x = 0,
+              y = 0
+            }
+          }
+        end)
+        it("should push the player to the bottom", function()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+
+          assert.are.same(344, positions.mario.x)
+          assert.are.same(476, positions.mario.y)
         end)
       end)
     end)
