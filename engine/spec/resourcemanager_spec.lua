@@ -182,21 +182,21 @@ describe("loading an entity with a nonexistent component", function ()
 end)
 
 describe("setting input to an entity that is not in config", function ()
-  local world
+  local world, walkLeft
 
   before_each(function ()
     world = resourcemanager.buildWorld{}
 
-    resourcemanager.setInput(world, "player", "walkLeft",
-                             command.new{hold = true, key = "left"})
+    walkLeft = command.new{hold = true, key = "left"}
+    resourcemanager.setInput(world, "player", "walkLeft", walkLeft)
   end)
 
   it("should not create an input component", function ()
     assert.is.falsy(world.gameState.components.input)
   end)
 
-  it("should not create a commands table", function ()
-    assert.is.falsy(world.hid.commands)
+  it("should create a commands table", function ()
+    assert.are.same({player = "walkLeft"}, world.hid.commands[walkLeft])
   end)
 end)
 
@@ -233,10 +233,10 @@ describe("loading an entity with an input", function ()
   end)
 
   it("should map the defined commands with the entity", function ()
-    assert.are.same({[playerId] = "walkLeft"}, world.hid.commands[walkLeft])
-    assert.are.same({[playerId] = "walkRight"}, world.hid.commands[walkRight])
-    assert.are.same({[playerId] = "walkUp"}, world.hid.commands[walkUp])
-    assert.are.same({[playerId] = "walkDown"}, world.hid.commands[walkDown])
+    assert.are.same({player = "walkLeft"}, world.hid.commands[walkLeft])
+    assert.are.same({player = "walkRight"}, world.hid.commands[walkRight])
+    assert.are.same({player = "walkUp"}, world.hid.commands[walkUp])
+    assert.are.same({player = "walkDown"}, world.hid.commands[walkDown])
   end)
 
   it("should set default components to the entity", function ()
@@ -269,12 +269,10 @@ describe("loading two entities that share the same input", function ()
     local walkRight = command.new{hold = true, key = "right"}
     resourcemanager.setInput(world, "ryu", "walkRight", walkRight)
     resourcemanager.setInput(world, "ken", "walkRight", walkRight)
-    local ryuId = entityTagger.getId("ryu")
-    local kenId = entityTagger.getId("ken")
 
-    assert.are.same({[ryuId] = "walkLeft", [kenId] = "walkLeft"},
+    assert.are.same({ryu = "walkLeft", ken = "walkLeft"},
                      world.hid.commands[walkLeft])
-    assert.are.same({[ryuId] = "walkRight", [kenId] = "walkRight"},
+    assert.are.same({ryu = "walkRight", ken = "walkRight"},
                      world.hid.commands[walkRight])
   end)
 end)

@@ -1,19 +1,11 @@
 local M = {}
 
 function M.new(args)
-  local newCommand = {
+  return {
     release = args.release,
     oneShot = args.oneShot,
-    key = args.key
+    keys = args.keys or {args.key}
   }
-  setmetatable(newCommand, {
-    __eq = function (a, b)
-      return a.release == b.release and a.oneShot == b.oneShot
-             and a.key == b.key
-    end
-  })
-
-  return newCommand
 end
 
 return M

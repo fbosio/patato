@@ -8,7 +8,7 @@ local garbagecollector = require "engine.systems.garbagecollector"
 local M = {}
 
 function M.load(love, entityTagger)
-  controller.load(love)
+  controller.load(love, entityTagger)
   animator.load(entityTagger)
 end
 

@@ -1,4 +1,4 @@
-local controller, command, hid
+local controller, entityTaggerMock, command, hid
 
 before_each(function ()
   controller = require "engine.systems.controller"
@@ -18,16 +18,10 @@ before_each(function ()
       [command.new{key = "left2"}] = {playerTwo = "walkLeft"},
       [command.new{key = "right"}] = {playerOne = "walkRight"},
       [command.new{key = "right2"}] = {playerTwo = "walkRight"},
-      [command.new{key = "left", release = true}] = {
+      [command.new{keys = {"left", "right"}, release = true}] = {
         playerOne = "stopWalkingHorizontally"
       },
-      [command.new{key = "left2", release = true}] = {
-        playerTwo = "stopWalkingHorizontally"
-      },
-      [command.new{key = "right", release = true}] = {
-        playerOne = "stopWalkingHorizontally"
-      },
-      [command.new{key = "right2", release = true}] = {
+      [command.new{keys = {"left2", "right2"}, release = true}] = {
         playerTwo = "stopWalkingHorizontally"
       },
       [command.new{key = "up", oneShot = true}] = {
@@ -67,6 +61,10 @@ before_each(function ()
       end
     }
   }
+  entityTaggerMock = {}
+  function entityTaggerMock.getIds(name)
+    return {name}
+  end
 end)
 
 after_each(function ()
@@ -102,7 +100,7 @@ describe("with one player with AD as walking input", function ()
       loveMock.keyboard.isDown = function ()
         return false
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set the velocity to zero", function ()
@@ -119,7 +117,7 @@ describe("with one player with AD as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "a"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set the velocity to negative walk speed", function ()
@@ -153,7 +151,7 @@ describe("with one player with AD as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "d"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set the velocity to positive walk speed", function ()
@@ -215,7 +213,7 @@ describe("with two players with AD and JL as walking input", function ()
       loveMock.keyboard.isDown = function ()
         return false
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set both velocity to zero", function ()
@@ -232,7 +230,7 @@ describe("with two players with AD and JL as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "a"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set player one velocity to negative walk speed", function ()
@@ -250,7 +248,7 @@ describe("with two players with AD and JL as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "d"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set player one velocity to positive walk speed", function ()
@@ -269,7 +267,7 @@ describe("with two players with AD and JL as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "j"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set player two velocity to negative walk speed", function ()
@@ -303,7 +301,7 @@ describe("with two players with AD and JL as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "l"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set player two velocity to positive walk speed", function ()
@@ -335,6 +333,7 @@ describe("with a menu", function ()
         selected = 1
       }
     }
+    controller.load({}, entityTaggerMock)
   end)
 
   describe("pressing S key", function ()
@@ -393,7 +392,7 @@ describe("loading a player wih animation and one without it", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "d"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should change player one animation", function ()

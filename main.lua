@@ -49,20 +49,20 @@ function love.load()
   engine.setInput("patato", "walkUp", engine.command{key = "up"})
   engine.setInput("patato", "walkDown", engine.command{key = "down"})
   engine.setInput("patato", "stopWalkingHorizontally",
-                  engine.command{key = "left", release = true})
-  engine.setInput("patato", "stopWalkingHorizontally",
-                  engine.command{key = "right", release = true})
+                  engine.command{keys = {"left", "right"}, release = true})
   engine.setInput("patato", "stopWalkingVertically",
-                  engine.command{key = "up", release = true})
-  engine.setInput("patato", "stopWalkingVertically",
-                  engine.command{key = "down", release = true})
-  engine.setInput("jump", engine.command{key = "jump"})
-  engine.setInput("showCustomMessage", engine.command{key = "message"})
-  engine.setInput("hideCustomMessage",
-                  engine.command{key = "message", release = true})
-  engine.setInput("menuPrevious", engine.command{key = "up", oneShot = true})
-  engine.setInput("menuNext", engine.command{key = "down", oneShot = true})
-  engine.setInput("menuSelect", engine.command{key = "start", oneShot = true})
+                  engine.command{keys = {"up", "down"}, release = true})
+  -- engine.setInput("jump", engine.command{key = "jump"})
+  -- engine.setInput("patato", "showCustomMessage",
+  --                 engine.command{key = "message"})
+  -- engine.setInput("patato", "hideCustomMessage",
+  --                 engine.command{key = "message", release = true})
+  engine.setInput("mainMenu", "menuPrevious",
+                  engine.command{key = "up", oneShot = true})
+  engine.setInput("mainMenu", "menuNext",
+                  engine.command{key = "down", oneShot = true})
+  engine.setInput("mainMenu", "menuSelect",
+                  engine.command{key = "start", oneShot = true})
 
   score = 0
   engine.setCollectableEffect("bottle", function ()

@@ -1,5 +1,5 @@
 describe("loading 3 levels with players, a menu with 4 options", function ()
-  local entityTagger, command
+  local entityTagger, command, loveMock
   local resourcemanager, controller, config, world, drankCoffee
 
   before_each(function ()
@@ -40,13 +40,15 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
       },
       firstLevel = "green hill zone"
     }
-    local loveMock = {graphics = {}}
+    loveMock = {graphics = {}, keyboard = {}}
     function loveMock.graphics.getDimensions()
       return 800, 600
     end
-    controller.load(loveMock)
+    controller.load(loveMock, entityTagger)
     resourcemanager.load(loveMock, entityTagger)
     world = resourcemanager.buildWorld(config)
+    resourcemanager.setInput(world, "sonic", "walkLeft",
+                             command.new{key = "left"})
     resourcemanager.setInput(world, "mainMenu", "menuPrevious",
                              command.new{key = "up", oneShot = true})
     resourcemanager.setInput(world, "mainMenu", "menuNext",
@@ -82,17 +84,34 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
   end)
 
   describe("and selecting the 'go to first level' option", function ()
-    it("should place the player according to the first level", function ()
+    before_each(function ()
       controller.keypressed("return", world.hid,
                             world.gameState.components.input,
                             world.gameState.components.menu,
                             world.gameState.inMenu)
+    end)
 
+    it("should place the player according to the first level", function ()
       local level = config.levels["green hill zone"]
       local playerId = entityTagger.getId("sonic")
       local playerPosition = world.gameState.components.position[playerId]
       assert.are.same(level.sonic[1], playerPosition.x)
       assert.are.same(level.sonic[2], playerPosition.y)
+    end)
+
+    describe("and pressing the A key", function ()
+      it("should make the player walk", function ()
+        function loveMock.keyboard.isDown(key)
+          return key == "a"
+        end
+
+        controller.update(world.hid, world.gameState.components)
+
+        local playerId = entityTagger.getId("sonic")
+        local playerVelocity = world.gameState.components.velocity[playerId]
+        local playerSpeed = world.gameState.components.impulseSpeed[playerId]
+        assert.are.same(-playerSpeed.walk, playerVelocity.x)
+      end)
     end)
   end)
 

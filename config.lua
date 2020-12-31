@@ -51,16 +51,16 @@ M.entities = {
   slope = {
     collideable = "triangle"
   },
-  -- mainMenu = {
-  --   input = {
-  --     menuPrevious = "up",
-  --     menuNext = "down",
-  --     menuSelect = "start"
-  --   },
-  --   menu = {
-  --     options = {"Start", "Show message", "Secret level"},
-  --   },
-  -- }
+  mainMenu = {
+    input = {
+      menuPrevious = "up",
+      menuNext = "down",
+      menuSelect = "start"
+    },
+    menu = {
+      options = {"Start", "Show message", "Secret level"},
+    },
+  }
 }
 
 M.levels = {

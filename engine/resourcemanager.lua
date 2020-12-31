@@ -7,7 +7,7 @@ local function setComponent(world, componentName, entity, value)
 end
 
 local function setComponentAttribute(world, componentName, entity,
-    attribute, value)
+                                     attribute, value)
   world.gameState.components[componentName] =
     world.gameState.components[componentName] or {}
   world.gameState.components[componentName][entity] =
@@ -47,6 +47,13 @@ local stateBuilders = {
   input = function (world, hasInput, entity)
     if hasInput then
       setComponent(world, "input", entity, {})
+      for _, commandActions in pairs(world.hid.commands or {}) do
+        for k, action in pairs(commandActions) do
+          if k == M.entityTagger.getName(entity) then
+            setComponentAttribute(world, "input", entity, action, false)
+          end
+        end
+      end
       createDefaults(world, entity)
     end
   end,
@@ -326,18 +333,21 @@ end
 
 function M.setInput(world, entityName, action, command)
   local commands = world.hid.commands or {}
-  local entities = M.entityTagger.getIds(entityName)
-  for _, entity in ipairs(entities or {}) do
-    if world.hid.keys[command.key] then
-      commands[command] = commands[command] or {}
-      commands[command][entity] = action
-      if world.gameState.inMenu and world.gameState.components.menu[entity]
-          or not world.gameState.inMenu then
-        setComponentAttribute(world, "input", entity, action, false)
-      end
+  local mustBeSet = true
+  for _, commandKey in ipairs(command.keys or {}) do
+    if not world.hid.keys[commandKey] then
+      mustBeSet = false
     end
   end
-  world.hid.commands = world.hid.commands or entities and commands
+  if mustBeSet then
+    commands[command] = commands[command] or {}
+    commands[command][entityName] = action
+    local entities = M.entityTagger.getIds(entityName)
+    for _, entity in ipairs(entities or {}) do
+      setComponentAttribute(world, "input", entity, action, false)
+    end
+  end
+  world.hid.commands = commands
 end
 
 return M

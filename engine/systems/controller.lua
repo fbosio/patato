@@ -1,69 +1,32 @@
 local M = {}
 
-local heldKeys = {}
-
 local function setInputActions(inputs, commandActions, value)
-  for entity, action in pairs(commandActions) do
-    inputs[entity][action] = value
-  end
-end
-
-local function updateInputsUsingNormalCommands(inputs, commands, virtualKey)
-  for command, commandActions in pairs(commands) do
-    if command.key == virtualKey and not command.oneShot
-        and not command.release then
-      for entity, action in pairs(commandActions) do
-        inputs[entity][action] = true
-        local wasNotDown = true
-        for _, heldKey in ipairs(heldKeys) do
-          if heldKey == virtualKey then
-            wasNotDown = false
-            break
-          end
-        end
-        if wasNotDown then
-          heldKeys[#heldKeys+1] = virtualKey
-        end
-      end
+  for entityName, action in pairs(commandActions) do
+    local entities = M.entityTagger.getIds(entityName)
+    for _, entity in ipairs(entities or {}) do
+      (inputs[entity] or {})[action] = value
     end
   end
 end
 
-local function updateInputsUsingReleaseCommands(inputs, commands, virtualKey)
-  local isKeyUp = false
-  for i, heldKey in ipairs(heldKeys) do
-    if heldKey == virtualKey then
-      isKeyUp = true
-      table.remove(heldKeys, i)
-      break
-    end
-  end
-
-  if isKeyUp then
-    for command, commandActions in pairs(commands) do
-      if command.key == virtualKey then
-        if command.release then
-          setInputActions(inputs, commandActions, true)
-        elseif not command.oneShot then
-          setInputActions(inputs, commandActions, false)
-        end
-      end
-    end
-  end
-end
-
-function M.load(love)
+function M.load(love, entityTagger)
   M.love = love
+  M.entityTagger = entityTagger
 end
 
 function M.update(hid, components)
-  for virtualKey, physicalKey in pairs(hid.keys) do
-    if M.love.keyboard.isDown(physicalKey) then
-      updateInputsUsingNormalCommands(components.input or {},
-                                      hid.commands or {}, virtualKey)
-    else
-      updateInputsUsingReleaseCommands(components.input or {},
-                                       hid.commands or {}, virtualKey)
+  for command, commandActions in pairs(hid.commands or {}) do
+    if not command.oneShot then
+      local mustExecute = true
+      for _, commandKey in ipairs(command.keys or {}) do
+        local physicalKey = hid.keys[commandKey]
+        local isKeyDown = M.love.keyboard.isDown(physicalKey)
+        if not physicalKey or command.release and isKeyDown
+            or not command.release and not isKeyDown then
+          mustExecute = false
+        end
+      end
+      setInputActions(components.input or {}, commandActions, mustExecute)
     end
   end
 
@@ -102,20 +65,24 @@ function M.update(hid, components)
 end
 
 function M.keypressed(key, hid, inputs, menus, inMenu)
-  for virtualKey, physicalKey in pairs(hid.keys) do
-    if physicalKey == key then
-      for command, commandActions in pairs(hid.commands or {}) do
-        if command.oneShot then
-          setInputActions(inputs, commandActions, command.key == virtualKey)
+  for command, commandActions in pairs(hid.commands or {}) do
+    if command.oneShot then
+      local mustExecute = false
+      for _, commandKey in ipairs(command.keys or {}) do
+        local physicalKey = hid.keys[commandKey]
+        if physicalKey == key then
+          mustExecute = true
+          break
         end
       end
-    end
-  end
-  if menus then
-    for entity, input in pairs(inputs) do
-      for actionName, enabled in pairs(input) do
-        if enabled then
-          hid.actions[actionName]{menu = menus[entity]}
+      if mustExecute then
+        for entityName, action in pairs(commandActions) do
+          local entities = M.entityTagger.getIds(entityName)
+          for _, entity in ipairs(entities or {}) do
+            if inputs[entity] then
+              hid.actions[action]{menu = menus[entity]}
+            end
+          end
         end
       end
     end
