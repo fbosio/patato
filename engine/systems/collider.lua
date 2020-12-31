@@ -120,23 +120,35 @@ local function collideRectangle(collideables, collisionBoxes, positions,
   end
 end
 
+local function collideLeftTriangleCorner(sb, cb, sv, sp, dt)
+  if (sb.right <= cb.left and sb.right + sv.x*dt > cb.left)
+      or (sb.right > cb.left and sb.right < cb.horizontalCenter) then
+    sv.x = 0
+    sp.x = cb.left - sb.width + sb.origin.x
+  end
+end
+
+local function collideRightTriangleCorner(sb, cb, sv, sp, dt)
+  if (sb.left >= cb.right and sb.left + sv.x*dt < cb.right)
+      or (sb.left < cb.right and sb.left > cb.horizontalCenter) then
+    sv.x = 0
+    sp.x = cb.right + sb.origin.x
+  end
+end
+
 local function collideUpwardTriangle(m, rising, sb, cb, sv, sp, dt,
                                      slopeEntity, solid)
   collideBottom(sb, cb, sv, sp, dt)
   if rising then
     m = m * (-1)
     collideRight(sb, cb, sv, sp, dt)
-    if sb.top < cb.bottom and sb.bottom > cb.bottom
-        and sb.right <= cb.left and sb.right + sv.x*dt > cb.left then
-      sv.x = 0
-      sp.x = cb.left - sb.width + sb.origin.x
+    if sb.top < cb.bottom and sb.bottom > cb.bottom then
+      collideLeftTriangleCorner(sb, cb, sv, sp, dt)
     end
   else
     collideLeft(sb, cb, sv, sp, dt)
-    if sb.top < cb.bottom and sb.bottom > cb.bottom
-        and sb.left >= cb.right and sb.left + sv.x*dt < cb.right then
-      sv.x = 0
-      sp.x = cb.right + sb.origin.x
+    if sb.top < cb.bottom and sb.bottom > cb.bottom then
+      collideRightTriangleCorner(sb, cb, sv, sp, dt)
     end
   end
   local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
@@ -156,17 +168,13 @@ local function collideDownwardTriangle(m, rising, sb, cb, sv, sp, dt,
   if rising then
     m = m * (-1)
     collideLeft(sb, cb, sv, sp, dt)
-    if sb.top < cb.top and sb.bottom > cb.top
-        and sb.left >= cb.right and sb.left + sv.x*dt < cb.right then
-      sv.x = 0
-      sp.x = cb.right + sb.origin.x
+    if sb.top < cb.top and sb.bottom > cb.top then
+      collideRightTriangleCorner(sb, cb, sv, sp, dt)
     end
   else
     collideRight(sb, cb, sv, sp, dt)
-    if sb.top < cb.top and sb.bottom > cb.top
-        and sb.right <= cb.left and sb.right + sv.x*dt > cb.left then
-      sv.x = 0
-      sp.x = cb.left - sb.width + sb.origin.x
+    if sb.top < cb.top and sb.bottom > cb.top then
+      collideLeftTriangleCorner(sb, cb, sv, sp, dt)
     end
   end
   local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
