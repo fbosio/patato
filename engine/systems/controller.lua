@@ -9,6 +9,35 @@ local function setInputActions(inputs, commandActions, value)
   end
 end
 
+local function buildActionArguments(entity, components)
+  local entityComponents = {}
+  for componentName, component in pairs(components) do
+    for k, v in pairs(component) do
+      if k == entity then
+        if componentName == "animation" then
+          local proxy = {}
+          setmetatable(proxy, {
+            __newindex = function (_, attr, newName)
+              if attr == "name" and v.name ~= newName then
+                v.name = newName
+                v.frame = 1
+                v.time = 0
+              end
+            end
+          })
+          entityComponents[componentName] = proxy
+        else
+          entityComponents[componentName] = v
+        end
+      end
+    end
+  end
+  if components.animation then
+    entityComponents.animation = entityComponents.animation or {}
+  end
+  return entityComponents
+end
+
 function M.load(love, entityTagger)
   M.love = love
   M.entityTagger = entityTagger
@@ -31,31 +60,7 @@ function M.update(hid, components)
   end
 
   for entity, input in pairs(components.input or {}) do
-    local entityComponents = {}
-    for componentName, component in pairs(components) do
-      for k, v in pairs(component) do
-        if k == entity then
-          if componentName == "animation" then
-            local proxy = {}
-            setmetatable(proxy, {
-              __newindex = function (_, attr, newName)
-                if attr == "name" and v.name ~= newName then
-                  v.name = newName
-                  v.frame = 1
-                  v.time = 0
-                end
-              end
-            })
-            entityComponents[componentName] = proxy
-          else
-            entityComponents[componentName] = v
-          end
-        end
-      end
-    end
-    if components.animation then
-      entityComponents.animation = entityComponents.animation or {}
-    end
+    local entityComponents = buildActionArguments(entity, components)
     for actionName, enabled in pairs(input) do
       if enabled then
         hid.actions[actionName](entityComponents)
@@ -64,7 +69,7 @@ function M.update(hid, components)
   end
 end
 
-function M.keypressed(key, hid, inputs, menus, inMenu)
+function M.keypressed(key, hid, components)
   for command, commandActions in pairs(hid.commands or {}) do
     if command.oneShot then
       local mustExecute = false
@@ -79,8 +84,9 @@ function M.keypressed(key, hid, inputs, menus, inMenu)
         for entityName, action in pairs(commandActions) do
           local entities = M.entityTagger.getIds(entityName)
           for _, entity in ipairs(entities or {}) do
-            if inputs[entity] then
-              hid.actions[action]{menu = menus[entity]}
+            if components.input[entity] then
+              local entityComponents = buildActionArguments(entity, components)
+              hid.actions[action](entityComponents)
             end
           end
         end

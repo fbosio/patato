@@ -28,6 +28,7 @@ end
 
 local function createDefaults(world, entity)
   setComponentAttribute(world, "impulseSpeed", entity, "walk", 400)
+  setComponentAttribute(world, "impulseSpeed", entity, "jump", 1500)
   createDefaultPosition(world, entity)
   createDefaultVelocity(world, entity)
 end

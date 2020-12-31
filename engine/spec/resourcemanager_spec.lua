@@ -244,7 +244,7 @@ describe("loading an entity with an input", function ()
                     world.gameState.components.position[playerId])
     assert.are.same({x = 0, y = 0},
                     world.gameState.components.velocity[playerId])
-    assert.are.same({walk = 400},
+    assert.are.same({walk = 400, jump = 1500},
                     world.gameState.components.impulseSpeed[playerId])
   end)
 end)

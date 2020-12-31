@@ -314,23 +314,25 @@ describe("with two players with AD and JL as walking input", function ()
 end)
 
 describe("with a menu", function ()
-  local inputs, menus, started
+  local components, started
 
   before_each(function ()
-    inputs = {
-      mainMenu = {
-        menuPrevious = false,
-        menuNext = false,
-        menuSelect = false
-      }
-    }
-    menus = {
-      mainMenu = {
-        options = {"Start", "Options", "Help"},
-        callbacks = {function ()
-          started = true
-        end},
-        selected = 1
+    components = {
+      input = {
+        mainMenu = {
+          menuPrevious = false,
+          menuNext = false,
+          menuSelect = false
+        }
+      },
+      menu = {
+        mainMenu = {
+          options = {"Start", "Options", "Help"},
+          callbacks = {function ()
+            started = true
+          end},
+          selected = 1
+        }
       }
     }
     controller.load({}, entityTaggerMock)
@@ -338,23 +340,23 @@ describe("with a menu", function ()
 
   describe("pressing S key", function ()
     it("should select the second menu option", function ()
-      controller.keypressed("s", hid, inputs, menus, true)
+      controller.keypressed("s", hid, components)
 
-      assert.are.same(2, menus.mainMenu.selected)
+      assert.are.same(2, components.menu.mainMenu.selected)
     end)
   end)
 
   describe("pressing W key", function ()
     it("should select the third menu option", function ()
-      controller.keypressed("w", hid, inputs, menus, true)
+      controller.keypressed("w", hid, components)
 
-      assert.are.same(3, menus.mainMenu.selected)
+      assert.are.same(3, components.menu.mainMenu.selected)
     end)
   end)
 
   describe("pressing RETURN key", function ()
     it("should run the callback of the first menu option", function ()
-      controller.keypressed("return", hid, inputs, menus, true)
+      controller.keypressed("return", hid, components)
 
       assert.is.truthy(started)
     end)

@@ -85,10 +85,7 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
 
   describe("and selecting the 'go to first level' option", function ()
     before_each(function ()
-      controller.keypressed("return", world.hid,
-                            world.gameState.components.input,
-                            world.gameState.components.menu,
-                            world.gameState.inMenu)
+      controller.keypressed("return", world.hid, world.gameState.components)
     end)
 
     it("should place the player according to the first level", function ()
@@ -117,14 +114,8 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
 
   describe("and selecting the 'go to second level' option", function ()
     it("should place the player according to the second level", function ()
-      controller.keypressed("s", world.hid,
-                            world.gameState.components.input,
-                            world.gameState.components.menu,
-                            world.gameState.inMenu)
-      controller.keypressed("return", world.hid,
-                            world.gameState.components.input,
-                            world.gameState.components.menu,
-                            world.gameState.inMenu)
+      controller.keypressed("s", world.hid, world.gameState.components)
+      controller.keypressed("return", world.hid, world.gameState.components)
 
       local level = config.levels["hill top zone"]
       local playerId = entityTagger.getId("sonic")
@@ -136,18 +127,9 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
 
   describe("and selecting the 'go to third level' option", function ()
     it("should place the player according to the third level", function ()
-      controller.keypressed("s", world.hid,
-                            world.gameState.components.input,
-                            world.gameState.components.menu,
-                            world.gameState.inMenu)
-      controller.keypressed("s", world.hid,
-                            world.gameState.components.input,
-                            world.gameState.components.menu,
-                            world.gameState.inMenu)
-      controller.keypressed("return", world.hid,
-                            world.gameState.components.input,
-                            world.gameState.components.menu,
-                            world.gameState.inMenu)
+      controller.keypressed("s", world.hid, world.gameState.components)
+      controller.keypressed("s", world.hid, world.gameState.components)
+      controller.keypressed("return", world.hid, world.gameState.components)
 
       local level = config.levels["metropolis zone"]
       local playerId = entityTagger.getId("sonic")
@@ -159,22 +141,10 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
 
   describe("and selecting the 'drink coffee' option", function ()
     it("should show that the coffee was drunk", function ()
-      controller.keypressed("s", world.hid,
-                            world.gameState.components.input,
-                            world.gameState.components.menu,
-                            world.gameState.inMenu)
-      controller.keypressed("s", world.hid,
-                            world.gameState.components.input,
-                            world.gameState.components.menu,
-                            world.gameState.inMenu)
-      controller.keypressed("s", world.hid,
-                            world.gameState.components.input,
-                            world.gameState.components.menu,
-                            world.gameState.inMenu)
-      controller.keypressed("return", world.hid,
-                            world.gameState.components.input,
-                            world.gameState.components.menu,
-                            world.gameState.inMenu)
+      controller.keypressed("s", world.hid, world.gameState.components)
+      controller.keypressed("s", world.hid, world.gameState.components)
+      controller.keypressed("s", world.hid, world.gameState.components)
+      controller.keypressed("return", world.hid, world.gameState.components)
 
       assert.is.truthy(drankCoffee)
     end)

@@ -87,8 +87,7 @@ end
  @tparam string key Character of the pressed key.
 ]]
 function M.keypressed(key)
-  systems.keypressed(key, M.hid, M.gameState.components.input,
-                     M.gameState.components.menu, M.gameState.inMenu)
+  systems.keypressed(key, M.hid, M.gameState.components)
 end
 
 

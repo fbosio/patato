@@ -16,11 +16,11 @@ function love.load()
     engine.startGame("secretLevel")
   end)
   
-  -- engine.setAction("jump", function (c)
-  --   if c.velocity.y == 0 then
-  --     c.velocity.y = -c.impulseSpeed.jump
-  --   end
-  -- end)
+  engine.setAction("jump", function (c)
+    if c.velocity.y == 0 then
+      c.velocity.y = -c.impulseSpeed.jump
+    end
+  end)
   engine.setAction("showCustomMessage", function ()
     message = "Flashlight!"
   end)
@@ -52,11 +52,12 @@ function love.load()
                   engine.command{keys = {"left", "right"}, release = true})
   engine.setInput("patato", "stopWalkingVertically",
                   engine.command{keys = {"up", "down"}, release = true})
-  -- engine.setInput("jump", engine.command{key = "jump"})
-  -- engine.setInput("patato", "showCustomMessage",
-  --                 engine.command{key = "message"})
-  -- engine.setInput("patato", "hideCustomMessage",
-  --                 engine.command{key = "message", release = true})
+  engine.setInput("patato", "jump",
+                  engine.command{key = "jump", oneShot = true})
+  engine.setInput("patato", "showCustomMessage",
+                  engine.command{key = "message"})
+  engine.setInput("patato", "hideCustomMessage",
+                  engine.command{key = "message", release = true})
   engine.setInput("mainMenu", "menuPrevious",
                   engine.command{key = "up", oneShot = true})
   engine.setInput("mainMenu", "menuNext",

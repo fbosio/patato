@@ -28,8 +28,8 @@ function M.update(dt, hid, components, collectableEffects, animationResources,
   garbagecollector.update(components)
 end
 
-function M.keypressed(key, hid, input, menu, inMenu)
-  controller.keypressed(key, hid, input, menu, inMenu)
+function M.keypressed(key, hid, components)
+  controller.keypressed(key, hid, components)
 end
 
 return M

@@ -10,7 +10,8 @@ M.keys = {
   up2 = "i",
   down2 = "k",
   start = "return",
-  message = "m"
+  message = "m",
+  jump = "space"
 }
 
 M.spriteSheet = "resources/sprites/patato.png"
@@ -33,7 +34,7 @@ M.entities = {
 --      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
 --    },
     solid = true,
-    -- gravitational = true
+    gravitational = true
   },
    bee = {
      input = true
@@ -76,7 +77,7 @@ M.levels = {
       {600, 500},
     },
     surface = {
-      {170, 280, 255, 355},  -- block: x1, y1, x2, y2
+      {100, 280, 255, 355},  -- block: x1, y1, x2, y2
       {255, 280, 340, 355},
       {170, 355, 255, 430},
       {255, 355, 340, 430},
