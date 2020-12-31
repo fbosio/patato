@@ -27,6 +27,11 @@ before_each(function ()
       width = 32,
       height = 64
     },
+    otherSlope = {
+      origin = {x = 16, y = 32},
+      width = 32,
+      height = 64
+    },
   }
 end)
 
@@ -905,6 +910,7 @@ describe("with a block and a slope", function ()
           assert.are.same(280, positions.mario.y)
         end)
       end)
+
     end)
 
     describe("whose normal vector is pointing down", function ()
@@ -1067,5 +1073,128 @@ describe("with a block and a slope", function ()
         end)
       end)
     end)
+  end)
+end)
+
+describe("with two adjacent slopes", function ()
+  local collideables, positions, velocities
+  before_each(function ()
+    collideables = {
+      slope = {name = "slope"},
+      otherSlope = {name = "otherSlope"},
+    }
+    positions = {
+      slope = {
+        x = 384,
+        y = 300
+      },
+      otherSlope = {
+        x = 416,
+        y = 300
+      }
+    }
+  end)
+  describe("facing up", function()
+    before_each(function ()
+      collideables.slope.normalPointingUp = true
+      collideables.slope.rising = true
+      collideables.otherSlope.normalPointingUp = true
+      collideables.otherSlope.rising = false
+    end)
+    describe("and a player moving to the right on the left slope", function()
+      before_each(function ()
+        positions.mario = {
+          x = 374,
+          y = 320
+        }
+        velocities = {
+          mario = {
+            x = 1400,
+            y = 0
+          }
+        }
+        solids.mario.slope = "slope"
+      end)
+      it("should let the player walk", function ()
+        collider.update(dt, solids, collideables, collisionBoxes, positions,
+                        velocities)
+        assert.are.same(1400, velocities.mario.x)
+        assert.are.same(374, positions.mario.x)
+      end)
+    end)
+    describe("and a player moving to the left on the right slope", function ()
+      before_each(function ()
+        positions.mario = {
+          x = 426,
+          y = 320
+        }
+        velocities = {
+          mario = {
+            x = -1400,
+            y = 0
+          }
+        }
+        solids.mario.slope = "otherSlope"
+      end)
+      it("should let the player walk", function ()
+        collider.update(dt, solids, collideables, collisionBoxes, positions,
+                        velocities)
+        assert.are.same(-1400, velocities.mario.x)
+        assert.are.same(426, positions.mario.x)
+      end)
+    end)
+  end)
+
+  describe("facing down", function()
+    before_each(function ()
+      collideables.slope.normalPointingUp = false
+      collideables.slope.rising = false
+      collideables.otherSlope.normalPointingUp = false
+      collideables.otherSlope.rising = true
+    end)
+    describe("and a player moving to the right under the left slope",
+      function ()
+        before_each(function ()
+          positions.mario = {
+            x = 374,
+            y = 352
+          }
+          velocities = {
+            mario = {
+              x = 1400,
+              y = 0
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should let the player walk", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(1400, velocities.mario.x)
+          assert.are.same(374, positions.mario.x)
+        end)
+      end)
+    describe("and a player moving to the left under the right slope",
+      function ()
+        before_each(function ()
+          positions.mario = {
+            x = 426,
+            y = 352
+          }
+          velocities = {
+            mario = {
+              x = -1400,
+              y = 0
+            }
+          }
+          solids.mario.slope = "otherSlope"
+        end)
+        it("should let the player walk", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(-1400, velocities.mario.x)
+          assert.are.same(426, positions.mario.x)
+        end)
+      end)
   end)
 end)

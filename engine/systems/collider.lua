@@ -164,6 +164,8 @@ local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
       sp.y = ySlope
       solid.slope = slopeEntity
     end
+  elseif solid.slope == slopeEntity then
+    solid.slope = nil
   end
 end
 
@@ -195,6 +197,8 @@ local function collideDownwardTriangle(mustCollideLeft, mustCollideRight, m,
       sp.y = ySlope + sb.height
       solid.slope = slopeEntity
     end
+  elseif solid.slope == slopeEntity then
+    solid.slope = nil
   end
 end
 
@@ -248,7 +252,6 @@ function M.update(dt, solids, collideables, collisionBoxes, positions,
                      dt)
       end
     end
-    solid.slope = nil
   end
 end
 
