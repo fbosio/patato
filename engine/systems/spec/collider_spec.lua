@@ -910,7 +910,26 @@ describe("with a block and a slope", function ()
           assert.are.same(280, positions.mario.y)
         end)
       end)
-
+      describe("and a player going to the block from top left", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 420,
+            y = 288
+          }
+          velocities = {
+            mario = {
+              x = 1400,
+              y = 700
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should push the player to the top", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(268, positions.mario.y)
+        end)
+      end)
     end)
 
     describe("whose normal vector is pointing down", function ()
@@ -958,6 +977,26 @@ describe("with a block and a slope", function ()
           collider.update(dt, solids, collideables, collisionBoxes, positions,
                           velocities)
           assert.are.same(320, positions.mario.y)
+        end)
+      end)
+      describe("and a player going to the block from bottom left", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 420,
+            y = 386
+          }
+          velocities = {
+            mario = {
+              x = 1400,
+              y = -700
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should push the player to the bottom", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(396, positions.mario.y)
         end)
       end)
     end)
@@ -1023,6 +1062,26 @@ describe("with a block and a slope", function ()
           assert.are.same(280, positions.mario.y)
         end)
       end)
+      describe("and a player going to the block from top right", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 380,
+            y = 288
+          }
+          velocities = {
+            mario = {
+              x = -1400,
+              y = 700
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should push the player to the top", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(268, positions.mario.y)
+        end)
+      end)
     end)
 
     describe("whose normal vector is pointing down", function ()
@@ -1072,6 +1131,27 @@ describe("with a block and a slope", function ()
           assert.are.same(384, positions.mario.y)
         end)
       end)
+      describe("and a player going to the block from bottom right", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 380,
+            y = 386
+          }
+          velocities = {
+            mario = {
+              x = -1400,
+              y = -700
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should push the player to the bottom", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(396, positions.mario.y)
+        end)
+      end)
+
     end)
   end)
 end)
