@@ -4,7 +4,7 @@ local collider, solids, collisionBoxes
 before_each(function ()
   collider = require "engine.systems.collider"
   solids = {
-    mario = {}
+    mario = {},
   }
   collisionBoxes = {
     mario = {
@@ -32,6 +32,7 @@ end)
 
 after_each(function ()
   package.loaded["engine.systems.collider"] = nil
+  solids.mario.slope = nil
 end)
 
 describe("with a block", function ()
@@ -745,6 +746,100 @@ describe("with a slope", function ()
                          velocities)
 
           assert.are.same(444, positions.mario.y)
+        end)
+      end)
+    end)
+  end)
+end)
+
+describe("with a block and a slope", function ()
+  local collideables, positions, velocities
+  before_each(function ()
+    collideables = {
+      block = {name = "block"},
+      slope = {name = "slope"}
+    }
+  end)
+
+  describe("to its left", function ()
+    before_each(function ()
+      positions = {
+        block = {
+          x = 416,
+          y = 300
+        },
+        slope = {
+          x = 384,
+          y = 300
+        }
+      }
+    end)
+    describe("whose normal vector is pointing up", function ()
+      before_each(function ()
+        collideables.slope.normalPointingUp = true
+        collideables.slope.raising = true
+      end)
+      describe("and a player on it walking to the right", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 374,
+            y = 320
+          }
+          velocities = {
+            mario = {
+              x = 1400,
+              y = 0
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should let the player walk", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(1400, velocities.mario.x)
+          assert.are.same(374, positions.mario.x)
+        end)
+      end)
+    end)
+  end)
+
+  describe("to its right", function ()
+    before_each(function ()
+      positions = {
+        block = {
+          x = 384,
+          y = 300
+        },
+        slope = {
+          x = 416,
+          y = 300
+        }
+      }
+    end)
+    describe("whose normal vector is pointing up", function ()
+      before_each(function ()
+        collideables.slope.normalPointingUp = true
+        collideables.slope.raising = true
+      end)
+      describe("and a player on it walking to the left", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 426,
+            y = 320
+          }
+          velocities = {
+            mario = {
+              x = -1400,
+              y = 0
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should let the player walk", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(-1400, velocities.mario.x)
+          assert.are.same(426, positions.mario.x)
         end)
       end)
     end)
