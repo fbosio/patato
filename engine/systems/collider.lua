@@ -30,21 +30,22 @@ local function mustCollideSides(collideables, collisionBoxes, positions,
   -- Decide if collision with boundary sides must be checked.
   local mustCheckLeft = true
   local mustCheckRight = true
-
-  -- Verify that the slope is not around.
+  -- Verify that slope is not around.
   local slopeAttributes = collideables[slopeEntity]
   local slopeBox = collisionBoxes[slopeEntity]
   local slopePosition = positions[slopeEntity]
   local translatedSlopeBox = getTranslatedBox(slopePosition, slopeBox)
-  if slopeAttributes.normalPointingUp and slopeAttributes.rising
-      and cb.top >= translatedSlopeBox.top
+  if cb.top >= translatedSlopeBox.top
       and cb.top <= translatedSlopeBox.bottom then
-    mustCheckLeft = cb.left < translatedSlopeBox.right
-  end
-  if slopeAttributes.normalPointingUp and not slopeAttributes.rising
-      and cb.top >= translatedSlopeBox.top
-      and cb.top <= translatedSlopeBox.bottom then
-    mustCheckRight = cb.right < translatedSlopeBox.left
+    if (slopeAttributes.normalPointingUp and slopeAttributes.rising)
+       or (not slopeAttributes.normalPointingUp
+           and not slopeAttributes.rising) then
+      mustCheckLeft = cb.left < translatedSlopeBox.right
+    elseif (slopeAttributes.normalPointingUp and not slopeAttributes.rising)
+           or (not slopeAttributes.normalPointingUp
+               and slopeAttributes.rising) then
+      mustCheckRight = cb.right < translatedSlopeBox.left
+    end
   end
 
   return mustCheckLeft, mustCheckRight
@@ -182,7 +183,6 @@ end
 local function collideTriangle(sb, cb, sv, sp, dt, normalPointingUp,
                                rising, slopeEntity, solid)
   local m = cb.height / cb.width
-  solid.slope = nil
   if normalPointingUp then
     collideUpwardTriangle(m, rising, sb, cb, sv, sp, dt, slopeEntity,
                           solid)
@@ -226,6 +226,7 @@ function M.update(dt, solids, collideables, collisionBoxes, positions,
                      dt)
       end
     end
+    solid.slope = nil
   end
 end
 

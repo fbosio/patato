@@ -779,7 +779,7 @@ describe("with a block and a slope", function ()
         collideables.slope.normalPointingUp = true
         collideables.slope.rising = true
       end)
-      describe("and a player on it walking to the right", function ()
+      describe("and a player above it walking to the right", function ()
         before_each(function ()
           positions.mario = {
             x = 374,
@@ -801,11 +801,17 @@ describe("with a block and a slope", function ()
         end)
       end)
 
-      describe("and a player on it overlapping the block", function ()
+      describe("and a player above it overlapping the block", function ()
         before_each(function ()
           positions.mario = {
             x = 394,
             y = 280
+          }
+          velocities = {
+            mario = {
+              x = 0,
+              y = 0
+            }
           }
           solids.mario.slope = "slope"
         end)
@@ -813,6 +819,55 @@ describe("with a block and a slope", function ()
           collider.update(dt, solids, collideables, collisionBoxes, positions,
                           velocities)
           assert.are.same(280, positions.mario.y)
+        end)
+      end)
+    end)
+
+    describe("whose normal vector is pointing down", function ()
+      before_each(function ()
+        collideables.slope.normalPointingUp = false
+        collideables.slope.rising = false
+      end)
+      describe("and a player below it walking to the right", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 374,
+            y = 364
+          }
+          velocities = {
+            mario = {
+              x = 1400,
+              y = 0
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should let the player walk", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(1400, velocities.mario.x)
+          assert.are.same(374, positions.mario.x)
+        end)
+      end)
+
+      describe("and a player below it overlapping the block", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 394,
+            y = 320
+          }
+          velocities = {
+            mario = {
+              x = 0,
+              y = 0
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should not change the position of the player", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(320, positions.mario.y)
         end)
       end)
     end)
@@ -836,7 +891,7 @@ describe("with a block and a slope", function ()
         collideables.slope.normalPointingUp = true
         collideables.slope.rising = false
       end)
-      describe("and a player on it walking to the left", function ()
+      describe("and a player above it walking to the left", function ()
         before_each(function ()
           positions.mario = {
             x = 426,
@@ -858,11 +913,17 @@ describe("with a block and a slope", function ()
         end)
       end)
 
-      describe("and a player on it overlapping the block", function ()
+      describe("and a player above it overlapping the block", function ()
         before_each(function ()
           positions.mario = {
             x = 406,
             y = 280
+          }
+          velocities = {
+            mario = {
+              x = 0,
+              y = 0
+            }
           }
           solids.mario.slope = "slope"
         end)
@@ -870,6 +931,55 @@ describe("with a block and a slope", function ()
           collider.update(dt, solids, collideables, collisionBoxes, positions,
                           velocities)
           assert.are.same(280, positions.mario.y)
+        end)
+      end)
+    end)
+
+    describe("whose normal vector is pointing down", function ()
+      before_each(function ()
+        collideables.slope.normalPointingUp = false
+        collideables.slope.rising = true
+      end)
+      describe("and a player below it walking to the left", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 426,
+            y = 344
+          }
+          velocities = {
+            mario = {
+              x = -1400,
+              y = 0
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should let the player walk", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(-1400, velocities.mario.x)
+          assert.are.same(426, positions.mario.x)
+        end)
+      end)
+
+      describe("and a player below it overlapping the block", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 406,
+            y = 384
+          }
+          velocities = {
+            mario = {
+              x = 0,
+              y = 0
+            }
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should not change the position of the player", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(384, positions.mario.y)
         end)
       end)
     end)
