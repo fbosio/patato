@@ -4,7 +4,7 @@ local collider, solids, collisionBoxes
 before_each(function ()
   collider = require "engine.systems.collider"
   solids = {
-    mario = true
+    mario = {}
   }
   collisionBoxes = {
     mario = {
@@ -499,7 +499,7 @@ describe("with a player touching the side of an upward slope", function ()
 end)
 
 
-describe("with a player touching the edge of an upward slope", function ()
+describe("with a player touching the corner of an upward slope", function ()
   local positions, velocities
   before_each(function ()
     positions = {
@@ -709,7 +709,7 @@ describe("with a player touching the side of a downward slope", function ()
   end)
 end)
 
-describe("with a player touching the edge of a downward slope", function ()
+describe("with a player touching the corner of a downward slope", function ()
   local positions, velocities
   before_each(function ()
     positions = {

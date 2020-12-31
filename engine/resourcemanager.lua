@@ -133,8 +133,8 @@ local stateBuilders = {
 
     world.resources.animations = animations
   end,
-  solid = function (world, isSolid, entity)
-    setComponent(world, "solid", entity, isSolid)
+  solid = function (world, _, entity)
+    setComponent(world, "solid", entity, {})
     createDefaultPosition(world, entity)
     createDefaultVelocity(world, entity)
   end,
