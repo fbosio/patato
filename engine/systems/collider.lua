@@ -130,7 +130,6 @@ end
 
 local function collideTopTriangleCorner(sb, cb, sv, sp, dt)
   if sb.bottom >= cb.top and sb.bottom <= cb.bottom then
-    sv.y = 0
     sp.y = cb.top - sb.height + sb.origin.y
   end
 end
@@ -145,7 +144,6 @@ end
 
 local function collideBottomTriangleCorner(sb, cb, sv, sp, dt)
   if sb.top >= cb.top and sb.top <= cb.bottom then
-    sv.y = 0
     sp.y = cb.bottom + sb.origin.y
   end
 end
@@ -176,13 +174,18 @@ local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
       collideTopTriangleCorner(sb, cb, sv, sp, dt)
     end
   end
-  local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
   if sb.horizontalCenter >= cb.left and sb.horizontalCenter <= cb.right
       and sb.bottom >= cb.top and sb.bottom <= cb.bottom then
+    local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
     if sb.bottom + sv.y*dt >= ySlope then
-      sv.y = 0
       sp.y = ySlope - sb.height + sb.origin.y
+      sv.y = 0
       solid.slope = slopeEntity
+    end
+    if sv.x ~= 0 and sv.y == 0 then
+      local newX = sp.x + sv.x*dt
+      local ySlope = m*(newX-cb.horizontalCenter) + cb.verticalCenter
+      sp.y = ySlope - sb.height + sb.origin.y
     end
   elseif solid.slope == slopeEntity then
       solid.slope = nil
@@ -215,9 +218,9 @@ local function collideDownwardTriangle(mustCollideLeft, mustCollideRight, m,
       collideBottomTriangleCorner(sb, cb, sv, sp, dt)
     end
   end
-  local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
   if sb.horizontalCenter >= cb.left and sb.horizontalCenter <= cb.right
       and sb.top <= cb.bottom and sb.top >= cb.top then
+    local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
     if sb.top + sv.y*dt <= ySlope then
       sv.y = 0
       sp.y = ySlope + sb.origin.y
@@ -230,7 +233,7 @@ end
 
 local function collideTriangle(collideables, collisionBoxes, positions,
                                sb, cb, sv, sp, dt, normalPointingUp, rising,
-                               slope, solid)
+                               slope, solid, gravitational)
   local left, right = mustCollideSides(collideables, collisionBoxes, positions,
                                        solid.slope, cb)
   local m = cb.height / cb.width
@@ -248,11 +251,12 @@ local function collideCloud(sb, cb, sv, sp, dt)
 end
 
 function M.update(dt, solids, collideables, collisionBoxes, positions,
-                  velocities)
+                  velocities, gravitationals)
   for solidEntity, solid in pairs(solids or {}) do
     local solidBox = collisionBoxes[solidEntity]
     local solidPosition = positions[solidEntity]
     local solidVelocity = velocities[solidEntity]
+    local isGravitational = (gravitationals or {})[solidEntity]
     local translatedSB = getTranslatedBox(solidPosition, solidBox)
 
     for collideableEntity, collideable in pairs(collideables or {}) do
@@ -271,7 +275,8 @@ function M.update(dt, solids, collideables, collisionBoxes, positions,
           collideTriangle(collideables, collisionBoxes, positions,
                           translatedSB, translatedCB, solidVelocity,
                           solidPosition, dt, collideable.normalPointingUp,
-                          collideable.rising, collideableEntity, solid)
+                          collideable.rising, collideableEntity, solid,
+                          isGravitational)
         end
       else
         collideCloud(translatedSB, translatedCB, solidVelocity, solidPosition,

@@ -1,5 +1,5 @@
 local dt = 1 / 70
-local collider, solids, collisionBoxes
+local collider, solids, collisionBoxes, gravitationals
 
 before_each(function ()
   collider = require "engine.systems.collider"
@@ -33,11 +33,13 @@ before_each(function ()
       height = 64
     },
   }
+  gravitationals = {}
 end)
 
 after_each(function ()
   package.loaded["engine.systems.collider"] = nil
   solids.mario.slope = nil
+  gravitationals.mario = nil
 end)
 
 describe("with a block", function ()
@@ -517,12 +519,32 @@ describe("with a slope", function ()
             }
           }
         end)
-        it("should push the player to the top", function()
+        it("should push the player to the top", function ()
           collider.update(dt, solids, collideables, collisionBoxes, positions,
                           velocities)
 
           assert.are.same(344, positions.mario.x)
           assert.are.same(348, positions.mario.y)
+        end)
+      end)
+      describe("and a gravitational entity going left", function ()
+        before_each(function ()
+          gravitationals.mario = true
+          positions.mario = {
+            x = 336,
+            y = 348
+          }
+          velocities = {
+            mario = {
+              x = -1400,
+              y = 0
+            }
+          }
+        end)
+        it("should put it exactly on the slope", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(388, positions.mario.y)
         end)
       end)
     end)
@@ -789,6 +811,26 @@ describe("with a slope", function ()
 
           assert.are.same(296, positions.mario.x)
           assert.are.same(348, positions.mario.y)
+        end)
+      end)
+      describe("and a gravitational entity going right", function ()
+        before_each(function ()
+          gravitationals.mario = true
+          positions.mario = {
+            x = 304,
+            y = 348
+          }
+          velocities = {
+            mario = {
+              x = 1400,
+              y = 0
+            }
+          }
+        end)
+        it("should put it exactly on the slope", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(388, positions.mario.y)
         end)
       end)
     end)
@@ -1362,3 +1404,4 @@ describe("with two adjacent slopes", function ()
       end)
   end)
 end)
+

@@ -32,14 +32,17 @@ M.entities = {
       walkDown = "down",
       showCustomMessage = "message"
     },
+    impulseSpeed = {
+      walk = 700
+    },
     collector = true,
-    collisionBox = {22, 63, 40, 120},
---    animations = {
---      walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
---      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
---    },
+    collisionBox = {20, 120, 40, 120},
+    animations = {
+      walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
+      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
+    },
     solid = true,
-    -- gravitational = true
+     gravitational = true
   },
    bee = {
      input = {
@@ -70,7 +73,7 @@ M.entities = {
 
 M.levels = {
   garden = {
-    patato = {40, 150},
+    patato = {250, 100},
     bee = {450, 105},
     bottle = {
       {325, 80},
@@ -82,7 +85,7 @@ M.levels = {
     },
     surface = {
       {200, 200, 300, 300},  -- block: x1, y1, x2, y2
-      {100, 400, 400, 300},
+      {100, 400, 700, 300},
       {200, 400, 300, 500},
       {300, 80, 600}  -- cloud: x1, y1, x2
     },
@@ -91,13 +94,6 @@ M.levels = {
       {400, 300, 300, 200},
       {100, 400, 200, 500},
       {400, 400, 300, 500},
-
-      {580, 200, 480, 300},
-
-      {620, 230, 680, 170},
-      {740, 230, 680, 170},
-      {620, 230, 680, 290},
-      {740, 230, 680, 290},
     }
   },
   secretLevel = {
