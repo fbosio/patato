@@ -28,27 +28,27 @@ local function mustCollideSides(collideables, collisionBoxes, positions,
   if not slopeEntity then return true, true end
 
   -- Decide if collision with boundary sides must be checked.
-  local mustCheckLeft = true
-  local mustCheckRight = true
-  -- Verify that slope is not around.
-  local slopeAttributes = collideables[slopeEntity]
+  local mustCollideLeft = true
+  local mustCollideRight = true
+  -- Check if the slope is around the collideable.
   local slopeBox = collisionBoxes[slopeEntity]
   local slopePosition = positions[slopeEntity]
   local translatedSlopeBox = getTranslatedBox(slopePosition, slopeBox)
+  -- Vertical intersection
   if cb.top >= translatedSlopeBox.top
       and cb.top <= translatedSlopeBox.bottom then
-    if (slopeAttributes.normalPointingUp and slopeAttributes.rising)
-       or (not slopeAttributes.normalPointingUp
-           and not slopeAttributes.rising) then
-      mustCheckLeft = cb.left < translatedSlopeBox.right
-    elseif (slopeAttributes.normalPointingUp and not slopeAttributes.rising)
-           or (not slopeAttributes.normalPointingUp
-               and slopeAttributes.rising) then
-      mustCheckRight = cb.right < translatedSlopeBox.left
-    end
+    local slopeAttributes = collideables[slopeEntity]
+    local normalPointingUp = slopeAttributes.normalPointingUp
+    local rising = slopeAttributes.rising
+    -- Horizontal intersection
+    mustCollideLeft = ((normalPointingUp and rising)
+                       or (not normalPointingUp and not rising))
+                      and cb.left < translatedSlopeBox.right
+    mustCollideRight = ((normalPointingUp and not rising)
+                        or (not normalPointingUp and rising))
+                       and cb.right < translatedSlopeBox.left
   end
-
-  return mustCheckLeft, mustCheckRight
+  return mustCollideLeft, mustCollideRight
 end
 
 local function collideRight(sb, cb, sv, sp, dt)
@@ -136,17 +136,22 @@ local function collideRightTriangleCorner(sb, cb, sv, sp, dt)
   end
 end
 
-local function collideUpwardTriangle(m, rising, sb, cb, sv, sp, dt,
-                                     slopeEntity, solid)
+local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
+                                     rising, sb, cb, sv, sp, dt, slopeEntity,
+                                     solid)
   collideBottom(sb, cb, sv, sp, dt)
   if rising then
     m = m * (-1)
-    collideRight(sb, cb, sv, sp, dt)
+    if mustCollideRight then
+      collideRight(sb, cb, sv, sp, dt)
+    end
     if sb.top < cb.bottom and sb.bottom > cb.bottom then
       collideLeftTriangleCorner(sb, cb, sv, sp, dt)
     end
   else
-    collideLeft(sb, cb, sv, sp, dt)
+    if mustCollideLeft then
+      collideLeft(sb, cb, sv, sp, dt)
+    end
     if sb.top < cb.bottom and sb.bottom > cb.bottom then
       collideRightTriangleCorner(sb, cb, sv, sp, dt)
     end
@@ -162,17 +167,22 @@ local function collideUpwardTriangle(m, rising, sb, cb, sv, sp, dt,
   end
 end
 
-local function collideDownwardTriangle(m, rising, sb, cb, sv, sp, dt,
-                                       slopeEntity, solid)
+local function collideDownwardTriangle(mustCollideLeft, mustCollideRight, m,
+                                       rising, sb, cb, sv, sp, dt, slopeEntity,
+                                       solid)
   collideTop(sb, cb, sv, sp, dt)
   if rising then
     m = m * (-1)
-    collideLeft(sb, cb, sv, sp, dt)
+    if mustCollideLeft then
+      collideLeft(sb, cb, sv, sp, dt)
+    end
     if sb.top < cb.top and sb.bottom > cb.top then
       collideRightTriangleCorner(sb, cb, sv, sp, dt)
     end
   else
-    collideRight(sb, cb, sv, sp, dt)
+    if mustCollideRight then
+      collideRight(sb, cb, sv, sp, dt)
+    end
     if sb.top < cb.top and sb.bottom > cb.top then
       collideLeftTriangleCorner(sb, cb, sv, sp, dt)
     end
@@ -188,14 +198,17 @@ local function collideDownwardTriangle(m, rising, sb, cb, sv, sp, dt,
   end
 end
 
-local function collideTriangle(sb, cb, sv, sp, dt, normalPointingUp,
-                               rising, slopeEntity, solid)
+local function collideTriangle(collideables, collisionBoxes, positions,
+                               sb, cb, sv, sp, dt, normalPointingUp, rising,
+                               slope, solid)
+  local left, right = mustCollideSides(collideables, collisionBoxes, positions,
+                                       solid.slope, cb)
   local m = cb.height / cb.width
   if normalPointingUp then
-    collideUpwardTriangle(m, rising, sb, cb, sv, sp, dt, slopeEntity,
+    collideUpwardTriangle(left, right, m, rising, sb, cb, sv, sp, dt, slope,
                           solid)
   else
-    collideDownwardTriangle(m, rising, sb, cb, sv, sp, dt, slopeEntity,
+    collideDownwardTriangle(left, right, m, rising, sb, cb, sv, sp, dt, slope,
                             solid)
   end
 end
@@ -225,7 +238,8 @@ function M.update(dt, solids, collideables, collisionBoxes, positions,
                            solid.slope, translatedSB, translatedCB,
                            solidVelocity, solidPosition, dt)
         else
-          collideTriangle(translatedSB, translatedCB, solidVelocity,
+          collideTriangle(collideables, collisionBoxes, positions,
+                          translatedSB, translatedCB, solidVelocity,
                           solidPosition, dt, collideable.normalPointingUp,
                           collideable.rising, collideableEntity, solid)
         end
