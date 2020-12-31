@@ -36,11 +36,15 @@ local function mustCollideSides(collideables, collisionBoxes, positions,
   local slopeBox = collisionBoxes[slopeEntity]
   local slopePosition = positions[slopeEntity]
   local translatedSlopeBox = getTranslatedBox(slopePosition, slopeBox)
-  if slopeAttributes.normalPointingUp and slopeAttributes.raising
+  if slopeAttributes.normalPointingUp and slopeAttributes.rising
       and cb.top >= translatedSlopeBox.top
       and cb.top <= translatedSlopeBox.bottom then
     mustCheckLeft = cb.left < translatedSlopeBox.right
-    mustCheckRight = cb.right > translatedSlopeBox.left
+  end
+  if slopeAttributes.normalPointingUp and not slopeAttributes.rising
+      and cb.top >= translatedSlopeBox.top
+      and cb.top <= translatedSlopeBox.bottom then
+    mustCheckRight = cb.right < translatedSlopeBox.left
   end
 
   return mustCheckLeft, mustCheckRight

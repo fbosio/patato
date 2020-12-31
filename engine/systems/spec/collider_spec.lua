@@ -777,7 +777,7 @@ describe("with a block and a slope", function ()
     describe("whose normal vector is pointing up", function ()
       before_each(function ()
         collideables.slope.normalPointingUp = true
-        collideables.slope.raising = true
+        collideables.slope.rising = true
       end)
       describe("and a player on it walking to the right", function ()
         before_each(function ()
@@ -800,6 +800,21 @@ describe("with a block and a slope", function ()
           assert.are.same(374, positions.mario.x)
         end)
       end)
+
+      describe("and a player on it overlapping the block", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 394,
+            y = 280
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should not change the position of the player", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(280, positions.mario.y)
+        end)
+      end)
     end)
   end)
 
@@ -819,7 +834,7 @@ describe("with a block and a slope", function ()
     describe("whose normal vector is pointing up", function ()
       before_each(function ()
         collideables.slope.normalPointingUp = true
-        collideables.slope.raising = true
+        collideables.slope.rising = false
       end)
       describe("and a player on it walking to the left", function ()
         before_each(function ()
@@ -840,6 +855,21 @@ describe("with a block and a slope", function ()
                           velocities)
           assert.are.same(-1400, velocities.mario.x)
           assert.are.same(426, positions.mario.x)
+        end)
+      end)
+
+      describe("and a player on it overlapping the block", function ()
+        before_each(function ()
+          positions.mario = {
+            x = 406,
+            y = 280
+          }
+          solids.mario.slope = "slope"
+        end)
+        it("should not change the position of the player", function ()
+          collider.update(dt, solids, collideables, collisionBoxes, positions,
+                          velocities)
+          assert.are.same(280, positions.mario.y)
         end)
       end)
     end)
