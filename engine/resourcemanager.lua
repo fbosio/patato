@@ -15,15 +15,6 @@ local function setComponentAttribute(world, componentName, entity,
   world.gameState.components[componentName][entity][attribute] = value
 end
 
-local function copyInputToState(world, input, entity)
-  for actionName, virtualKey in pairs(input) do
-    if world.hid.keys[virtualKey] then
-      setComponentAttribute(world, "input", entity, actionName,
-                            virtualKey)
-    end
-  end
-end
-
 local function createDefaultPosition(world, entity)
   local width, height = M.love.graphics.getDimensions()
   setComponentAttribute(world, "position", entity, "x", width/2)
@@ -53,9 +44,11 @@ local function copyMenuToState(world, menu, entity)
 end
 
 local stateBuilders = {
-  input = function (world, component, entity)
-    copyInputToState(world, component, entity)
-    createDefaults(world, entity)
+  input = function (world, hasInput, entity)
+    if hasInput then
+      setComponent(world, "input", entity, {})
+      createDefaults(world, entity)
+    end
   end,
   impulseSpeed = function (world, component, entity)
     for impulseName, speed in pairs(component) do
@@ -169,7 +162,6 @@ local function buildNonMenu(entityName, entityComponents, world)
     for componentName, component in pairs(entityComponents) do
       entity = entity or M.entityTagger.tag(entityName)
       if componentName == "input" and entityComponents.gravitational then
-        copyInputToState(world, component, entity)
         createDefaults(world, entity)
       end
       assert(stateBuilders[componentName],
@@ -191,9 +183,8 @@ local function buildMenu(config, world)
         copyMenuToState(world, component, entity)
         world.gameState.components.input =
           world.gameState.components.input or {}
-        world.gameState.components.input[entity] = entityComponents.input
-        copyInputToState(world, world.gameState.components.input[entity] or {},
-                         entity)
+        world.gameState.components.input[entity] =
+          entityComponents.input and {}
       end
     end
   end
@@ -220,12 +211,18 @@ local function buildNonMenuIfInLevel(config, world, levelName, entityName,
   end
 end
 
-local function buildActionsAndOmissions(world)
+local function buildActions(world)
   world.hid.actions = {
     walkLeft = function (c) c.velocity.x = -c.impulseSpeed.walk end,
     walkRight = function (c) c.velocity.x = c.impulseSpeed.walk end,
     walkUp = function (c) c.velocity.y = -c.impulseSpeed.walk end,
     walkDown = function (c) c.velocity.y = c.impulseSpeed.walk end,
+    stopWalkingHorizontally = function (c) c.velocity.x = 0 end,
+    stopWalkingVertically = function (c) 
+      if not c.gravitational then
+        c.velocity.y = 0
+      end
+    end,
     menuPrevious = function (c)
       c.menu.selected = c.menu.selected - 1
       if c.menu.selected == 0 then
@@ -241,23 +238,6 @@ local function buildActionsAndOmissions(world)
     menuSelect = function (c)
       (c.menu.callbacks[c.menu.selected] or function () end)()
     end,
-  }
-  setmetatable(world.hid.actions, {
-    __index = function ()
-      return function () end
-    end
-  })
-  local function defaultHorizontalOmission(c)
-    c.velocity.x = 0
-  end
-  local function defaultVerticalOmission(c)
-    if not c.gravitational then
-      c.velocity.y = 0
-    end
-  end
-  world.hid.omissions = {
-    [{"walkLeft", "walkRight"}] = defaultHorizontalOmission,
-    [{"walkUp", "walkDown"}] = defaultVerticalOmission,
   }
 end
 
@@ -337,11 +317,27 @@ function M.buildWorld(config)
   world.hid.keys.down = world.hid.keys.down or "s"
   world.hid.keys.start = world.hid.keys.start or "return"
 
-  buildActionsAndOmissions(world)
+  buildActions(world)
   buildResources(config, world)
   M.buildState(config, world)
 
   return world
+end
+
+function M.setInput(world, entityName, action, command)
+  local commands = world.hid.commands or {}
+  local entities = M.entityTagger.getIds(entityName)
+  for _, entity in ipairs(entities or {}) do
+    if world.hid.keys[command.key] then
+      commands[command] = commands[command] or {}
+      commands[command][entity] = action
+      if world.gameState.inMenu and world.gameState.components.menu[entity]
+          or not world.gameState.inMenu then
+        setComponentAttribute(world, "input", entity, action, false)
+      end
+    end
+  end
+  world.hid.commands = world.hid.commands or entities and commands
 end
 
 return M

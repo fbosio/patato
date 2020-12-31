@@ -33,6 +33,7 @@ local entityTagger = require "engine.tagger"
 local resourcemanager = require "engine.resourcemanager"
 local systems = require "engine.systems"
 local renderer = require "engine.renderer"
+local command = require "engine.command"
 
 local M = {}
 
@@ -173,53 +174,19 @@ function M.setAction(action, callback)
   M.hid.actions[action] = callback
 end
 
--- Check that all values of table t1 are in table t2.
-local function isIncluded(t1, t2)
-  for _, v1 in ipairs(t1) do
-    local hasValue = false
-    for _, v2 in ipairs(t2) do
-      if v1 == v2 then
-        hasValue = true
-        break
-      end
-    end
-    if not hasValue then
-      return false
-    end
-  end
-  return true
+--[=[--
+  Associate an action to a command. Store this association in the `input`
+  component of an entity.
+]=]
+function M.setInput(entityName, action, command)
+  resourcemanager.setInput(M, entityName, action, command)
 end
 
---[[--
- Associate a callback to an omission.
-
- An _omission_ is triggered when none of the keys associated with it are
- pressed. It is identified by a table of action names.
- @tparam table actions
-  The identifiers of the actions that will trigger the callback when inactive.
- @tparam function callback What the event triggers.
-  The callback receives a table `c` that has the components associated with the
-  entity that triggered the input event in the first place.
- @usage
-  engine.setOmissions({"walkLeft", "walkRight", "walkUp", "walkDown"},
-    function (c)
-      c.animation.name = "standing"
-    end
-  )
-]]
-function M.setOmissions(actions, callback)
-  local areActionsNew = true
-  for t, _ in pairs(M.hid.omissions) do
-    if isIncluded(t, actions) and isIncluded(actions, t) then
-      M.hid.omissions[t] = callback
-      areActionsNew = false
-      break
-    end
-  end
-
-  if areActionsNew then
-    M.hid.omissions[actions] = callback
-  end
+--[=[--
+  Create a new command
+]=]
+function M.command(args)
+  return command.new(args)
 end
 
 return M

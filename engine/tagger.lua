@@ -18,6 +18,10 @@ function M.getId(name)
   end
 end
 
+function M.getIds(name)
+  return tags[name]
+end
+
 function M.getName(entity)
   for name, ids in pairs(tags) do
     for _, id in ipairs(ids) do

@@ -1,13 +1,8 @@
-local controller, hid
+local controller, command, hid
 
 before_each(function ()
   controller = require "engine.systems.controller"
-  local function defaultHorizontalOmission(c)
-    c.velocity.x = 0
-  end
-  local function defaultVerticalOmission(c)
-    c.velocity.y = 0
-  end
+  command = require "engine.command"
   hid = {
     keys = {
       left = "a",
@@ -18,11 +13,40 @@ before_each(function ()
       down = "s",
       start = "return"
     },
+    commands = {
+      [command.new{key = "left"}] = {playerOne = "walkLeft"},
+      [command.new{key = "left2"}] = {playerTwo = "walkLeft"},
+      [command.new{key = "right"}] = {playerOne = "walkRight"},
+      [command.new{key = "right2"}] = {playerTwo = "walkRight"},
+      [command.new{key = "left", release = true}] = {
+        playerOne = "stopWalkingHorizontally"
+      },
+      [command.new{key = "left2", release = true}] = {
+        playerTwo = "stopWalkingHorizontally"
+      },
+      [command.new{key = "right", release = true}] = {
+        playerOne = "stopWalkingHorizontally"
+      },
+      [command.new{key = "right2", release = true}] = {
+        playerTwo = "stopWalkingHorizontally"
+      },
+      [command.new{key = "up", oneShot = true}] = {
+        mainMenu = "menuPrevious"
+      },
+      [command.new{key = "down", oneShot = true}] = {
+        mainMenu = "menuNext"
+      },
+      [command.new{key = "start", oneShot = true}] = {
+        mainMenu = "menuSelect"
+      }
+    },
     actions = {
       walkLeft = function (c) c.velocity.x = -c.impulseSpeed.walk end,
       walkRight = function (c) c.velocity.x = c.impulseSpeed.walk end,
       walkUp = function (c) c.velocity.y = -c.impulseSpeed.walk end,
       walkDown = function (c) c.velocity.y = c.impulseSpeed.walk end,
+      stopWalkingHorizontally = function (c) c.velocity.x = 0 end,
+      stopWalkingVertically = function (c) c.velocity.y = 0 end,
       menuPrevious = function (c)
         c.menu.selected = c.menu.selected - 1
         if c.menu.selected == 0 then
@@ -40,17 +64,14 @@ before_each(function ()
       end,
       changeAnimationToWalking = function (c)
         c.animation.name = "walking"
-      end,
-    },
-    omissions = {
-      [{"walkLeft", "walkRight"}] = defaultHorizontalOmission,
-      [{"walkUp", "walkDown"}] = defaultVerticalOmission,
+      end
     }
   }
 end)
 
 after_each(function ()
   package.loaded["engine.systems.controller"] = nil
+  package.loaded["engine.command"] = nil
 end)
 
 describe("with one player with AD as walking input", function ()
@@ -60,8 +81,10 @@ describe("with one player with AD as walking input", function ()
     components = {
       input = {
         playerOne = {
-          walkLeft = "left",
-          walkRight = "right"
+          walkLeft = false,
+          walkRight = false,
+          stopWalkingHorizontally = false,
+          stopWalkingVertically = false
         }
       },
       velocity = {
@@ -165,12 +188,14 @@ describe("with two players with AD and JL as walking input", function ()
     components = {
       input = {
         playerOne = {
-          walkLeft = "left",
-          walkRight = "right"
+          walkLeft = false,
+          walkRight = false,
+          stopWalkingHorizontally = false
         },
         playerTwo = {
-          walkLeft = "left2",
-          walkRight = "right2"
+          walkLeft = false,
+          walkRight = false,
+          stopWalkingHorizontally = false
         }
       },
       velocity = {
@@ -296,9 +321,9 @@ describe("with a menu", function ()
   before_each(function ()
     inputs = {
       mainMenu = {
-        menuPrevious = "up",
-        menuNext = "down",
-        menuSelect = "start"
+        menuPrevious = false,
+        menuNext = false,
+        menuSelect = false
       }
     }
     menus = {
@@ -344,15 +369,21 @@ describe("loading a player wih animation and one without it", function ()
     components = {
       input = {
         playerOne = {
-          changeAnimationToWalking = "right"
-        },
-        playerTwo = {
-          changeAnimationToWalking = "right"
-        },
+          changeAnimationToWalking = false
+        }
+      },
+      velocity = {
+        playerOne = {x = 0, y = 0}
+      },
+      impulseSpeed = {
+        playerOne = {walk = 400}
       },
       animation = {
         playerOne = {name = "idle"}
       },
+    }
+    hid.commands[command.new{key = "right"}] = {
+      playerOne = "changeAnimationToWalking"
     }
   end)
 

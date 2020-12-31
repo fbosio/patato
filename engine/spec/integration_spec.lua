@@ -1,9 +1,10 @@
 describe("loading 3 levels with players, a menu with 4 options", function ()
-  local entityTagger
+  local entityTagger, command
   local resourcemanager, controller, config, world, drankCoffee
 
   before_each(function ()
     entityTagger = require "engine.tagger"
+    command = require "engine.command"
     resourcemanager = require "engine.resourcemanager"
     controller = require "engine.systems.controller"
     config = {
@@ -12,19 +13,10 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
       },
       entities = {
         sonic = {
-          input = {
-            walkLeft = "left",
-            walkRight = "right",
-            walkUp = "up",
-            walkDown = "down"
-          }
+          input = true
         },
         mainMenu = {
-          input = {
-            menuPrevious = "up",
-            menuNext = "down",
-            menuSelect = "start"
-          },
+          input = true,
           menu = {
             options = {
               "Go to Green hill zone",
@@ -55,6 +47,12 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
     controller.load(loveMock)
     resourcemanager.load(loveMock, entityTagger)
     world = resourcemanager.buildWorld(config)
+    resourcemanager.setInput(world, "mainMenu", "menuPrevious",
+                             command.new{key = "up", oneShot = true})
+    resourcemanager.setInput(world, "mainMenu", "menuNext",
+                             command.new{key = "down", oneShot = true})
+    resourcemanager.setInput(world, "mainMenu", "menuSelect",
+                             command.new{key = "start", oneShot = true})
     drankCoffee = false
     local mainMenuId = entityTagger.getId("mainMenu")
     world.gameState.components.menu[mainMenuId].callbacks = {
@@ -80,6 +78,7 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
     package.loaded["engine.systems.controller"] = nil
     package.loaded["engine.resourcemanager"] = nil
     package.loaded["engine.tagger"] = nil
+    package.loaded["engine.command"] = nil
   end)
 
   describe("and selecting the 'go to first level' option", function ()

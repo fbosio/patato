@@ -1,43 +1,51 @@
 local M = {}
 
-local function doActionIfKeyIsDown(keys, actions, input, components, isMenu)
-  local held = {}
+local heldKeys = {}
 
-  for virtualKey, physicalKey in pairs(keys) do
-    if M.love.keyboard.isDown(physicalKey) then
-      held[#held+1] = virtualKey
-      for actionName, inputKey in pairs(input) do
-        if inputKey == virtualKey and not isMenu then
-          actions[actionName](components)
+local function setInputActions(inputs, commandActions, value)
+  for entity, action in pairs(commandActions) do
+    inputs[entity][action] = value
+  end
+end
+
+local function updateInputsUsingNormalCommands(inputs, commands, virtualKey)
+  for command, commandActions in pairs(commands) do
+    if command.key == virtualKey and not command.oneShot
+        and not command.release then
+      for entity, action in pairs(commandActions) do
+        inputs[entity][action] = true
+        local wasNotDown = true
+        for _, heldKey in ipairs(heldKeys) do
+          if heldKey == virtualKey then
+            wasNotDown = false
+            break
+          end
+        end
+        if wasNotDown then
+          heldKeys[#heldKeys+1] = virtualKey
         end
       end
     end
   end
-
-  return held
 end
 
--- hid.omissions, held, input, entityComponents
-local function doOmissionIfKeyIsUp(omissions, held, input, components)
-  for omittedActions, omission in pairs(omissions) do
-    local mustOmit = true
-
-    for inputAction, inputKey in pairs(input) do
-      for _, pressedKey in ipairs(held) do
-        for _, omittedAction in ipairs(omittedActions) do
-          if inputKey == pressedKey and omittedAction == inputAction then
-            mustOmit = false
-          end
-        end
-      end
+local function updateInputsUsingReleaseCommands(inputs, commands, virtualKey)
+  local isKeyUp = false
+  for i, heldKey in ipairs(heldKeys) do
+    if heldKey == virtualKey then
+      isKeyUp = true
+      table.remove(heldKeys, i)
+      break
     end
+  end
 
-    if mustOmit then
-      for inputAction, _ in pairs(input) do
-        for _, omittedAction in ipairs(omittedActions) do
-          if omittedAction == inputAction then
-            omission(components)
-          end
+  if isKeyUp then
+    for command, commandActions in pairs(commands) do
+      if command.key == virtualKey then
+        if command.release then
+          setInputActions(inputs, commandActions, true)
+        elseif not command.oneShot then
+          setInputActions(inputs, commandActions, false)
         end
       end
     end
@@ -49,8 +57,17 @@ function M.load(love)
 end
 
 function M.update(hid, components)
+  for virtualKey, physicalKey in pairs(hid.keys) do
+    if M.love.keyboard.isDown(physicalKey) then
+      updateInputsUsingNormalCommands(components.input or {},
+                                      hid.commands or {}, virtualKey)
+    else
+      updateInputsUsingReleaseCommands(components.input or {},
+                                       hid.commands or {}, virtualKey)
+    end
+  end
+
   for entity, input in pairs(components.input or {}) do
-    local isMenu = (components.menu or {})[entity]
     local entityComponents = {}
     for componentName, component in pairs(components) do
       for k, v in pairs(component) do
@@ -76,25 +93,29 @@ function M.update(hid, components)
     if components.animation then
       entityComponents.animation = entityComponents.animation or {}
     end
-    local held = doActionIfKeyIsDown(hid.keys, hid.actions, input,
-                                     entityComponents, isMenu)
-    doOmissionIfKeyIsUp(hid.omissions, held, input, entityComponents)
+    for actionName, enabled in pairs(input) do
+      if enabled then
+        hid.actions[actionName](entityComponents)
+      end
+    end
   end
 end
 
 function M.keypressed(key, hid, inputs, menus, inMenu)
-  if inMenu then
-    local pressedVirtualKey
-    for virtualKey, physicalKey in pairs(hid.keys) do
-      if physicalKey == key then
-        pressedVirtualKey = virtualKey
-        break
+  for virtualKey, physicalKey in pairs(hid.keys) do
+    if physicalKey == key then
+      for command, commandActions in pairs(hid.commands or {}) do
+        if command.oneShot then
+          setInputActions(inputs, commandActions, command.key == virtualKey)
+        end
       end
     end
-    for entity, menu in pairs(menus or {}) do
-      for actionName, virtualKey in pairs(inputs[entity]) do
-        if pressedVirtualKey == virtualKey then
-          hid.actions[actionName]{menu = menu}
+  end
+  if menus then
+    for entity, input in pairs(inputs) do
+      for actionName, enabled in pairs(input) do
+        if enabled then
+          hid.actions[actionName]{menu = menus[entity]}
         end
       end
     end
