@@ -120,9 +120,11 @@ local function collideRectangle(collideables, collisionBoxes, positions,
   end
 end
 
-local function collideRightTriangleCorner(sb, cb, sv, sp, dt)
+local function collideRightTriangleCorner(sb, cb, sv, sp, dt, slopeEntity,
+                                          sSlopeEntity)
   if (sb.left >= cb.right and sb.left + sv.x*dt < cb.right)
-      or (sb.left < cb.right and sb.left > cb.horizontalCenter) then
+      or (sb.left < cb.right and sb.left > cb.horizontalCenter)
+      and slopeEntity ~= sSlopeEntity then
     sv.x = 0
     sp.x = cb.right + sb.origin.x
   end
@@ -134,9 +136,11 @@ local function collideTopTriangleCorner(sb, cb, sv, sp, dt)
   end
 end
 
-local function collideLeftTriangleCorner(sb, cb, sv, sp, dt)
+local function collideLeftTriangleCorner(sb, cb, sv, sp, dt, slopeEntity,
+                                         sSlopeEntity)
   if (sb.right <= cb.left and sb.right + sv.x*dt > cb.left)
-      or (sb.right > cb.left and sb.right < cb.horizontalCenter) then
+      or (sb.right > cb.left and sb.right < cb.horizontalCenter)
+      and slopeEntity ~= sSlopeEntity then
     sv.x = 0
     sp.x = cb.left - sb.width + sb.origin.x
   end
@@ -158,7 +162,7 @@ local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
       collideRight(sb, cb, sv, sp, dt)
     end
     if sb.top < cb.bottom and sb.bottom > cb.bottom then
-      collideLeftTriangleCorner(sb, cb, sv, sp, dt)
+      collideLeftTriangleCorner(sb, cb, sv, sp, dt, slopeEntity, solid.slope)
     end
     if sb.left < cb.right and sb.horizontalCenter > cb.right then
       collideTopTriangleCorner(sb, cb, sv, sp, dt)
@@ -168,7 +172,7 @@ local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
       collideLeft(sb, cb, sv, sp, dt)
     end
     if sb.top < cb.bottom and sb.bottom > cb.bottom then
-      collideRightTriangleCorner(sb, cb, sv, sp, dt)
+      collideRightTriangleCorner(sb, cb, sv, sp, dt, slopeEntity, solid.slope)
     end
     if sb.right > cb.left and sb.horizontalCenter < cb.left then
       collideTopTriangleCorner(sb, cb, sv, sp, dt)
@@ -202,7 +206,7 @@ local function collideDownwardTriangle(mustCollideLeft, mustCollideRight, m,
       collideLeft(sb, cb, sv, sp, dt)
     end
     if sb.top < cb.top and sb.bottom > cb.top then
-      collideRightTriangleCorner(sb, cb, sv, sp, dt)
+      collideRightTriangleCorner(sb, cb, sv, sp, dt, slopeEntity, solid.slope)
     end
     if sb.right > cb.left and sb.horizontalCenter < cb.left then
       collideBottomTriangleCorner(sb, cb, sv, sp, dt)
@@ -212,7 +216,7 @@ local function collideDownwardTriangle(mustCollideLeft, mustCollideRight, m,
       collideRight(sb, cb, sv, sp, dt)
     end
     if sb.top < cb.top and sb.bottom > cb.top then
-      collideLeftTriangleCorner(sb, cb, sv, sp, dt)
+      collideLeftTriangleCorner(sb, cb, sv, sp, dt, slopeEntity, solid.slope)
     end
     if sb.left < cb.right and sb.horizontalCenter > cb.right then
       collideBottomTriangleCorner(sb, cb, sv, sp, dt)

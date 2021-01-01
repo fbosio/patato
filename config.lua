@@ -33,16 +33,16 @@ M.entities = {
       showCustomMessage = "message"
     },
     impulseSpeed = {
-      walk = 700
+      walk = 100
     },
     collector = true,
     collisionBox = {20, 120, 40, 120},
-    animations = {
-      walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
-      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
-    },
+--    animations = {
+--      walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
+--      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
+--    },
     solid = true,
-     gravitational = true
+--     gravitational = true
   },
    bee = {
      input = {
@@ -90,6 +90,7 @@ M.levels = {
       {300, 80, 600}  -- cloud: x1, y1, x2
     },
     slope = {
+      {100, 40, 20, 150},
       {100, 300, 200, 200},
       {400, 300, 300, 200},
       {100, 400, 200, 500},

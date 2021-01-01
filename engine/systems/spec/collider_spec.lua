@@ -1056,6 +1056,7 @@ describe("with a block and a slope", function ()
           assert.are.same(268, positions.mario.y)
         end)
       end)
+
     end)
 
     describe("whose normal vector is pointing down", function ()
