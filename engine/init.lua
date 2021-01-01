@@ -49,7 +49,8 @@ local M = {}
  @section callbacks
 ]]
 
---- Should be called exactly once inside [love.load](https://love2d.org/wiki/love.load)
+--- Should be called exactly once inside
+--  [love.load](https://love2d.org/wiki/love.load)
 function M.load()
   systems.load(love, entityTagger)
   resourcemanager.load(love, entityTagger)
@@ -83,7 +84,7 @@ end
  Triggered just when a key is pressed.
 
  It is not called after, while the key is held down.
- Ideal for selecting the options in the menu.
+ Ideal for one shot commands, like jumping or selecting options in a menu.
  @tparam string key Character of the pressed key.
 ]]
 function M.keypressed(key)
@@ -145,9 +146,9 @@ end
 
  An _action_ is triggered when some key is held down by the user.
  The action is identified for an entity by a unique name in its `input`
- component which is defined in `config.lua`
+ component which is defined in @{setInputs}.
  @tparam string action
-  The identifier of the input event, as defined in `config.lua`
+  The identifier of the input event, as defined in @{setInputs}.
  @tparam function callback What the event triggers.
   The callback receives a table `c` that has the components associated with
   the entity that triggered the input event in the first place.
@@ -174,15 +175,40 @@ function M.setAction(action, callback)
 end
 
 --[=[--
-  Associate an action to a command. Store this association in the `input`
-  component of an entity.
+  Associate actions of an entity to commands.
+  
+  A command must be created using @{command}.
+  The `input` component of the entity will have stored the actions associated
+  to the commands.
+  @tparam string entityName Name of the entity, as defined in `config.lua`.
+  @tparam table actionCommands Table that has action names as keys and commands
+  as values.
+  @usage
+  engine.setInputs("patato", {
+    walkLeft = engine.command{key = "left"},
+    walkRight = engine.command{key = "right"},
+    stopWalking = engine.command{keys = {"left", "right"}, release = true}
+  })
 ]=]
 function M.setInputs(entityName, actionCommands)
   resourcemanager.setInputs(M, entityName, actionCommands)
 end
 
 --[=[--
-  Create a new command
+  Create a new command.
+
+  A command is a table that represents a keyboard gesture.
+  @tparam table args Arguments for building the command. Valid arguments are:
+  
+  - **key:** String that represents a key, defined in the `keys` table in 
+    `config.lua`. If this argument is set, do not set the `keys` argument.
+  - **keys:** Table of strings that represent keys, defined in the `keys`
+    table in `config.lua`. If this argument is set, do not set the `key`
+    argument.
+  - **release:** `true` if the command represents a key-up gesture. `false`
+    otherwise.
+  - **oneShot:** `true` if the command must be detected in only one frame.
+    `false` otherwise.
 ]=]
 function M.command(args)
   return command.new(args)
