@@ -332,20 +332,22 @@ function M.buildWorld(config)
   return world
 end
 
-function M.setInput(world, entityName, action, command)
+function M.setInputs(world, entityName, actionCommands)
   local commands = world.hid.commands or {}
-  local mustBeSet = true
-  for _, commandKey in ipairs(command.keys or {}) do
-    if not world.hid.keys[commandKey] then
-      mustBeSet = false
+  for action, command in pairs(actionCommands) do
+    local mustBeSet = true
+    for _, commandKey in ipairs(command.keys or {}) do
+      if not world.hid.keys[commandKey] then
+        mustBeSet = false
+      end
     end
-  end
-  if mustBeSet then
-    commands[command] = commands[command] or {}
-    commands[command][entityName] = action
-    local entities = M.entityTagger.getIds(entityName)
-    for _, entity in ipairs(entities or {}) do
-      setComponentAttribute(world, "input", entity, action, false)
+    if mustBeSet then
+      commands[command] = commands[command] or {}
+      commands[command][entityName] = action
+      local entities = M.entityTagger.getIds(entityName)
+      for _, entity in ipairs(entities or {}) do
+        setComponentAttribute(world, "input", entity, action, false)
+      end
     end
   end
   world.hid.commands = commands

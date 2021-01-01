@@ -44,26 +44,28 @@ function love.load()
     c.animation.name = "walking"
   end)
 
-  engine.setInput("patato", "walkLeft", engine.command{key = "left"})
-  engine.setInput("patato", "walkRight", engine.command{key = "right"})
-  engine.setInput("patato", "walkUp", engine.command{key = "up"})
-  engine.setInput("patato", "walkDown", engine.command{key = "down"})
-  engine.setInput("patato", "stopWalkingHorizontally",
-                  engine.command{keys = {"left", "right"}, release = true})
-  engine.setInput("patato", "stopWalkingVertically",
-                  engine.command{keys = {"up", "down"}, release = true})
-  engine.setInput("patato", "jump",
-                  engine.command{key = "jump", oneShot = true})
-  engine.setInput("patato", "showCustomMessage",
-                  engine.command{key = "message"})
-  engine.setInput("patato", "hideCustomMessage",
-                  engine.command{key = "message", release = true})
-  engine.setInput("mainMenu", "menuPrevious",
-                  engine.command{key = "up", oneShot = true})
-  engine.setInput("mainMenu", "menuNext",
-                  engine.command{key = "down", oneShot = true})
-  engine.setInput("mainMenu", "menuSelect",
-                  engine.command{key = "start", oneShot = true})
+  engine.setInputs("patato", {
+    walkLeft = engine.command{key = "left"},
+    walkRight = engine.command{key = "right"},
+    walkUp = engine.command{key = "up"},
+    walkDown = engine.command{key = "down"},
+    stopWalkingHorizontally = engine.command{
+      keys = {"left", "right"},
+      release = true
+    },
+    stopWalkingVertically = engine.command{
+      keys = {"up", "down"},
+      release = true
+    },
+    jump = engine.command{key = "jump", oneShot = true},
+    showCustomMessage = engine.command{key = "message"},
+    hideCustomMessage = engine.command{key = "message", release = true}
+  })
+  engine.setInputs("mainMenu", {
+    menuPrevious = engine.command{key = "up", oneShot = true},
+    menuNext = engine.command{key = "down", oneShot = true},
+    menuSelect = engine.command{key = "start", oneShot = true}
+  })
 
   score = 0
   engine.setCollectableEffect("bottle", function ()

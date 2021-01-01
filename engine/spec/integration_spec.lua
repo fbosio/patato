@@ -47,14 +47,14 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
     controller.load(loveMock, entityTagger)
     resourcemanager.load(loveMock, entityTagger)
     world = resourcemanager.buildWorld(config)
-    resourcemanager.setInput(world, "sonic", "walkLeft",
-                             command.new{key = "left"})
-    resourcemanager.setInput(world, "mainMenu", "menuPrevious",
-                             command.new{key = "up", oneShot = true})
-    resourcemanager.setInput(world, "mainMenu", "menuNext",
-                             command.new{key = "down", oneShot = true})
-    resourcemanager.setInput(world, "mainMenu", "menuSelect",
-                             command.new{key = "start", oneShot = true})
+    resourcemanager.setInputs(world, "sonic", {
+      walkLeft = command.new{key = "left"}
+    })
+    resourcemanager.setInputs(world, "mainMenu", {
+      menuPrevious = command.new{key = "up", oneShot = true},
+      menuNext = command.new{key = "down", oneShot = true},
+      menuSelect = command.new{key = "start", oneShot = true}
+    })
     drankCoffee = false
     local mainMenuId = entityTagger.getId("mainMenu")
     world.gameState.components.menu[mainMenuId].callbacks = {
