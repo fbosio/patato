@@ -7,40 +7,12 @@ local function setComponent(world, componentName, entity, value)
 end
 
 local function setComponentAttribute(world, componentName, entity,
-    attribute, value)
+                                     attribute, value)
   world.gameState.components[componentName] =
     world.gameState.components[componentName] or {}
   world.gameState.components[componentName][entity] =
     world.gameState.components[componentName][entity] or {}
   world.gameState.components[componentName][entity][attribute] = value
-end
-
-local function copyInputToState(world, input, entity, foundMenu,
-                                isGravitational)
-  if not next(input) then  -- check that input (non-boolean) is an empty table
-    local defaultInput = foundMenu and {
-      menuPrevious = "up",
-      menuNext = "down",
-      menuSelect = "start"
-    } or isGravitational and {
-      walkLeft = "left",
-      walkRight = "right",
-    } or {
-      walkLeft = "left",
-      walkRight = "right",
-      walkUp = "up",
-      walkDown = "down"
-    }
-    for actionName, defaultKey in pairs(defaultInput) do
-      input[actionName] = input[actionName] or defaultKey
-    end
-  end
-  for actionName, virtualKey in pairs(input) do
-    if world.hid.keys[virtualKey] then
-      setComponentAttribute(world, "input", entity, actionName,
-                            virtualKey)
-    end
-  end
 end
 
 local function createDefaultPosition(world, entity)
@@ -56,6 +28,7 @@ end
 
 local function createDefaults(world, entity)
   setComponentAttribute(world, "impulseSpeed", entity, "walk", 400)
+  setComponentAttribute(world, "impulseSpeed", entity, "jump", 1500)
   createDefaultPosition(world, entity)
   createDefaultVelocity(world, entity)
 end
@@ -72,9 +45,18 @@ local function copyMenuToState(world, menu, entity)
 end
 
 local stateBuilders = {
-  input = function (world, component, entity)
-    copyInputToState(world, component, entity)
-    createDefaults(world, entity)
+  input = function (world, hasInput, entity)
+    if hasInput then
+      setComponent(world, "input", entity, {})
+      for _, commandActions in pairs(world.hid.commands or {}) do
+        for k, action in pairs(commandActions) do
+          if k == M.entityTagger.getName(entity) then
+            setComponentAttribute(world, "input", entity, action, false)
+          end
+        end
+      end
+      createDefaults(world, entity)
+    end
   end,
   impulseSpeed = function (world, component, entity)
     for impulseName, speed in pairs(component) do
@@ -188,7 +170,6 @@ local function buildNonMenu(entityName, entityComponents, world)
     for componentName, component in pairs(entityComponents) do
       entity = entity or M.entityTagger.tag(entityName)
       if componentName == "input" and entityComponents.gravitational then
-        copyInputToState(world, component, entity, false, true)
         createDefaults(world, entity)
       end
       assert(stateBuilders[componentName],
@@ -210,9 +191,8 @@ local function buildMenu(config, world)
         copyMenuToState(world, component, entity)
         world.gameState.components.input =
           world.gameState.components.input or {}
-        world.gameState.components.input[entity] = entityComponents.input
-        copyInputToState(world, world.gameState.components.input[entity] or {},
-                         entity, true)
+        world.gameState.components.input[entity] =
+          entityComponents.input and {}
       end
     end
   end
@@ -239,12 +219,18 @@ local function buildNonMenuIfInLevel(config, world, levelName, entityName,
   end
 end
 
-local function buildActionsAndOmissions(world)
+local function buildActions(world)
   world.hid.actions = {
     walkLeft = function (c) c.velocity.x = -c.impulseSpeed.walk end,
     walkRight = function (c) c.velocity.x = c.impulseSpeed.walk end,
     walkUp = function (c) c.velocity.y = -c.impulseSpeed.walk end,
     walkDown = function (c) c.velocity.y = c.impulseSpeed.walk end,
+    stopWalkingHorizontally = function (c) c.velocity.x = 0 end,
+    stopWalkingVertically = function (c) 
+      if not c.gravitational then
+        c.velocity.y = 0
+      end
+    end,
     menuPrevious = function (c)
       c.menu.selected = c.menu.selected - 1
       if c.menu.selected == 0 then
@@ -260,23 +246,6 @@ local function buildActionsAndOmissions(world)
     menuSelect = function (c)
       (c.menu.callbacks[c.menu.selected] or function () end)()
     end,
-  }
-  setmetatable(world.hid.actions, {
-    __index = function ()
-      return function () end
-    end
-  })
-  local function defaultHorizontalOmission(c)
-    c.velocity.x = 0
-  end
-  local function defaultVerticalOmission(c)
-    if not c.gravitational then
-      c.velocity.y = 0
-    end
-  end
-  world.hid.omissions = {
-    [{"walkLeft", "walkRight"}] = defaultHorizontalOmission,
-    [{"walkUp", "walkDown"}] = defaultVerticalOmission,
   }
 end
 
@@ -356,11 +325,32 @@ function M.buildWorld(config)
   world.hid.keys.down = world.hid.keys.down or "s"
   world.hid.keys.start = world.hid.keys.start or "return"
 
-  buildActionsAndOmissions(world)
+  buildActions(world)
   buildResources(config, world)
   M.buildState(config, world)
 
   return world
+end
+
+function M.setInputs(world, entityName, actionCommands)
+  local commands = world.hid.commands or {}
+  for action, command in pairs(actionCommands) do
+    local mustBeSet = true
+    for _, commandKey in ipairs(command.keys or {}) do
+      if not world.hid.keys[commandKey] then
+        mustBeSet = false
+      end
+    end
+    if mustBeSet then
+      commands[command] = commands[command] or {}
+      commands[command][entityName] = action
+      local entities = M.entityTagger.getIds(entityName)
+      for _, entity in ipairs(entities or {}) do
+        setComponentAttribute(world, "input", entity, action, false)
+      end
+    end
+  end
+  world.hid.commands = commands
 end
 
 return M

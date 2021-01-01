@@ -1,13 +1,8 @@
-local controller, hid
+local controller, entityTaggerMock, command, hid
 
 before_each(function ()
   controller = require "engine.systems.controller"
-  local function defaultHorizontalOmission(c)
-    c.velocity.x = 0
-  end
-  local function defaultVerticalOmission(c)
-    c.velocity.y = 0
-  end
+  command = require "engine.command"
   hid = {
     keys = {
       left = "a",
@@ -18,11 +13,34 @@ before_each(function ()
       down = "s",
       start = "return"
     },
+    commands = {
+      [command.new{key = "left"}] = {playerOne = "walkLeft"},
+      [command.new{key = "left2"}] = {playerTwo = "walkLeft"},
+      [command.new{key = "right"}] = {playerOne = "walkRight"},
+      [command.new{key = "right2"}] = {playerTwo = "walkRight"},
+      [command.new{keys = {"left", "right"}, release = true}] = {
+        playerOne = "stopWalkingHorizontally"
+      },
+      [command.new{keys = {"left2", "right2"}, release = true}] = {
+        playerTwo = "stopWalkingHorizontally"
+      },
+      [command.new{key = "up", oneShot = true}] = {
+        mainMenu = "menuPrevious"
+      },
+      [command.new{key = "down", oneShot = true}] = {
+        mainMenu = "menuNext"
+      },
+      [command.new{key = "start", oneShot = true}] = {
+        mainMenu = "menuSelect"
+      }
+    },
     actions = {
       walkLeft = function (c) c.velocity.x = -c.impulseSpeed.walk end,
       walkRight = function (c) c.velocity.x = c.impulseSpeed.walk end,
       walkUp = function (c) c.velocity.y = -c.impulseSpeed.walk end,
       walkDown = function (c) c.velocity.y = c.impulseSpeed.walk end,
+      stopWalkingHorizontally = function (c) c.velocity.x = 0 end,
+      stopWalkingVertically = function (c) c.velocity.y = 0 end,
       menuPrevious = function (c)
         c.menu.selected = c.menu.selected - 1
         if c.menu.selected == 0 then
@@ -40,17 +58,18 @@ before_each(function ()
       end,
       changeAnimationToWalking = function (c)
         c.animation.name = "walking"
-      end,
-    },
-    omissions = {
-      [{"walkLeft", "walkRight"}] = defaultHorizontalOmission,
-      [{"walkUp", "walkDown"}] = defaultVerticalOmission,
+      end
     }
   }
+  entityTaggerMock = {}
+  function entityTaggerMock.getIds(name)
+    return {name}
+  end
 end)
 
 after_each(function ()
   package.loaded["engine.systems.controller"] = nil
+  package.loaded["engine.command"] = nil
 end)
 
 describe("with one player with AD as walking input", function ()
@@ -60,8 +79,10 @@ describe("with one player with AD as walking input", function ()
     components = {
       input = {
         playerOne = {
-          walkLeft = "left",
-          walkRight = "right"
+          walkLeft = false,
+          walkRight = false,
+          stopWalkingHorizontally = false,
+          stopWalkingVertically = false
         }
       },
       velocity = {
@@ -79,7 +100,7 @@ describe("with one player with AD as walking input", function ()
       loveMock.keyboard.isDown = function ()
         return false
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set the velocity to zero", function ()
@@ -96,7 +117,7 @@ describe("with one player with AD as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "a"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set the velocity to negative walk speed", function ()
@@ -130,7 +151,7 @@ describe("with one player with AD as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "d"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set the velocity to positive walk speed", function ()
@@ -165,12 +186,14 @@ describe("with two players with AD and JL as walking input", function ()
     components = {
       input = {
         playerOne = {
-          walkLeft = "left",
-          walkRight = "right"
+          walkLeft = false,
+          walkRight = false,
+          stopWalkingHorizontally = false
         },
         playerTwo = {
-          walkLeft = "left2",
-          walkRight = "right2"
+          walkLeft = false,
+          walkRight = false,
+          stopWalkingHorizontally = false
         }
       },
       velocity = {
@@ -190,7 +213,7 @@ describe("with two players with AD and JL as walking input", function ()
       loveMock.keyboard.isDown = function ()
         return false
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set both velocity to zero", function ()
@@ -207,7 +230,7 @@ describe("with two players with AD and JL as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "a"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set player one velocity to negative walk speed", function ()
@@ -225,7 +248,7 @@ describe("with two players with AD and JL as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "d"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set player one velocity to positive walk speed", function ()
@@ -244,7 +267,7 @@ describe("with two players with AD and JL as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "j"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set player two velocity to negative walk speed", function ()
@@ -278,7 +301,7 @@ describe("with two players with AD and JL as walking input", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "l"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should set player two velocity to positive walk speed", function ()
@@ -291,46 +314,49 @@ describe("with two players with AD and JL as walking input", function ()
 end)
 
 describe("with a menu", function ()
-  local inputs, menus, started
+  local components, started
 
   before_each(function ()
-    inputs = {
-      mainMenu = {
-        menuPrevious = "up",
-        menuNext = "down",
-        menuSelect = "start"
+    components = {
+      input = {
+        mainMenu = {
+          menuPrevious = false,
+          menuNext = false,
+          menuSelect = false
+        }
+      },
+      menu = {
+        mainMenu = {
+          options = {"Start", "Options", "Help"},
+          callbacks = {function ()
+            started = true
+          end},
+          selected = 1
+        }
       }
     }
-    menus = {
-      mainMenu = {
-        options = {"Start", "Options", "Help"},
-        callbacks = {function ()
-          started = true
-        end},
-        selected = 1
-      }
-    }
+    controller.load({}, entityTaggerMock)
   end)
 
   describe("pressing S key", function ()
     it("should select the second menu option", function ()
-      controller.keypressed("s", hid, inputs, menus, true)
+      controller.keypressed("s", hid, components)
 
-      assert.are.same(2, menus.mainMenu.selected)
+      assert.are.same(2, components.menu.mainMenu.selected)
     end)
   end)
 
   describe("pressing W key", function ()
     it("should select the third menu option", function ()
-      controller.keypressed("w", hid, inputs, menus, true)
+      controller.keypressed("w", hid, components)
 
-      assert.are.same(3, menus.mainMenu.selected)
+      assert.are.same(3, components.menu.mainMenu.selected)
     end)
   end)
 
   describe("pressing RETURN key", function ()
     it("should run the callback of the first menu option", function ()
-      controller.keypressed("return", hid, inputs, menus, true)
+      controller.keypressed("return", hid, components)
 
       assert.is.truthy(started)
     end)
@@ -344,15 +370,21 @@ describe("loading a player wih animation and one without it", function ()
     components = {
       input = {
         playerOne = {
-          changeAnimationToWalking = "right"
-        },
-        playerTwo = {
-          changeAnimationToWalking = "right"
-        },
+          changeAnimationToWalking = false
+        }
+      },
+      velocity = {
+        playerOne = {x = 0, y = 0}
+      },
+      impulseSpeed = {
+        playerOne = {walk = 400}
       },
       animation = {
         playerOne = {name = "idle"}
       },
+    }
+    hid.commands[command.new{key = "right"}] = {
+      playerOne = "changeAnimationToWalking"
     }
   end)
 
@@ -362,7 +394,7 @@ describe("loading a player wih animation and one without it", function ()
       loveMock.keyboard.isDown = function (key)
         return key == "d"
       end
-      controller.load(loveMock)
+      controller.load(loveMock, entityTaggerMock)
     end)
 
     it("should change player one animation", function ()

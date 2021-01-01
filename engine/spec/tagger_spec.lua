@@ -27,10 +27,22 @@ describe("tagging an entity once", function ()
 end)
 
 describe("tagging an entity twice", function ()
-  it("should return nothing", function ()
-    entityTagger.tag("player")
-    entityTagger.tag("player")
+  local id1, id2
+  
+  before_each(function ()
+    id1 = entityTagger.tag("player")
+    id2 = entityTagger.tag("player")
+  end)
 
-    assert.are.falsy(entityTagger.getId("player"))
+  describe("and getting an unique id", function ()
+    it("should return nothing", function ()
+      assert.is.falsy(entityTagger.getId("player"))
+    end)
+  end)
+
+  describe("and getting every id related to the entity", function ()
+    it("should return the two ids used for the entity", function ()
+      assert.are.same({id1, id2}, entityTagger.getIds("player"))
+    end)
   end)
 end)

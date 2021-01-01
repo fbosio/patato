@@ -1,100 +1,94 @@
 local M = {}
 
-local function doActionIfKeyIsDown(keys, actions, input, components, isMenu)
-  local held = {}
-
-  for virtualKey, physicalKey in pairs(keys) do
-    if M.love.keyboard.isDown(physicalKey) then
-      held[#held+1] = virtualKey
-      for actionName, inputKey in pairs(input) do
-        if inputKey == virtualKey and not isMenu then
-          actions[actionName](components)
-        end
-      end
-    end
-  end
-
-  return held
-end
-
--- hid.omissions, held, input, entityComponents
-local function doOmissionIfKeyIsUp(omissions, held, input, components)
-  for omittedActions, omission in pairs(omissions) do
-    local mustOmit = true
-
-    for inputAction, inputKey in pairs(input) do
-      for _, pressedKey in ipairs(held) do
-        for _, omittedAction in ipairs(omittedActions) do
-          if inputKey == pressedKey and omittedAction == inputAction then
-            mustOmit = false
-          end
-        end
-      end
-    end
-
-    if mustOmit then
-      for inputAction, _ in pairs(input) do
-        for _, omittedAction in ipairs(omittedActions) do
-          if omittedAction == inputAction then
-            omission(components)
-          end
-        end
-      end
+local function setInputActions(inputs, commandActions, value)
+  for entityName, action in pairs(commandActions) do
+    local entities = M.entityTagger.getIds(entityName)
+    for _, entity in ipairs(entities or {}) do
+      (inputs[entity] or {})[action] = value
     end
   end
 end
 
-function M.load(love)
+local function buildActionArguments(entity, components)
+  local entityComponents = {}
+  for componentName, component in pairs(components) do
+    for k, v in pairs(component) do
+      if k == entity then
+        if componentName == "animation" then
+          local proxy = {}
+          setmetatable(proxy, {
+            __newindex = function (_, attr, newName)
+              if attr == "name" and v.name ~= newName then
+                v.name = newName
+                v.frame = 1
+                v.time = 0
+              end
+            end
+          })
+          entityComponents[componentName] = proxy
+        else
+          entityComponents[componentName] = v
+        end
+      end
+    end
+  end
+  if components.animation then
+    entityComponents.animation = entityComponents.animation or {}
+  end
+  return entityComponents
+end
+
+function M.load(love, entityTagger)
   M.love = love
+  M.entityTagger = entityTagger
 end
 
 function M.update(hid, components)
-  for entity, input in pairs(components.input or {}) do
-    local isMenu = (components.menu or {})[entity]
-    local entityComponents = {}
-    for componentName, component in pairs(components) do
-      for k, v in pairs(component) do
-        if k == entity then
-          if componentName == "animation" then
-            local proxy = {}
-            setmetatable(proxy, {
-              __newindex = function (_, attr, newName)
-                if attr == "name" and v.name ~= newName then
-                  v.name = newName
-                  v.frame = 1
-                  v.time = 0
-                end
-              end
-            })
-            entityComponents[componentName] = proxy
-          else
-            entityComponents[componentName] = v
-          end
+  for command, commandActions in pairs(hid.commands or {}) do
+    if not command.oneShot then
+      local mustExecute = true
+      for _, commandKey in ipairs(command.keys or {}) do
+        local physicalKey = hid.keys[commandKey]
+        local isKeyDown = M.love.keyboard.isDown(physicalKey)
+        if not physicalKey or command.release and isKeyDown
+            or not command.release and not isKeyDown then
+          mustExecute = false
         end
       end
+      setInputActions(components.input or {}, commandActions, mustExecute)
     end
-    if components.animation then
-      entityComponents.animation = entityComponents.animation or {}
+  end
+
+  for entity, input in pairs(components.input or {}) do
+    local entityComponents = buildActionArguments(entity, components)
+    for actionName, enabled in pairs(input) do
+      if enabled then
+        hid.actions[actionName](entityComponents)
+      end
     end
-    local held = doActionIfKeyIsDown(hid.keys, hid.actions, input,
-                                     entityComponents, isMenu)
-    doOmissionIfKeyIsUp(hid.omissions, held, input, entityComponents)
   end
 end
 
-function M.keypressed(key, hid, inputs, menus, inMenu)
-  if inMenu then
-    local pressedVirtualKey
-    for virtualKey, physicalKey in pairs(hid.keys) do
-      if physicalKey == key then
-        pressedVirtualKey = virtualKey
-        break
+function M.keypressed(key, hid, components)
+  for command, commandActions in pairs(hid.commands or {}) do
+    if command.oneShot then
+      local mustExecute = false
+      for _, commandKey in ipairs(command.keys or {}) do
+        local physicalKey = hid.keys[commandKey]
+        if physicalKey == key then
+          mustExecute = true
+          break
+        end
       end
-    end
-    for entity, menu in pairs(menus or {}) do
-      for actionName, virtualKey in pairs(inputs[entity]) do
-        if pressedVirtualKey == virtualKey then
-          hid.actions[actionName]{menu = menu}
+      if mustExecute then
+        for entityName, action in pairs(commandActions) do
+          local entities = M.entityTagger.getIds(entityName)
+          for _, entity in ipairs(entities or {}) do
+            if components.input[entity] then
+              local entityComponents = buildActionArguments(entity, components)
+              hid.actions[action](entityComponents)
+            end
+          end
         end
       end
     end

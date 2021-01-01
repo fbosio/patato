@@ -9,7 +9,12 @@ if not pcall(function() config = require "config" end) then
   config = {
     entities = {
       player = {
-        input = {}
+        input = {
+          walkLeft = "left",
+          walkRight = "right",
+          walkUp = "up",
+          walkDown = "down"
+        }
       }
     }
   }
@@ -28,6 +33,7 @@ local entityTagger = require "engine.tagger"
 local resourcemanager = require "engine.resourcemanager"
 local systems = require "engine.systems"
 local renderer = require "engine.renderer"
+local command = require "engine.command"
 
 local M = {}
 
@@ -43,7 +49,8 @@ local M = {}
  @section callbacks
 ]]
 
---- Should be called exactly once inside [love.load](https://love2d.org/wiki/love.load)
+--- Should be called exactly once inside
+--  [love.load](https://love2d.org/wiki/love.load)
 function M.load()
   systems.load(love, entityTagger)
   resourcemanager.load(love, entityTagger)
@@ -77,12 +84,11 @@ end
  Triggered just when a key is pressed.
 
  It is not called after, while the key is held down.
- Ideal for selecting the options in the menu.
+ Ideal for one shot commands, like jumping or selecting options in a menu.
  @tparam string key Character of the pressed key.
 ]]
 function M.keypressed(key)
-  systems.keypressed(key, M.hid, M.gameState.components.input,
-                     M.gameState.components.menu, M.gameState.inMenu)
+  systems.keypressed(key, M.hid, M.gameState.components)
 end
 
 
@@ -140,9 +146,9 @@ end
 
  An _action_ is triggered when some key is held down by the user.
  The action is identified for an entity by a unique name in its `input`
- component which is defined in `config.lua`
+ component which is defined in @{setInputs}.
  @tparam string action
-  The identifier of the input event, as defined in `config.lua`
+  The identifier of the input event, as defined in @{setInputs}.
  @tparam function callback What the event triggers.
   The callback receives a table `c` that has the components associated with
   the entity that triggered the input event in the first place.
@@ -168,53 +174,44 @@ function M.setAction(action, callback)
   M.hid.actions[action] = callback
 end
 
--- Check that all values of table t1 are in table t2.
-local function isIncluded(t1, t2)
-  for _, v1 in ipairs(t1) do
-    local hasValue = false
-    for _, v2 in ipairs(t2) do
-      if v1 == v2 then
-        hasValue = true
-        break
-      end
-    end
-    if not hasValue then
-      return false
-    end
-  end
-  return true
+--[=[--
+  Associate actions of an entity to commands.
+  
+  A command must be created using @{command}.
+  The `input` component of the entity will have stored the actions associated
+  to the commands.
+  @tparam string entityName Name of the entity, as defined in `config.lua`.
+  @tparam table actionCommands Table that has action names as keys and commands
+  as values.
+  @usage
+  engine.setInputs("patato", {
+    walkLeft = engine.command{key = "left"},
+    walkRight = engine.command{key = "right"},
+    stopWalking = engine.command{keys = {"left", "right"}, release = true}
+  })
+]=]
+function M.setInputs(entityName, actionCommands)
+  resourcemanager.setInputs(M, entityName, actionCommands)
 end
 
---[[--
- Associate a callback to an omission.
+--[=[--
+  Create a new command.
 
- An _omission_ is triggered when none of the keys associated with it are
- pressed. It is identified by a table of action names.
- @tparam table actions
-  The identifiers of the actions that will trigger the callback when inactive.
- @tparam function callback What the event triggers.
-  The callback receives a table `c` that has the components associated with the
-  entity that triggered the input event in the first place.
- @usage
-  engine.setOmissions({"walkLeft", "walkRight", "walkUp", "walkDown"},
-    function (c)
-      c.animation.name = "standing"
-    end
-  )
-]]
-function M.setOmissions(actions, callback)
-  local areActionsNew = true
-  for t, _ in pairs(M.hid.omissions) do
-    if isIncluded(t, actions) and isIncluded(actions, t) then
-      M.hid.omissions[t] = callback
-      areActionsNew = false
-      break
-    end
-  end
-
-  if areActionsNew then
-    M.hid.omissions[actions] = callback
-  end
+  A command is a table that represents a keyboard gesture.
+  @tparam table args Arguments for building the command. Valid arguments are:
+  
+  - **key:** String that represents a key, defined in the `keys` table in 
+    `config.lua`. If this argument is set, do not set the `keys` argument.
+  - **keys:** Table of strings that represent keys, defined in the `keys`
+    table in `config.lua`. If this argument is set, do not set the `key`
+    argument.
+  - **release:** `true` if the command represents a key-up gesture. `false`
+    otherwise.
+  - **oneShot:** `true` if the command must be detected in only one frame.
+    `false` otherwise.
+]=]
+function M.command(args)
+  return command.new(args)
 end
 
 return M

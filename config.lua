@@ -10,7 +10,8 @@ M.keys = {
   up2 = "i",
   down2 = "k",
   start = "return",
-  message = "m"
+  message = "m",
+  jump = "space"
 }
 
 M.spriteSheet = "resources/sprites/patato.png"
@@ -25,16 +26,7 @@ M.sprites = {
 
 M.entities = {
   patato = {
-    input = {
-      walkLeft = "left",
-      walkRight = "right",
-      walkUp = "up",
-      walkDown = "down",
-      showCustomMessage = "message"
-    },
-    impulseSpeed = {
-      walk = 700
-    },
+    input = true,
     collector = true,
     collisionBox = {20, 120, 40, 120},
 --    animations = {
@@ -42,13 +34,10 @@ M.entities = {
 --      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
 --    },
     solid = true,
-     gravitational = true
+    gravitational = true
   },
    bee = {
-     input = {
-       walkLeft = "left2",
-       walkRight = "right2",
-     }
+     input = true
    },
   bottle = {
     collectable = true,
@@ -64,7 +53,11 @@ M.entities = {
     collideable = "triangle"
   },
   mainMenu = {
-    input = {},
+    input = {
+      menuPrevious = "up",
+      menuNext = "down",
+      menuSelect = "start"
+    },
     menu = {
       options = {"Start", "Show message", "Secret level"},
     },

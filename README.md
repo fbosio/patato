@@ -59,13 +59,20 @@ The engine displays an error if `config.lua` is empty or lacks a `return M` stat
   
   M.entities = {
     myPlayer = {
-      input = {}
+      input = {
+        walkLeft = "left",
+        walkRight = "right",
+        walkUp = "up",
+        walkDown = "down"
+      }
     }
   }
   
   return M
   ```
   This is the same configuration that is used when no `config.lua` file is present.
+  
+  Note that the `input` table has four pairs declared. Each pair maps a key with an action. For instance, the key `"left"` is mapped with the action `walkLeft`. The four actions declared in this example are defined by default. The `"left"`, `"right"`, `"up"` and `"down"` keys are mapped by default with the A, D, W and S physical keys respectively.
 * More options
   ```lua
   local M = {}
@@ -78,6 +85,10 @@ The engine displays an error if `config.lua` is empty or lacks a `return M` stat
   M.entities = {
     playerOne = {
       input = {
+        walkLeft = "left",
+        walkRight = "right",
+        walkUp = "up",
+        walkDown = "down"
       }
     },
     playerTwo = {
@@ -94,7 +105,7 @@ The engine displays an error if `config.lua` is empty or lacks a `return M` stat
   return M
   ```
   Now the game is loaded with two players in it.
-  - `playerOne` is moved by pressing the AWSD keys, because that is what the engine does by default when an empty `input` table is declared.
+  - `playerOne` is moved by pressing the AWSD keys, like the previous example.
   - `playerTwo` may be moved only in the horizontal direction because its `input` table has only the fields `walkLeft` and `walkRight` in it. This player is moved in the horizontal direction by pressing the `"left2"` and `"right2"` keys, which are mapped to the J and L physical keys of the keyboard by the `keys` table, defined above.
   - `impulseSpeed` defines how fast each player moves when the corresponding keys are pressed.
     + `playerOne` walk speed is implicitly defined by the engine.
@@ -116,10 +127,19 @@ local M = {}
 
 M.entities = {
   player = {
-    input = {}
+    input = {
+      walkLeft = "left",
+      walkRight = "right",
+      walkUp = "up",
+      walkDown = "down"
+    }
   },
   mainMenu = {
-    input = {},
+    input = {
+      menuPrevious = "up",
+      menuNext = "down",
+      menuSelect = "start"
+    },
     menu = {
       options = {"Start", "Show message"},
     }
@@ -201,10 +221,19 @@ M.keys = {
 
 M.entities = {
   player = {
-    input = {}
+    input = {
+      walkLeft = "left",
+      walkRight = "right",
+      walkUp = "up",
+      walkDown = "down"
+    }
   },
   mainMenu = {
-    input = {},
+    input = {
+      menuPrevious = "up",
+      menuNext = "down",
+      menuSelect = "start"
+    },
     menu = {
       options = {"Start", "Show message"},
     }
@@ -221,7 +250,12 @@ local M = {}
 
 M.entities = {
   player = {
-    input = {}
+    input = {
+      walkLeft = "left",
+      walkRight = "right",
+      walkUp = "up",
+      walkDown = "down"
+    }
   }
 }
 
@@ -247,10 +281,19 @@ local M = {}
 
 M.entities = {
   player = {
-    input = {}
+    input = {
+      walkLeft = "left",
+      walkRight = "right",
+      walkUp = "up",
+      walkDown = "down"
+    }
   },
   mainMenu = {
-    input = {},
+    input = {
+      menuPrevious = "up",
+      menuNext = "down",
+      menuSelect = "start"
+    },
     menu = {
       options = {"Start quest", "Play minigame"}
     }
@@ -317,7 +360,12 @@ local M = {}
 
 M.entities = {
   player = {
-    input = {},
+    input = {
+      walkLeft = "left",
+      walkRight = "right",
+      walkUp = "up",
+      walkDown = "down"
+    },
     collector = true,
     collisionBox = {15, 35, 30, 70}
   },

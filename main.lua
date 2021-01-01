@@ -15,7 +15,7 @@ function love.load()
   engine.setMenuOptionEffect("mainMenu", 3, function ()
     engine.startGame("secretLevel")
   end)
-
+  
   engine.setAction("jump", function (c)
     if c.velocity.y == 0 then
       c.velocity.y = -c.impulseSpeed.jump
@@ -24,10 +24,9 @@ function love.load()
   engine.setAction("showCustomMessage", function ()
     message = "Flashlight!"
   end)
-  engine.setOmissions({"showCustomMessage"}, function ()
+  engine.setAction("hideCustomMessage", function ()
     message = ""
   end)
-
   engine.setAction("walkLeft", function (c)
     c.velocity.x = -c.impulseSpeed.walk
     c.animation.name = "walking"
@@ -44,19 +43,29 @@ function love.load()
     c.velocity.y = c.impulseSpeed.walk
     c.animation.name = "walking"
   end)
-  engine.setOmissions({"walkLeft", "walkRight", "walkUp", "walkDown"},
-    function (c)
-      c.animation.name = "standing"
-    end
-  )
-  for k, v in pairs(engine.hid.omissions) do
-    local text = "[{"
-    for _, name in ipairs(k) do
-      text = text .. '"' .. name .. '", '
-    end
-    text = text .. "}] = " .. tostring(v)
-    print(text)
-  end
+
+  engine.setInputs("patato", {
+    walkLeft = engine.command{key = "left"},
+    walkRight = engine.command{key = "right"},
+    walkUp = engine.command{key = "up"},
+    walkDown = engine.command{key = "down"},
+    stopWalkingHorizontally = engine.command{
+      keys = {"left", "right"},
+      release = true
+    },
+    stopWalkingVertically = engine.command{
+      keys = {"up", "down"},
+      release = true
+    },
+    jump = engine.command{key = "jump", oneShot = true},
+    showCustomMessage = engine.command{key = "message"},
+    hideCustomMessage = engine.command{key = "message", release = true}
+  })
+  engine.setInputs("mainMenu", {
+    menuPrevious = engine.command{key = "up", oneShot = true},
+    menuNext = engine.command{key = "down", oneShot = true},
+    menuSelect = engine.command{key = "start", oneShot = true}
+  })
 
   score = 0
   engine.setCollectableEffect("bottle", function ()
@@ -86,7 +95,6 @@ function love.draw()
   if not engine.gameState.inMenu then
     love.graphics.print(score, 0, 0)
   end
-
 
   local mouseX, mouseY = love.mouse.getPosition()
   love.graphics.print(tostring(mouseX) .. ", " .. tostring(mouseY),
