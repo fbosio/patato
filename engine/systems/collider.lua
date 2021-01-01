@@ -123,8 +123,7 @@ end
 local function collideRightTriangleCorner(sb, cb, sv, sp, dt, slopeEntity,
                                           sSlopeEntity)
   if (sb.left >= cb.right and sb.left + sv.x*dt < cb.right)
-      or (sb.left < cb.right and sb.left > cb.horizontalCenter)
-      and slopeEntity ~= sSlopeEntity then
+      or (sb.left < cb.right and sb.left > cb.horizontalCenter) then
     sv.x = 0
     sp.x = cb.right + sb.origin.x
   end
@@ -139,8 +138,7 @@ end
 local function collideLeftTriangleCorner(sb, cb, sv, sp, dt, slopeEntity,
                                          sSlopeEntity)
   if (sb.right <= cb.left and sb.right + sv.x*dt > cb.left)
-      or (sb.right > cb.left and sb.right < cb.horizontalCenter)
-      and slopeEntity ~= sSlopeEntity then
+      or (sb.right > cb.left and sb.right < cb.horizontalCenter) then
     sv.x = 0
     sp.x = cb.left - sb.width + sb.origin.x
   end
@@ -154,7 +152,7 @@ end
 
 local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
                                      rising, sb, cb, sv, sp, dt, slopeEntity,
-                                     solid)
+                                     solid, gravitational)
   collideBottom(sb, cb, sv, sp, dt)
   if rising then
     m = m * (-1)
@@ -181,15 +179,18 @@ local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
   if sb.horizontalCenter >= cb.left and sb.horizontalCenter <= cb.right
       and sb.bottom >= cb.top and sb.bottom <= cb.bottom then
     local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
-    if sb.bottom + sv.y*dt >= ySlope then
+    if sb.bottom + sv.y*dt >= ySlope
+        or (sb.bottom == cb.top and sb.right+sv.x*dt > cb.left) then
       sp.y = ySlope - sb.height + sb.origin.y
       sv.y = 0
       solid.slope = slopeEntity
     end
-    if sv.x ~= 0 and sv.y == 0 then
+    if gravitational and sv.x ~= 0 and sv.y == 0 then
       local newX = sp.x + sv.x*dt
-      local ySlope = m*(newX-cb.horizontalCenter) + cb.verticalCenter
-      sp.y = ySlope - sb.height + sb.origin.y
+      if newX <= cb.right and newX >= cb.left then
+        local ySlope = m*(newX-cb.horizontalCenter) + cb.verticalCenter
+        sp.y = ySlope - sb.height + sb.origin.y
+      end
     end
   elseif solid.slope == slopeEntity then
       solid.slope = nil
@@ -243,7 +244,7 @@ local function collideTriangle(collideables, collisionBoxes, positions,
   local m = cb.height / cb.width
   if normalPointingUp then
     collideUpwardTriangle(left, right, m, rising, sb, cb, sv, sp, dt, slope,
-                          solid)
+                          solid, gravitational)
   else
     collideDownwardTriangle(left, right, m, rising, sb, cb, sv, sp, dt, slope,
                             solid)

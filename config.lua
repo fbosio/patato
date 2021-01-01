@@ -33,7 +33,7 @@ M.entities = {
       showCustomMessage = "message"
     },
     impulseSpeed = {
-      walk = 100
+      walk = 700
     },
     collector = true,
     collisionBox = {20, 120, 40, 120},
@@ -42,7 +42,7 @@ M.entities = {
 --      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
 --    },
     solid = true,
---     gravitational = true
+     gravitational = true
   },
    bee = {
      input = {
