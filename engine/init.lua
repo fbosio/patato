@@ -177,19 +177,12 @@ end
   Associate an action to a command. Store this association in the `input`
   component of an entity.
 ]=]
-function M.setInputs(entityName, actionCommands)
+function M.setInputs(entityName, newInput)
+  local actionCommands = {}
+  for action, commandArgs in pairs(newInput) do
+    actionCommands[action] = command.new(commandArgs)
+  end
   resourcemanager.setInputs(M, entityName, actionCommands)
-end
-
-function M.setInput(entityName, action, command)
-  resourcemanager.setInputs(M, entityName, {[action] = command})
-end
-
---[=[--
-  Create a new command
-]=]
-function M.command(args)
-  return command.new(args)
 end
 
 return M
