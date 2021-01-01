@@ -19,7 +19,7 @@ function M.update(dt, hid, components, collectableEffects, animationResources,
                    physics.gravity)
   collider.update(dt, components.solid, components.collideable,
                   components.collisionBox, components.position,
-                  components.velocity)
+                  components.velocity, components.gravitational)
   transporter.move(dt, components.velocity, components.position)
   messenger.update(components.collector, components.collectable,
                    collectableEffects, components.collisionBox,
