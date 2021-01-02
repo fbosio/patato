@@ -1,7 +1,6 @@
 local engine = require "engine"
 local elapsed, message, score
 
-
 function love.load()
   engine.load()
 
@@ -16,11 +15,6 @@ function love.load()
     engine.startGame("secretLevel")
   end)
   
-  engine.setAction("jump", function (c)
-    if c.velocity.y == 0 then
-      c.velocity.y = -c.impulseSpeed.jump
-    end
-  end)
   engine.setAction("showCustomMessage", function ()
     message = "Flashlight!"
   end)
@@ -29,10 +23,6 @@ function love.load()
   end)
   engine.setAction("walkLeft", function (c)
     c.velocity.x = -c.impulseSpeed.walk
-    c.animation.name = "walking"
-  end)
-  engine.setAction("walkRight", function (c)
-    c.velocity.x = c.impulseSpeed.walk
     c.animation.name = "walking"
   end)
   engine.setAction("walkUp", function (c)
@@ -50,6 +40,11 @@ function love.load()
   engine.setAction("stopWalkingVertically", function (c)
     c.velocity.y = 0
     c.animation.name = "standing"
+  end)
+  engine.setAction("jump", function (c)
+    if c.velocity.y == 0 then
+      c.velocity.y = -c.impulseSpeed.jump
+    end
   end)
 
   engine.setInputs("patato", {
@@ -78,6 +73,11 @@ function love.load()
   score = 0
   engine.setCollectableEffect("bottle", function ()
     score = score + 1
+  end)
+
+  engine.setAction("walkRight", function (c)
+    c.velocity.x = c.impulseSpeed.walk
+    c.animation.name = "walking"
   end)
 end
 

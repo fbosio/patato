@@ -35,6 +35,7 @@ local systems = require "engine.systems"
 local renderer = require "engine.renderer"
 local command = require "engine.command"
 
+
 local M = {}
 
 
@@ -49,8 +50,17 @@ local M = {}
  @section callbacks
 ]]
 
---- Should be called exactly once inside
---  [love.load](https://love2d.org/wiki/love.load)
+--[[--
+ Should be called exactly once inside
+ [love.load](https://love2d.org/wiki/love.load).
+
+ Required if you call @{engine.update}.
+
+ @usage
+  function love.load()
+    engine.load()
+  end
+]]
 function M.load()
   systems.load(love, entityTagger)
   resourcemanager.load(love, entityTagger)
@@ -66,26 +76,53 @@ function M.load()
   renderer.load(love, entityTagger)
 end
 
---- Should be called inside [love.update](https://love2d.org/wiki/love.update)
--- @tparam number dt Time since the last update in seconds.
+--[[--
+ Should be called inside [love.update](https://love2d.org/wiki/love.update).
+
+ A previous call to @{engine.load} is required by this callback in order to
+ work.
+
+ @tparam number dt Time since the last update in seconds.
+ @usage
+  function love.load()
+    engine.load()
+  end
+
+  function love.update(dt)
+    engine.update(dt)
+  end
+]]
 function M.update(dt)
   systems.update(dt, M.hid, M.gameState.components, M.collectableEffects,
                  M.resources.animations, M.physics)
 end
 
---- Should be called inside [love.draw](https://love2d.org/wiki/love.draw)
+--[[--
+ Should be called inside [love.draw](https://love2d.org/wiki/love.draw) to
+ actually see the game.
+
+ @usage
+  function love.draw()
+    engine.draw()
+  end
+]]
 function M.draw()
   renderer.draw(M.gameState.components, M.gameState.inMenu, M.resources)
 end
 
 --[[--
  Add it inside [love.keypressed](https://love2d.org/wiki/love.keypressed)
+ to capture an event only when a key is pressed and not while it is held down.
 
- Triggered just when a key is pressed.
-
- It is not called after, while the key is held down.
- Ideal for one shot commands, like jumping or selecting options in a menu.
+ Needed for _one shot commands_.
+ These commands are used often for jumping or selecting options in a menu.
  @tparam string key Character of the pressed key.
+ @usage
+  function love.keypressed(key)
+    engine.keypressed(key)
+  end
+ @see setInputs
+ @see command
 ]]
 function M.keypressed(key)
   systems.keypressed(key, M.hid, M.gameState.components)
@@ -100,12 +137,24 @@ end
  @section api
 ]]
 
---- Hide menu and load a specific level of the game.
--- @tparam[opt=config.firstLevel] string levelName
---  Name of the level, as defined in `config.lua`.
-function M.startGame(levelName)
+--[[--
+ Hide menu and load a specific level of the game.
+
+ Used often without arguments inside a @{setMenuOptionEffect} callback when a
+ menu entity that has a `"Start Game"` option, or similar, is defined in
+ `config.lua`.
+
+ @tparam[opt=config.firstLevel] string level
+  Name of the level, as defined in `config.lua`.
+ @usage
+  -- In this case, "Start Game" is the option number 1 of the menu
+  engine.setMenuOptionEffect("mainMenu", 1, function ()
+    engine.startGame()
+  end)
+]]
+function M.startGame(level)
   M.gameState.inMenu = false
-  resourcemanager.buildState(config, M, levelName)
+  resourcemanager.buildState(config, M, level)
 end
 
 
@@ -114,6 +163,7 @@ end
  @tparam string entity
   The identifier of the menu, as defined in `config.lua`
  @tparam number index Number of option in the `options` table of the menu
+  that is defined in `config.lua`
  @tparam function callback What the option does when selected
  @usage
   engine.setMenuOptionEffect("mainMenu", 2, function ()
@@ -127,9 +177,10 @@ function M.setMenuOptionEffect(entity, index, callback)
   end
 end
 
+
 --[[--
  Associate a callback to a collectable.
- @tparam string name
+ @tparam string entity
   The identifier of the collectable, as defined in `config.lua`
  @tparam function callback What the collectable does when collected
  @usage
@@ -137,16 +188,17 @@ end
     health = health + 1  -- defined in outer scope
   end)
 ]]
-function M.setCollectableEffect(name, callback)
-  M.collectableEffects[name] = callback
+function M.setCollectableEffect(entity, callback)
+  M.collectableEffects[entity] = callback
 end
+
 
 --[=[--
  Associate a callback to an action.
 
- An _action_ is triggered when some key is held down by the user.
- The action is identified for an entity by a unique name in its `input`
- component which is defined in @{setInputs}.
+ An _action_ is triggered by a _command_.
+ For an entity, the action is identified by a unique name which is defined when
+ calling @{setInputs}.
  @tparam string action
   The identifier of the input event, as defined in @{setInputs}.
  @tparam function callback What the event triggers.
@@ -154,50 +206,55 @@ end
   the entity that triggered the input event in the first place.
  @usage
  engine.setAction("walkRight", function (c)
-    --[[
-      "walkRight" is a field of the input table of an entity in `config.lua`,
-       `c` is the components table of that entity.
+   --[[
+       `c` is the components table of the entity.
        In this case, `c` has at least three fields:
        1. `velocity`
        2. `impulseSpeed`
        3. `animation`
-       which are tables themselves that have respectively the fields
+       whose values are tables themselves that have respectively the fields
        1. `x`
        2. `walk`
        3. `name`
-    ]]
-    c.velocity.x = c.impulseSpeed.walk
-    c.animation.name = "walking"
-  end)
+   ]]
+   c.velocity.x = c.impulseSpeed.walk
+   c.animation.name = "walking"
+ end)
 ]=]
 function M.setAction(action, callback)
   M.hid.actions[action] = callback
 end
 
+
 --[[--
   Associate actions of an entity to commands.
   
   A command must be created using @{command}.
-  The `input` component of the entity will have stored the actions associated
-  to the commands.
-  @tparam string entityName Name of the entity, as defined in `config.lua`.
-  @tparam table actionCommands Table that has action names as keys and commands
-  as values.
+  Set a callback for an action using @{setAction}.
+  @tparam string entity
+   The identifier of the entity, as defined in `config.lua`
+  @tparam table actionCommands Table that has action names as fields and
+  commands as values.
   @usage
-  engine.setInputs("patato", {
+  engine.setInputs("hero", {
     walkLeft = engine.command{key = "left"},
     walkRight = engine.command{key = "right"},
-    stopWalking = engine.command{keys = {"left", "right"}, release = true}
+    stopWalking = engine.command{keys = {"left", "right"}, release = true},
+    jump = engine.command{key = "jump", oneShot = true}
   })
 ]]
-function M.setInputs(entityName, actionCommands)
-  resourcemanager.setInputs(M, entityName, actionCommands)
+function M.setInputs(entity, actionCommands)
+  resourcemanager.setInputs(M, entity, actionCommands)
 end
+
 
 --[[--
   Create a new command.
 
   A command is a table that represents a keyboard gesture.
+
+  See @{setInputs} for examples of use.
+
   @tparam table args Arguments for building the command. Valid arguments are:
   
   - **key:** String that represents a key, defined in the `keys` table in 
@@ -207,11 +264,12 @@ end
     argument.
   - **release:** `true` if the command represents a key-up gesture. `false`
     otherwise.
-  - **oneShot:** `true` if the command must be detected in only one frame.
+  - **oneShot:** `true` if the command must be detected in one frame only.
     `false` otherwise.
 ]]
 function M.command(args)
   return command.new(args)
 end
+
 
 return M
