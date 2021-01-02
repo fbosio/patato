@@ -5,29 +5,7 @@
 ]]
 
 local config
-if not pcall(function() config = require "config" end) then
-  config = {
-    entities = {
-      player = {
-        input = {
-          walkLeft = "left",
-          walkRight = "right",
-          walkUp = "up",
-          walkDown = "down"
-        }
-      }
-    }
-  }
-end
-if type(config) ~= "table" then
-  local message = "Incorrect config, received " .. type(config) .. "."
-  if type(config) == "boolean" and config then
-    message = message .. "\n"
-                      .. "Probably config.lua is empty or you forgot the "
-                      .. '"return M" statement.'
-  end
-  error(message)
-end
+pcall(function() config = require "config" end)
 
 local entityTagger = require "engine.tagger"
 local resourcemanager = require "engine.resourcemanager"
@@ -40,15 +18,15 @@ local M = {}
 
 
 --[[--
- Callbacks.
+Callbacks.
 
- Similar to those in [Löve2D](https://love2d.org/wiki/love).
+Similar to those in [Löve2D](https://love2d.org/wiki/love).
 
- Call them inside the [Löve2D](https://love2d.org/wiki/love) callbacks of
+Call them inside the [Löve2D](https://love2d.org/wiki/love) callbacks of
  the same name.
-
+ 
  @section callbacks
-]]
+ ]]
 
 --[[--
  Should be called exactly once inside
@@ -64,9 +42,49 @@ local M = {}
 function M.load()
   systems.load(love, entityTagger)
   resourcemanager.load(love, entityTagger)
+  
+  local emptyConfig = not config
+  if emptyConfig then
+    config = {
+      entities = {
+        player = {
+          input = true
+        }
+      }
+    }
+  end
+    
+  if type(config) ~= "table" then
+    local message = "Incorrect config, received " .. type(config) .. "."
+    if type(config) == "boolean" and config then
+      message = message .. "\n"
+                        .. "Probably config.lua is empty or you forgot the "
+                        .. '"return M" statement.'
+    end
+    error(message)
+  end
+
   for k, v in pairs(resourcemanager.buildWorld(config)) do
     M[k] = v
   end
+  
+  if emptyConfig then
+    M.setInputs("player", {
+      walkLeft = M.command{key = "left"},
+      walkRight = M.command{key = "right"},
+      walkUp = M.command{key = "up"},
+      walkDown = M.command{key = "down"},
+      stopWalkingHorizontally = M.command{
+        keys = {"left", "right"},
+        release = true
+      },
+      stopWalkingVertically = M.command{
+        keys = {"up", "down"},
+        release = true
+      },
+    })
+  end
+  
   M.collectableEffects = {}
   setmetatable(M.collectableEffects, {
     __index = function ()
