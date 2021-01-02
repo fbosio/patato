@@ -174,7 +174,7 @@ function M.setAction(action, callback)
   M.hid.actions[action] = callback
 end
 
---[=[--
+--[[--
   Associate actions of an entity to commands.
   
   A command must be created using @{command}.
@@ -189,12 +189,12 @@ end
     walkRight = engine.command{key = "right"},
     stopWalking = engine.command{keys = {"left", "right"}, release = true}
   })
-]=]
+]]
 function M.setInputs(entityName, actionCommands)
   resourcemanager.setInputs(M, entityName, actionCommands)
 end
 
---[=[--
+--[[--
   Create a new command.
 
   A command is a table that represents a keyboard gesture.
@@ -209,7 +209,7 @@ end
     otherwise.
   - **oneShot:** `true` if the command must be detected in only one frame.
     `false` otherwise.
-]=]
+]]
 function M.command(args)
   return command.new(args)
 end

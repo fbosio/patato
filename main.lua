@@ -43,6 +43,14 @@ function love.load()
     c.velocity.y = c.impulseSpeed.walk
     c.animation.name = "walking"
   end)
+  engine.setAction("stopWalkingHorizontally", function (c)
+    c.velocity.x = 0
+    c.animation.name = "standing"
+  end)
+  engine.setAction("stopWalkingVertically", function (c)
+    c.velocity.y = 0
+    c.animation.name = "standing"
+  end)
 
   engine.setInputs("patato", {
     walkLeft = engine.command{key = "left"},

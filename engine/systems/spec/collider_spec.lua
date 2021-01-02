@@ -38,8 +38,6 @@ end)
 
 after_each(function ()
   package.loaded["engine.systems.collider"] = nil
-  solids.player.slope = nil
-  gravitationals.player = nil
 end)
 
 describe("with a block", function ()

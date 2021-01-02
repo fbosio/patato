@@ -50,9 +50,10 @@ function M.update(hid, components)
       for _, commandKey in ipairs(command.keys or {}) do
         local physicalKey = hid.keys[commandKey]
         local isKeyDown = M.love.keyboard.isDown(physicalKey)
-        if not physicalKey or command.release and isKeyDown
+        if command.release and isKeyDown
             or not command.release and not isKeyDown then
           mustExecute = false
+          break
         end
       end
       setInputActions(components.input or {}, commandActions, mustExecute)

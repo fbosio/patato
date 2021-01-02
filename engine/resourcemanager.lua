@@ -338,7 +338,7 @@ function M.setInputs(world, entityName, actionCommands)
     local mustBeSet = true
     for _, commandKey in ipairs(command.keys or {}) do
       if not world.hid.keys[commandKey] then
-        mustBeSet = false
+        mustBeSet = false  -- throw error
       end
     end
     if mustBeSet then

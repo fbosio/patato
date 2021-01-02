@@ -29,10 +29,10 @@ M.entities = {
     input = true,
     collector = true,
     collisionBox = {20, 120, 40, 120},
---    animations = {
---      walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
---      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
---    },
+   animations = {
+     walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
+     standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
+   },
     solid = true,
     gravitational = true
   },
