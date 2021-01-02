@@ -45,13 +45,11 @@ end
 
 function M.update(hid, components)
   for command, commandActions in pairs(hid.commands or {}) do
-    if not command.oneShot then
+    if not command.oneShot and not command.release then
       local mustExecute = true
       for _, commandKey in ipairs(command.keys or {}) do
         local physicalKey = hid.keys[commandKey]
-        local isKeyDown = M.love.keyboard.isDown(physicalKey)
-        if command.release and isKeyDown
-            or not command.release and not isKeyDown then
+        if not M.love.keyboard.isDown(physicalKey) then
           mustExecute = false
           break
         end
@@ -70,28 +68,41 @@ function M.update(hid, components)
   end
 end
 
+local function executeAction(key, commandKeys, hid, commandActions, components)
+  local mustExecute = false
+  for _, commandKey in ipairs(commandKeys or {}) do
+    local physicalKey = hid.keys[commandKey]
+    if physicalKey == key then
+      mustExecute = true
+      break
+    end
+  end
+  if mustExecute then
+    for entityName, action in pairs(commandActions) do
+      local entities = M.entityTagger.getIds(entityName)
+      for _, entity in ipairs(entities or {}) do
+        if components.input[entity] then
+          local entityComponents = buildActionArguments(entity, components)
+          hid.actions[action](entityComponents)
+        end
+      end
+    end
+  end
+end
+
+
 function M.keypressed(key, hid, components)
   for command, commandActions in pairs(hid.commands or {}) do
     if command.oneShot then
-      local mustExecute = false
-      for _, commandKey in ipairs(command.keys or {}) do
-        local physicalKey = hid.keys[commandKey]
-        if physicalKey == key then
-          mustExecute = true
-          break
-        end
-      end
-      if mustExecute then
-        for entityName, action in pairs(commandActions) do
-          local entities = M.entityTagger.getIds(entityName)
-          for _, entity in ipairs(entities or {}) do
-            if components.input[entity] then
-              local entityComponents = buildActionArguments(entity, components)
-              hid.actions[action](entityComponents)
-            end
-          end
-        end
-      end
+      executeAction(key, command.keys, hid, commandActions, components)
+    end
+  end
+end
+
+function M.keyreleased(key, hid, components)
+  for command, commandActions in pairs(hid.commands or {}) do
+    if command.release then
+      executeAction(key, command.keys, hid, commandActions, components)
     end
   end
 end

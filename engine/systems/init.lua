@@ -32,4 +32,8 @@ function M.keypressed(key, hid, components)
   controller.keypressed(key, hid, components)
 end
 
+function M.keyreleased(key, hid, components)
+  controller.keyreleased(key, hid, components)
+end
+
 return M

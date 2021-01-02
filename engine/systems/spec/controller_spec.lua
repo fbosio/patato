@@ -130,6 +130,7 @@ describe("with one player with AD as walking input", function ()
     describe("and then leaving it", function ()
       before_each(function ()
         controller.update(hid, components)
+        controller.keyreleased("a", hid, components)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -164,6 +165,7 @@ describe("with one player with AD as walking input", function ()
     describe("and then leaving it", function ()
       before_each(function ()
         controller.update(hid, components)
+        controller.keyreleased("a", hid, components)
 
         loveMock.keyboard.isDown = function ()
           return false
@@ -281,6 +283,7 @@ describe("with two players with AD and JL as walking input", function ()
     describe("and then leaving it", function ()
       before_each(function ()
         controller.update(hid, components)
+        controller.keyreleased("j", hid, components)
 
         loveMock.keyboard.isDown = function ()
           return false

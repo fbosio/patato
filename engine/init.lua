@@ -146,6 +146,22 @@ function M.keypressed(key)
   systems.keypressed(key, M.hid, M.gameState.components)
 end
 
+--[[--
+ Add it inside [love.keyreleased](https://love2d.org/wiki/love.keyreleased)
+
+ Needed for _release_ commands.
+ @tparam string key Character of the pressed key.
+ @usage
+  function love.keyreleased(key)
+    engine.keyreleased(key)
+  end
+ @see setInputs
+ @see command
+]]
+function M.keyreleased(key)
+  systems.keyreleased(key, M.hid, M.gameState.components)
+end
+
 
 --[[--
  API

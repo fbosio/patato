@@ -112,3 +112,7 @@ end
 function love.keypressed(key)
   engine.keypressed(key)
 end
+
+function love.keyreleased(key)
+  engine.keyreleased(key)
+end
