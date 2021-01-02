@@ -608,10 +608,10 @@ describe("loading collectable entities that are in a level", function ()
   end)
 end)
 
-
 describe("loading an entity that is both collector and collectable", function ()
-  it("should throw an error", function ()
-    local config = {
+  local config
+  before_each(function ()
+    config = {
       entities = {
         absurdSpecimen = {
           collector = true,
@@ -619,8 +619,25 @@ describe("loading an entity that is both collector and collectable", function ()
         }
       }
     }
+  end)
 
-    assert.has_error(function () resourcemanager.buildWorld(config) end)
+  describe("without levels defined", function ()
+    it("should throw an error", function ()
+      assert.has_error(function () resourcemanager.buildWorld(config) end)
+    end)
+  end)
+
+  describe("with a level defined", function ()
+    it("should throw an error", function ()
+      config.levels = {
+        absurdSpecimen = {
+          {0, 10},
+          {10, 10},
+          {20, 0}
+        }
+      }
+      assert.has_error(function () resourcemanager.buildWorld(config) end)
+    end)
   end)
 end)
 
@@ -976,8 +993,9 @@ describe("loading an entity that has a wrong collideable type", function ()
 end)
 
 describe("loading an entity that is both collideable and solid", function ()
-  it("should throw an error", function ()
-    local config = {
+  local config
+  before_each(function ()
+    config = {
       entities = {
         absurdSpecimen = {
           collideable = "rectangle",
@@ -985,8 +1003,24 @@ describe("loading an entity that is both collideable and solid", function ()
         }
       }
     }
+  end)
 
-    assert.has_error(function () resourcemanager.buildWorld(config) end)
+  describe("without levels defined", function ()
+    it("should throw an error", function ()
+      assert.has_error(function () resourcemanager.buildWorld(config) end)
+    end)
+  end)
+
+  describe("with a level defined", function ()
+    it("should throw an error", function ()
+      config.levels = {
+        absurdSpecimen = {
+          {400, 50, 700, 200},
+          {400, 400, 700, 550},
+        }
+      }
+      assert.has_error(function () resourcemanager.buildWorld(config) end)
+    end)
   end)
 end)
 
@@ -1004,5 +1038,107 @@ describe("loading a gravitational entity", function ()
 
     local anvilId = entityTagger.getId("anvil")
     assert.is.truthy(world.gameState.components.gravitational[anvilId])
+  end)
+end)
+
+describe("loading a climber entity", function ()
+  it("should copy the component", function ()
+    local config = {
+      entities = {
+        player = {
+          climber = true
+        }
+      }
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    local playerId = entityTagger.getId("player")
+    assert.is.truthy(world.gameState.components.climber[playerId])
+  end)
+end)
+
+describe("loading a ladder entity that is not in any level", function ()
+  it("should not copy the component", function ()
+    local config = {
+      entities = {
+        ladder = {
+          ladder = true
+        }
+      }
+    }
+
+    local world = resourcemanager.buildWorld(config)
+
+    assert.is.falsy(world.gameState.components.collideable)
+  end)
+end)
+
+describe("loading ladder entities that are in a level", function ()
+  local config, world
+
+  before_each(function ()
+    config = {
+      entities = {
+        ladders = {
+          ladder = true
+        }
+      },
+      levels = {
+        garden = {
+          ladders = {
+            {400, 50, 700, 200},
+            {400, 400, 700, 550},
+          }
+        }
+      }
+    }
+  
+    world = resourcemanager.buildWorld(config)
+  end)
+
+  it("should copy the ladder components with its name", function ()
+    local ladder = world.gameState.components.ladder
+    assert.are.same("ladders", ladder[1].name)
+    assert.are.same("ladders", ladder[2].name)
+  end)
+
+  it("should create collision boxes for each entity", function ()
+    assert.are.same({
+      {origin = {x = 150, y = 75}, width = 300, height = 150},
+      {origin = {x = 150, y = 75}, width = 300, height = 150},
+    }, world.gameState.components.collisionBox)
+  end)
+end)
+
+describe("loading an entity that is both climber and ladder", function ()
+  local config
+  before_each(function ()
+    config = {
+      entities = {
+        absurdSpecimen = {
+          climber = true,
+          ladder = true
+        }
+      }
+    }
+  end)
+
+  describe("without levels defined", function ()
+    it("should throw an error", function ()
+      assert.has_error(function () resourcemanager.buildWorld(config) end)
+    end)
+  end)
+
+  describe("with a level defined", function ()
+    it("should throw an error", function ()
+      config.levels = {
+        absurdSpecimen = {
+          {400, 50, 700, 200},
+          {400, 400, 700, 550},
+        }
+      }
+      assert.has_error(function () resourcemanager.buildWorld(config) end)
+    end)
   end)
 end)

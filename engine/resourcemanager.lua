@@ -67,9 +67,11 @@ local stateBuilders = {
   collector = function (world, isCollector, entity)
     setComponent(world, "collector", entity, isCollector)
   end,
-  collectable = function (world, _, entity)
-    setComponent(world, "collectable", entity,
-                 {name = M.entityTagger.getName(entity)})
+  collectable = function (world, isCollectable, entity)
+    if isCollectable then
+      setComponent(world, "collectable", entity,
+                    {name = M.entityTagger.getName(entity)})
+    end
   end,
   collisionBox = function (world, component, entity)
     local t = {
@@ -115,10 +117,12 @@ local stateBuilders = {
 
     world.resources.animations = animations
   end,
-  solid = function (world, _, entity)
-    setComponent(world, "solid", entity, {})
-    createDefaultPosition(world, entity)
-    createDefaultVelocity(world, entity)
+  solid = function (world, isSolid, entity)
+    if isSolid then
+      setComponent(world, "solid", entity, {})
+      createDefaultPosition(world, entity)
+      createDefaultVelocity(world, entity)
+    end
   end,
   collideable = function (world, type, entity)
     local name = M.entityTagger.getName(entity)
@@ -132,10 +136,23 @@ local stateBuilders = {
     createDefaultPosition(world, entity)
     createDefaultVelocity(world, entity)
   end,
+  climber = function (world, isClimber, entity)
+    if isClimber then
+      setComponent(world, "climber", entity, {})
+      createDefaultPosition(world, entity)
+      createDefaultVelocity(world, entity)
+    end
+  end,
+  ladder = function (world, isLadder, entity)
+    if isLadder then
+      local name = M.entityTagger.getName(entity)
+      setComponentAttribute(world, "ladder", entity, "name", name)
+    end
+  end,
 }
 
 local function buildFromVertex(entity, entityComponents, vertex, world)
-  if entityComponents.collideable then
+  if entityComponents.collideable or entityComponents.ladder then
     local x1 = math.min(vertex[1], vertex[3])
     local x2 = math.max(vertex[1], vertex[3])
     local y1 = math.min(vertex[2], vertex[4] or vertex[2])
@@ -150,7 +167,8 @@ local function buildFromVertex(entity, entityComponents, vertex, world)
                           width)
     setComponentAttribute(world, "collisionBox", entity, "height",
                           height)
-    if entityComponents.collideable == "triangle"
+    if not entityComponents.ladder
+        and entityComponents.collideable == "triangle"
         and vertex[2] ~= vertex[4] then
       setComponentAttribute(world, "collideable", entity, "normalPointingUp",
                             vertex[2] > vertex[4])
@@ -269,21 +287,24 @@ local function buildResources(config, world)
   end
 end
 
-local function checkComponentsCompatibility(config, entityName)
-  local isNotCollectable = not config.entities[entityName].collectable
-  local isNotCollector = not config.entities[entityName].collector
-  assert(isNotCollectable or isNotCollector,
-          "Entities must not be collectables and collectors at the "
-          .. "same time, but entity \"" .. entityName .. "\" has both "
-          .. "components declared in config.lua")
-  local isNotCollideable = not config.entities[entityName].collideable
-  local isNotSolid = not config.entities[entityName].solid
-  assert(isNotCollideable or isNotSolid,
-          "Entities must not be collideables and solids at the "
-          .. "same time, but entity \"" .. entityName .. "\" has both "
-          .. "components declared in config.lua")
+local function entityCanBeBuilt(config, entityName, componentPairs)
+  local canBeBuilt = true
+  for _, t in ipairs(componentPairs) do
+    canBeBuilt = canBeBuilt and not config.entities[entityName][t[1]]
+  end
+  
+  return canBeBuilt
+end
 
-  return isNotCollectable and isNotCollideable
+local function checkComponentsCompatibility(config, entityName, componentPairs)
+  for _, t in ipairs(componentPairs) do
+    local components = config.entities[entityName]
+    local v1, v2 = unpack(t)
+    assert(not components[v1] or not components[v2],
+           "Entities must not be " .. v1 .. "s and " .. v2 .. "s at the same"
+           .. "time, but entity \"" .. entityName .. "\" has both "
+           .. "components declared in config.lua")
+  end
 end
 
 function M.buildState(config, world, levelName)
@@ -292,15 +313,18 @@ function M.buildState(config, world, levelName)
   if config.entities then
     local hasNoMenuComponents = buildMenu(config, world)
     if hasNoMenuComponents then
+      local componentPairs = {
+        {"collectable", "collector"},
+        {"collideable", "solid"},
+        {"ladder", "climber"}
+      }
       for entityName, entityComponents in pairs(config.entities) do
+        checkComponentsCompatibility(config, entityName, componentPairs)
         if config.levels then
           buildNonMenuIfInLevel(config, world, levelName, entityName,
                                 entityComponents)
-        else
-          local canBeBuilt = checkComponentsCompatibility(config, entityName)
-          if canBeBuilt then
-            buildNonMenu(entityName, entityComponents, world)
-          end
+        elseif entityCanBeBuilt(config, entityName, componentPairs) then
+          buildNonMenu(entityName, entityComponents, world)
         end
       end
     end
