@@ -5,23 +5,9 @@ A platform adventure video game, ported with [Löve2D](https://love2d.org/).
 
 
 ## Engine
-The engine has **events** and **public functions**.
-
-* **Four events**, similar to those in [Löve2D](https://love2d.org/).
-  - `load()`
-  - `update(dt)`
-  - `draw()`
-  - `keypressed(key)`
-* **Engine-specific functions**
-  - `startGame(levelName)`
-  - `setMenuOptionEffect(entity, index, callback)`
-  - `setCollectableEffect(name, callback)`
-  - `setAction(action, callback)`
-  - `setOmissions(actions, callback)`
-
 In its simplest form, the engine is used like follows.
 
-Create a `main.lua` file along with the `engine` directory that contains the Game engine.
+Create a `main.lua` file along with the `engine` directory.
 ```lua
 local engine = require "engine"
 
@@ -41,79 +27,133 @@ end
 After running `love .` in the directory that contains those files, a window with one character, drawn as a point, is loaded.
 The character movement is controlled by the AWSD keys by default.
 
+Next to the drawn point, there is a text that uniquely identifies it.
+The identifier is called an **entity**.
+
 ### Configuration file
 Create a `config.lua` file along with `main.lua` and `engine/`.
 **The file must be non empty**, because is loaded as a module.
 The engine displays an error if `config.lua` is empty or lacks a `return M` statement, where `M` is the engine module table.
 
-* In its simplest form, `config.lua` looks like this.
-  ```lua
-  local M = {}
+In its simplest form, `config.lua` looks like this.
+```lua
+local M = {}
 
-  return M
-  ```
-  When `main.lua` is run with [Löve2D](https://love2d.org/) using this configuration, an empty window is opened.
-* Game with one player.
-   ```lua
-  local M = {}
-  
-  M.entities = {
-    myPlayer = {
-      input = {
-        walkLeft = "left",
-        walkRight = "right",
-        walkUp = "up",
-        walkDown = "down"
-      }
-    }
-  }
-  
-  return M
-  ```
-  This is the same configuration that is used when no `config.lua` file is present.
-  
-  Note that the `input` table has four pairs declared. Each pair maps a key with an action. For instance, the key `"left"` is mapped with the action `walkLeft`. The four actions declared in this example are defined by default. The `"left"`, `"right"`, `"up"` and `"down"` keys are mapped by default with the A, D, W and S physical keys respectively.
-* More options
-  ```lua
-  local M = {}
+return M
+```
+When `main.lua` is run with [Löve2D](https://love2d.org/) using this configuration, an empty window is opened.
+Keep reading for less trivial examples.
 
-  M.keys = {
-    left2 = "j",
-    right2 = "l"
-  }
+### Inputs
+Let's create a game with one player.
+```lua
+local M = {}
 
-  M.entities = {
-    playerOne = {
-      input = {
-        walkLeft = "left",
-        walkRight = "right",
-        walkUp = "up",
-        walkDown = "down"
-      }
+M.entities = {
+  myPlayer = {input = true}
+}
+
+return M
+```
+
+At this point, the engine does not know what to do with `myPlayer` when the user gives input to it, like pressing some keys of the keyboard for example.
+_Inputs need to be set_ first in the `main.lua` file.
+```lua
+local engine = require "engine"
+
+function love.load()
+  engine.load()
+
+  engine.setInputs("myPlayer", {
+    walkLeft = engine.command{key = "left"},
+    walkRight = engine.command{key = "right"},
+    walkUp = engine.command{key = "up"},
+    walkDown = engine.command{key = "down"},
+    stopWalkingHorizontally = engine.command{
+      keys = {"left", "right"},
+      release = true
     },
-    playerTwo = {
-      input = {
-        walkLeft = "left2",
-        walkRight = "right2"
-      },
-      impulseSpeed = {
-        walk = 100
-      }
+    stopWalkingVertically = engine.command{
+      keys = {"up", "down"},
+      release = true
     }
+  })
+end
+
+function love.update(dt)
+  engine.update(dt)
+end
+
+function love.draw()
+  engine.draw()
+end
+```
+
+`engine.setInputs` receives two arguments.
+1. An entity name that has an `input` field set to `true` in `config.lua` (`"myPlayer"`, in this case).
+2. A table with commands. A **command** is just a bunch of keys with some options associated to it. The function `engine.command` defines a command from a table that has a string `key` or a table with several `keys`. The `release = true` argument is just a way to tell the engine that it needs to check when the key is released instead of pressed.
+   
+Now the character can be moved with the AWSD keys.
+This setup is, in fact, the same that the engine takes by default when it finds no `config.lua` file.
+
+The `key` and `keys` arguments of `engine.command` state that `"left"` and `"right"` must be pressed in order to make the character respectively walk to the left or to the right. But that is actually achieved by pressing respectively the A and D keys.
+
+`engine.command` does not care about the _actual_ keys of the keyboard, or joystick buttons, or whatever. It just needs _references_ to those things, like the `"left"` and `"right"` strings used above, which are called **virtual inputs**. The A and D keys above are called **physical inputs**.
+
+The engine associates the `"left"`, `"up"`, `"down"` and `"right"` inputs with the AWSD physical keys by default.
+
+### More options
+Let's make the player walk slower and just horizontally when the user presses the J and L keys of the keyboard.
+The new `config.lua` looks like this.
+```lua
+local M = {}
+
+M.keys = {
+  left = "j",
+  right = "l"
+}
+
+M.entities = {
+  myPlayer = {
+    input = true,
+    impulseSpeed = {walk = 1000}
   }
+}
 
-  return M
-  ```
-  Now the game is loaded with two players in it.
-  - `playerOne` is moved by pressing the AWSD keys, like the previous example.
-  - `playerTwo` may be moved only in the horizontal direction because its `input` table has only the fields `walkLeft` and `walkRight` in it. This player is moved in the horizontal direction by pressing the `"left2"` and `"right2"` keys, which are mapped to the J and L physical keys of the keyboard by the `keys` table, defined above.
-  - `impulseSpeed` defines how fast each player moves when the corresponding keys are pressed.
-    + `playerOne` walk speed is implicitly defined by the engine.
-    + `playerTwo` walk speed is explicitly defined as `100` by the `walk` field in the `impulseSpeed` table.
+return M
+```
 
-In `config.lua`, each field of the `entities` table is the name of what will be referred here as an **entity**.
-In turn, each entity has tables associated to it, that will be called **components**.
-So, in the latter case above, `playerOne` and `playerTwo` are entities, while `input`, and `impulseSpeed` are its components. 
+Remember that inputs need to be set in `main.lua`.
+```lua
+local engine = require "engine"
+
+function love.load()
+  engine.load()
+
+  engine.setInputs("myPlayer", {
+    walkLeft = engine.command{key = "left"},
+    walkRight = engine.command{key = "right"},
+    stopWalkingHorizontally = engine.command{
+      keys = {"left", "right"},
+      release = true
+    }
+  })
+end
+
+function love.update(dt)
+  engine.update(dt)
+end
+
+function love.draw()
+  engine.draw()
+end
+```
+
+The `keys` table of the configuration maps virtual inputs (`left` and `right`) with physical inputs (`"j"` and `"l"`, respectively).
+
+`impulseSpeed` defines how fast the player moves. Walk speed was implicitly defined by the engine in the above examples. It is now explicitly defined as `1000` by the `walk` field in the `impulseSpeed` table in `config.lua`.
+
+`input` and `impulseSpeed` are **components** of `myPlayer`.
 
 ### Menu
 For the engine, a menu is just another entity with a `menu` component attached to it.
@@ -126,20 +166,9 @@ Here's an example `config.lua` that defines a menu with two options:
 local M = {}
 
 M.entities = {
-  player = {
-    input = {
-      walkLeft = "left",
-      walkRight = "right",
-      walkUp = "up",
-      walkDown = "down"
-    }
-  },
+  myPlayer = {input = true},
   mainMenu = {
-    input = {
-      menuPrevious = "up",
-      menuNext = "down",
-      menuSelect = "start"
-    },
+    input = true,
     menu = {
       options = {"Start", "Show message"},
     }
@@ -160,7 +189,20 @@ local elapsed, showingMessage
 function love.load()
   engine.load()
 
-  -- setMenuOptionEffect(entity, index, callback)
+  engine.setInputs("myPlayer", {
+    walkLeft = engine.command{key = "left"},
+    walkRight = engine.command{key = "right"},
+    stopWalkingHorizontally = engine.command{
+      keys = {"left", "right"},
+      release = true
+    }
+  })
+  
+  engine.setInputs("mainMenu", {
+    menuNext = engine.command{key = "down", oneShot = true},
+    menuPrevious = engine.command{key = "up", oneShot = true},
+    menuSelect = engine.command{key = "start", oneShot = true}
+  })
   engine.setMenuOptionEffect("mainMenu", 1, function ()
     engine.startGame()
   end)
@@ -196,8 +238,9 @@ end
 ```
 
 An option may be now selected by pressing the W, S and Return/Enter keys.
-These are the default keys.
-Note that the `keypressed` callback is needed for navigating through the menu options: _omitting it, user input is not detected_.
+These are the default physical keys.
+Note that the `"mainMenu"` commands have the `oneShot = true` argument.
+This makes the `keypressed` callback mandatory for navigating through the menu options: _omitting it, user input is not detected_.
 
 Option effects are declared inside the `love.load` callback by using `setMenuOptionEffect`. It receives three arguments.
 
@@ -220,20 +263,9 @@ M.keys = {
 }
 
 M.entities = {
-  player = {
-    input = {
-      walkLeft = "left",
-      walkRight = "right",
-      walkUp = "up",
-      walkDown = "down"
-    }
-  },
+  myPlayer = {input = true},
   mainMenu = {
-    input = {
-      menuPrevious = "up",
-      menuNext = "down",
-      menuSelect = "start"
-    },
+    input = true,
     menu = {
       options = {"Start", "Show message"},
     }
@@ -249,22 +281,15 @@ The following `config.lua` declares two levels.
 local M = {}
 
 M.entities = {
-  player = {
-    input = {
-      walkLeft = "left",
-      walkRight = "right",
-      walkUp = "up",
-      walkDown = "down"
-    }
-  }
+  myPlayer = {input = true}
 }
 
 M.levels = {
   quest = {
-    player = {700, 100}
+    myPlayer = {700, 100}
   },
   minigame = {
-    player = {100, 500}
+    myPlayer = {100, 500}
   }
 }
 M.firstLevel = "quest"
@@ -280,20 +305,9 @@ The level can be selected from a menu, too.
 local M = {}
 
 M.entities = {
-  player = {
-    input = {
-      walkLeft = "left",
-      walkRight = "right",
-      walkUp = "up",
-      walkDown = "down"
-    }
-  },
+  myPlayer = {input = true},
   mainMenu = {
-    input = {
-      menuPrevious = "up",
-      menuNext = "down",
-      menuSelect = "start"
-    },
+    input = true,
     menu = {
       options = {"Start quest", "Play minigame"}
     }
@@ -302,10 +316,10 @@ M.entities = {
 
 M.levels = {
   quest = {
-    player = {700, 100}
+    myPlayer = {700, 100}
   },
   minigame = {
-    player = {100, 500}
+    myPlayer = {100, 500}
   }
 }
 M.firstLevel = "quest"
@@ -321,7 +335,20 @@ local engine = require "engine"
 function love.load()
   engine.load()
 
-  -- setMenuOptionEffect(entity, index, callback)
+  engine.setInputs("myPlayer", {
+    walkLeft = engine.command{key = "left"},
+    walkRight = engine.command{key = "right"},
+    stopWalkingHorizontally = engine.command{
+      keys = {"left", "right"},
+      release = true
+    }
+  })
+  
+  engine.setInputs("mainMenu", {
+    menuNext = engine.command{key = "down", oneShot = true},
+    menuPrevious = engine.command{key = "up", oneShot = true},
+    menuSelect = engine.command{key = "start", oneShot = true}
+  })
   engine.setMenuOptionEffect("mainMenu", 1, function ()
     engine.startGame()
   end)
@@ -359,13 +386,8 @@ The components are declared in `config.lua`.
 local M = {}
 
 M.entities = {
-  player = {
-    input = {
-      walkLeft = "left",
-      walkRight = "right",
-      walkUp = "up",
-      walkDown = "down"
-    },
+  myPlayer = {
+    input = true,
     collector = true,
     collisionBox = {15, 35, 30, 70}
   },
@@ -377,7 +399,7 @@ M.entities = {
 
 M.levels = {
   myLevel = {
-    player = {260, 300},
+    myPlayer = {260, 300},
     coin = {
       {440, 300},
       {460, 300},
@@ -400,8 +422,16 @@ local score
 function love.load()
   engine.load()
 
+  engine.setInputs("myPlayer", {
+    walkLeft = engine.command{key = "left"},
+    walkRight = engine.command{key = "right"},
+    stopWalkingHorizontally = engine.command{
+      keys = {"left", "right"},
+      release = true
+    }
+  })
+  
   score = 0
-  -- setCollectableEffect(name, callback)
   engine.setCollectableEffect("coin", function ()
     score = score + 1
   end)
