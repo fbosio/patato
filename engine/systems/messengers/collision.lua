@@ -1,20 +1,8 @@
-local M = {}
+local helpers = require "engine.systems.messengers.helpers"
+local getTranslatedBox = helpers.getTranslatedBox
 
-local function getTranslatedBox(position, box)
-  local x = position.x - box.origin.x
-  local y = position.y - box.origin.y
-  return {
-    origin = {x = box.origin.x, y = box.origin.y},
-    width = box.width,
-    height = box.height,
-    left = x,
-    right = x + box.width,
-    top = y,
-    bottom = y + box.height,
-    horizontalCenter = x + box.width/2,
-    verticalCenter = y + box.height/2
-  }
-end
+
+local M = {}
 
 --[[
   sb = solid box,
@@ -287,6 +275,8 @@ function M.update(dt, solids, collideables, collisionBoxes, positions,
       end
     end
   end
+
+  
 end
 
 return M

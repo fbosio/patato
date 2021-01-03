@@ -1,8 +1,7 @@
-local animator = require "engine.systems.animator"
-local collider = require "engine.systems.collider"
 local controller = require "engine.systems.controller"
 local transporter = require "engine.systems.transporter"
-local messenger = require "engine.systems.messenger"
+local messengers = require "engine.systems.messengers"
+local animator = require "engine.systems.animator"
 local garbagecollector = require "engine.systems.garbagecollector"
 
 local M = {}
@@ -17,13 +16,8 @@ function M.update(dt, hid, components, collectableEffects, animationResources,
   controller.update(hid, components)
   transporter.drag(dt, components.velocity, components.gravitational,
                    physics.gravity)
-  collider.update(dt, components.solid, components.collideable,
-                  components.collisionBox, components.position,
-                  components.velocity, components.gravitational)
+  messengers.update(dt, components, collectableEffects)
   transporter.move(dt, components.velocity, components.position)
-  messenger.update(components.collector, components.collectable,
-                   collectableEffects, components.collisionBox,
-                   components.position, components.garbage)
   animator.update(dt, components.animation, animationResources)
   garbagecollector.update(components)
 end

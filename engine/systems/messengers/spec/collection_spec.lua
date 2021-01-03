@@ -1,11 +1,11 @@
 local messenger
 
 before_each(function ()
-  messenger = require "engine.systems.messenger"
+  messenger = require "engine.systems.messengers.collection"
 end)
 
 after_each(function ()
-  package.loaded["engine.systems.messenger"] = nil
+  package.loaded["engine.systems.messengers.collection"] = nil
 end)
 
 describe("loading a collector that collides with a collectable", function ()

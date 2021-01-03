@@ -1,8 +1,8 @@
 local dt = 1 / 70
-local collider, solids, collisionBoxes, gravitationals, climbers
+local collider, solids, collisionBoxes, gravitationals
 
 before_each(function ()
-  collider = require "engine.systems.collider"
+  collider = require "engine.systems.messengers.collision"
   solids = {
     player = {},
   }
@@ -31,26 +31,13 @@ before_each(function ()
       origin = {x = 16, y = 32},
       width = 32,
       height = 64
-    },
-    ladder = {
-      origin = {x = 0, y = 128},
-      width = 0,
-      height = 128
-    },
-    trellis = {
-      origin = {x = 32, y = 128},
-      width = 64,
-      height = 128
-    },
+    }
   }
   gravitationals = {}
-  climbers = {
-    player = {},
-  }
 end)
 
 after_each(function ()
-  package.loaded["engine.systems.collider"] = nil
+  package.loaded["engine.systems.messengers.collision"] = nil
 end)
 
 describe("with a block", function ()
@@ -1458,11 +1445,3 @@ describe("with two adjacent slopes", function ()
   end)
 end)
 
-describe("with a ladder", function ()
-  local ladder
-  before_each(function ()
-    ladder = {
-      {name = "ladder"}
-    }
-  end)
-end)
