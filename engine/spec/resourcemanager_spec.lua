@@ -1058,35 +1058,35 @@ describe("loading a climber entity", function ()
   end)
 end)
 
-describe("loading a ladder entity that is not in any level", function ()
+describe("loading a trellis entity that is not in any level", function ()
   it("should not copy the component", function ()
     local config = {
       entities = {
-        ladder = {
-          ladder = true
+        trellis = {
+          trellis = true
         }
       }
     }
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.is.falsy(world.gameState.components.collideable)
+    assert.is.falsy(world.gameState.components.trellis)
   end)
 end)
 
-describe("loading ladder entities that are in a level", function ()
+describe("loading trellis entities that are in a level", function ()
   local config, world
 
   before_each(function ()
     config = {
       entities = {
-        ladders = {
-          ladder = true
+        trellises = {
+          trellis = true
         }
       },
       levels = {
         garden = {
-          ladders = {
+          trellises = {
             {400, 50, 700, 200},
             {400, 400, 700, 550},
           }
@@ -1097,10 +1097,10 @@ describe("loading ladder entities that are in a level", function ()
     world = resourcemanager.buildWorld(config)
   end)
 
-  it("should copy the ladder components with its name", function ()
-    local ladder = world.gameState.components.ladder
-    assert.are.same("ladders", ladder[1].name)
-    assert.are.same("ladders", ladder[2].name)
+  it("should copy the trellis components with its name", function ()
+    local trellis = world.gameState.components.trellis
+    assert.are.same("trellises", trellis[1].name)
+    assert.are.same("trellises", trellis[2].name)
   end)
 
   it("should create collision boxes for each entity", function ()
@@ -1111,14 +1111,14 @@ describe("loading ladder entities that are in a level", function ()
   end)
 end)
 
-describe("loading an entity that is both climber and ladder", function ()
+describe("loading an entity that is both climber and trellis", function ()
   local config
   before_each(function ()
     config = {
       entities = {
         absurdSpecimen = {
           climber = true,
-          ladder = true
+          trellis = true
         }
       }
     }

@@ -1,5 +1,5 @@
 local dt = 1 / 70
-local collider, solids, collisionBoxes, gravitationals
+local collider, solids, collisionBoxes, gravitationals, climbers
 
 before_each(function ()
   collider = require "engine.systems.collider"
@@ -32,8 +32,21 @@ before_each(function ()
       width = 32,
       height = 64
     },
+    ladder = {
+      origin = {x = 0, y = 128},
+      width = 0,
+      height = 128
+    },
+    trellis = {
+      origin = {x = 32, y = 128},
+      width = 64,
+      height = 128
+    },
   }
   gravitationals = {}
+  climbers = {
+    player = {},
+  }
 end)
 
 after_each(function ()
@@ -1005,7 +1018,6 @@ describe("with a slope", function ()
   end)
 end)
 
-
 describe("with a block and a slope", function ()
   local collideables, positions, velocities
   before_each(function ()
@@ -1446,3 +1458,11 @@ describe("with two adjacent slopes", function ()
   end)
 end)
 
+describe("with a ladder", function ()
+  local ladder
+  before_each(function ()
+    ladder = {
+      {name = "ladder"}
+    }
+  end)
+end)

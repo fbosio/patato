@@ -143,16 +143,16 @@ local stateBuilders = {
       createDefaultVelocity(world, entity)
     end
   end,
-  ladder = function (world, isLadder, entity)
-    if isLadder then
+  trellis = function (world, isTrellis, entity)
+    if isTrellis then
       local name = M.entityTagger.getName(entity)
-      setComponentAttribute(world, "ladder", entity, "name", name)
+      setComponentAttribute(world, "trellis", entity, "name", name)
     end
   end,
 }
 
 local function buildFromVertex(entity, entityComponents, vertex, world)
-  if entityComponents.collideable or entityComponents.ladder then
+  if entityComponents.collideable or entityComponents.trellis then
     local x1 = math.min(vertex[1], vertex[3])
     local x2 = math.max(vertex[1], vertex[3])
     local y1 = math.min(vertex[2], vertex[4] or vertex[2])
@@ -167,7 +167,7 @@ local function buildFromVertex(entity, entityComponents, vertex, world)
                           width)
     setComponentAttribute(world, "collisionBox", entity, "height",
                           height)
-    if not entityComponents.ladder
+    if not entityComponents.trellis
         and entityComponents.collideable == "triangle"
         and vertex[2] ~= vertex[4] then
       setComponentAttribute(world, "collideable", entity, "normalPointingUp",
@@ -316,7 +316,7 @@ function M.buildState(config, world, levelName)
       local componentPairs = {
         {"collectable", "collector"},
         {"collideable", "solid"},
-        {"ladder", "climber"}
+        {"trellis", "climber"}
       }
       for entityName, entityComponents in pairs(config.entities) do
         checkComponentsCompatibility(config, entityName, componentPairs)
