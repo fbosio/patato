@@ -1,5 +1,6 @@
 local helpers = require "engine.systems.messengers.helpers"
 local getTranslatedBox = helpers.getTranslatedBox
+local translate = helpers.translate
 
 
 local M = {}
@@ -7,8 +8,7 @@ local M = {}
 --[[
   sb = solid box,
   cb = collideable box,
-  sv = solid velocity,
-  sp = solid position,
+  sv = solid velocity
 ]]
 
 local function mustCollideSides(collideables, collisionBoxes, positions,
@@ -39,143 +39,143 @@ local function mustCollideSides(collideables, collisionBoxes, positions,
   return mustCollideLeft, mustCollideRight
 end
 
-local function collideRight(sb, cb, sv, sp, dt)
+local function collideRight(sb, cb, sv, dt)
   if sb.top < cb.bottom and sb.bottom > cb.top
       and sb.left >= cb.right and sb.left + sv.x*dt < cb.right then
     sv.x = 0
-    sp.x = cb.right + sb.origin.x
+    translate.left(sb, cb.right)
   end
 end
 
-local function collideTop(sb, cb, sv, sp, dt)
+local function collideTop(sb, cb, sv, dt)
   if sb.bottom <= cb.top and sb.bottom + sv.y*dt > cb.top
       and sb.left < cb.right and sb.right > cb.left then
     sv.y = 0
-    sp.y = cb.top - sb.height + sb.origin.y
+    translate.bottom(sb, cb.top)
   end
 end
 
-local function collideLeft(sb, cb, sv, sp, dt)
+local function collideLeft(sb, cb, sv, dt)
   if sb.top < cb.bottom and sb.bottom > cb.top
       and sb.right <= cb.left and sb.right + sv.x*dt > cb.left then
     sv.x = 0
-    sp.x = cb.left - sb.width + sb.origin.x
+    translate.right(sb, cb.left)
   end
 end
 
-local function collideBottom(sb, cb, sv, sp, dt)
+local function collideBottom(sb, cb, sv, dt)
   if sb.top >= cb.bottom and sb.top + sv.y*dt < cb.bottom
       and sb.left < cb.right and sb.right > cb.left then
     sv.y = 0
-    sp.y = cb.bottom + sb.origin.y
+    translate.top(sb, cb.bottom)
   end
 end
 
 local function collideRectangleSides(mustCollideLeftSide, mustCollideRightSide,
-                                     sb, cb, sv, sp, dt)
+                                     sb, cb, sv, dt)
   if mustCollideLeftSide then
-    collideLeft(sb, cb, sv, sp, dt)
+    collideLeft(sb, cb, sv, dt)
   end
   if mustCollideRightSide then
-    collideRight(sb, cb, sv, sp, dt)
+    collideRight(sb, cb, sv, dt)
   end
-  collideTop(sb, cb, sv, sp, dt)
-  collideBottom(sb, cb, sv, sp, dt)
+  collideTop(sb, cb, sv, dt)
+  collideBottom(sb, cb, sv, dt)
 end
 
-local function collideRectangleCorners(sb, cb, sv, sp)
+local function collideRectangleCorners(sb, cb, sv)
   -- Avoid box overlapping
   if sb.left < cb.right and sb.right > cb.left then
     -- Top
     if sb.bottom > cb.top and sb.bottom < cb.verticalCenter then
       sv.y = 0
-      sp.y = cb.top + sb.origin.y - sb.height
+      translate.bottom(sb, cb.top)
     -- Bottom
     elseif sb.top < cb.bottom and sb.top > cb.verticalCenter then
       sv.y = 0
-      sp.y = cb.bottom + sb.origin.y
+      translate.top(sb, cb.bottom)
     end
   end
 end
 
 local function collideRectangle(collideables, collisionBoxes, positions,
-                                slope, sb, cb, sv, sp, dt)
+                                slope, sb, cb, sv, dt)
   local left, right = mustCollideSides(collideables, collisionBoxes, positions,
                                        slope, cb)
-  collideRectangleSides(left, right, sb, cb, sv, sp, dt)
+  collideRectangleSides(left, right, sb, cb, sv, dt)
   if left and right then
-    collideRectangleCorners(sb, cb, sv, sp)
+    collideRectangleCorners(sb, cb, sv)
   end
 end
 
-local function collideRightTriangleCorner(sb, cb, sv, sp, dt)
+local function collideRightTriangleCorner(sb, cb, sv, dt)
   if (sb.left >= cb.right and sb.left + sv.x*dt < cb.right)
       or (sb.left < cb.right and sb.left > cb.horizontalCenter) then
     sv.x = 0
-    sp.x = cb.right + sb.origin.x
+    translate.left(sb, cb.right)
   end
 end
 
-local function collideTopTriangleCorner(sb, cb, sv, sp, dt)
+local function collideTopTriangleCorner(sb, cb, sv, dt)
   if sb.bottom >= cb.top and sb.bottom <= cb.bottom then
-    sp.y = cb.top - sb.height + sb.origin.y
+    translate.bottom(sb, cb.top)
   end
 end
 
-local function collideLeftTriangleCorner(sb, cb, sv, sp, dt)
+local function collideLeftTriangleCorner(sb, cb, sv, dt)
   if (sb.right <= cb.left and sb.right + sv.x*dt > cb.left)
       or (sb.right > cb.left and sb.right < cb.horizontalCenter) then
     sv.x = 0
-    sp.x = cb.left - sb.width + sb.origin.x
+    translate.right(sb, cb.left)
   end
 end
 
-local function collideBottomTriangleCorner(sb, cb, sv, sp, dt)
+local function collideBottomTriangleCorner(sb, cb, sv, dt)
   if sb.top >= cb.top and sb.top <= cb.bottom then
-    sp.y = cb.bottom + sb.origin.y
+    translate.top(sb, cb.bottom)
   end
 end
 
 local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
-                                     rising, sb, cb, sv, sp, dt, slopeEntity,
+                                     rising, sb, cb, sv, dt, slopeEntity,
                                      solid, gravitational)
-  collideBottom(sb, cb, sv, sp, dt)
+  collideBottom(sb, cb, sv, dt)
   if rising then
     m = m * (-1)
     if mustCollideRight then
-      collideRight(sb, cb, sv, sp, dt)
+      collideRight(sb, cb, sv, dt)
     end
     if sb.top < cb.bottom and sb.bottom > cb.bottom then
-      collideLeftTriangleCorner(sb, cb, sv, sp, dt)
+      collideLeftTriangleCorner(sb, cb, sv, dt)
     end
     if sb.left < cb.right and sb.horizontalCenter > cb.right then
-      collideTopTriangleCorner(sb, cb, sv, sp, dt)
+      collideTopTriangleCorner(sb, cb, sv, dt)
     end
   else
     if mustCollideLeft then
-      collideLeft(sb, cb, sv, sp, dt)
+      collideLeft(sb, cb, sv, dt)
     end
     if sb.top < cb.bottom and sb.bottom > cb.bottom then
-      collideRightTriangleCorner(sb, cb, sv, sp, dt)
+      collideRightTriangleCorner(sb, cb, sv, dt)
     end
     if sb.right > cb.left and sb.horizontalCenter < cb.left then
-      collideTopTriangleCorner(sb, cb, sv, sp, dt)
+      collideTopTriangleCorner(sb, cb, sv, dt)
     end
   end
   if sb.horizontalCenter >= cb.left and sb.horizontalCenter <= cb.right
       and sb.bottom >= cb.top and sb.bottom <= cb.bottom then
-    local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
+    local ySlope = m*(sb.position.x-cb.horizontalCenter) + cb.verticalCenter
     if sb.bottom + sv.y*dt >= ySlope
         or (sb.bottom == cb.top and sb.right+sv.x*dt > cb.left) then
-      sp.y = ySlope - sb.height + sb.origin.y
       sv.y = 0
+      translate.bottom(sb, ySlope)
       solid.slope = slopeEntity
     end
     if gravitational and sv.x ~= 0 and sv.y == 0 then
-      local newX = sp.x + sv.x*dt
+      local newX = sb.position.x + sv.x*dt
       if newX <= cb.right and newX >= cb.left then
         local ySlope = m*(newX-cb.horizontalCenter) + cb.verticalCenter
-        sp.y = ySlope - sb.height + sb.origin.y
+        translate.bottom(sb, ySlope)
       end
     end
   elseif solid.slope == slopeEntity then
@@ -184,37 +184,37 @@ local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
 end
 
 local function collideDownwardTriangle(mustCollideLeft, mustCollideRight, m,
-                                       rising, sb, cb, sv, sp, dt, slopeEntity,
+                                       rising, sb, cb, sv, dt, slopeEntity,
                                        solid)
-  collideTop(sb, cb, sv, sp, dt)
+  collideTop(sb, cb, sv, dt)
   if rising then
     m = m * (-1)
     if mustCollideLeft then
-      collideLeft(sb, cb, sv, sp, dt)
+      collideLeft(sb, cb, sv, dt)
     end
     if sb.top < cb.top and sb.bottom > cb.top then
-      collideRightTriangleCorner(sb, cb, sv, sp, dt)
+      collideRightTriangleCorner(sb, cb, sv, dt)
     end
     if sb.right > cb.left and sb.horizontalCenter < cb.left then
-      collideBottomTriangleCorner(sb, cb, sv, sp, dt)
+      collideBottomTriangleCorner(sb, cb, sv, dt)
     end
   else
     if mustCollideRight then
-      collideRight(sb, cb, sv, sp, dt)
+      collideRight(sb, cb, sv, dt)
     end
     if sb.top < cb.top and sb.bottom > cb.top then
-      collideLeftTriangleCorner(sb, cb, sv, sp, dt)
+      collideLeftTriangleCorner(sb, cb, sv, dt)
     end
     if sb.left < cb.right and sb.horizontalCenter > cb.right then
-      collideBottomTriangleCorner(sb, cb, sv, sp, dt)
+      collideBottomTriangleCorner(sb, cb, sv, dt)
     end
   end
   if sb.horizontalCenter >= cb.left and sb.horizontalCenter <= cb.right
       and sb.top <= cb.bottom and sb.top >= cb.top then
-    local ySlope = m*(sp.x-cb.horizontalCenter) + cb.verticalCenter
+    local ySlope = m*(sb.position.x-cb.horizontalCenter) + cb.verticalCenter
     if sb.top + sv.y*dt <= ySlope then
       sv.y = 0
-      sp.y = ySlope + sb.origin.y
+      translate.top(sb, ySlope)
       solid.slope = slopeEntity
     end
   elseif solid.slope == slopeEntity then
@@ -223,22 +223,22 @@ local function collideDownwardTriangle(mustCollideLeft, mustCollideRight, m,
 end
 
 local function collideTriangle(collideables, collisionBoxes, positions,
-                               sb, cb, sv, sp, dt, normalPointingUp, rising,
+                               sb, cb, sv, dt, normalPointingUp, rising,
                                slope, solid, gravitational)
   local left, right = mustCollideSides(collideables, collisionBoxes, positions,
                                        solid.slope, cb)
   local m = cb.height / cb.width
   if normalPointingUp then
-    collideUpwardTriangle(left, right, m, rising, sb, cb, sv, sp, dt, slope,
+    collideUpwardTriangle(left, right, m, rising, sb, cb, sv, dt, slope,
                           solid, gravitational)
   else
-    collideDownwardTriangle(left, right, m, rising, sb, cb, sv, sp, dt, slope,
+    collideDownwardTriangle(left, right, m, rising, sb, cb, sv, dt, slope,
                             solid)
   end
 end
 
-local function collideCloud(sb, cb, sv, sp, dt)
-  collideTop(sb, cb, sv, sp, dt)
+local function collideCloud(sb, cb, sv, dt)
+  collideTop(sb, cb, sv, dt)
 end
 
 function M.update(dt, solids, collideables, collisionBoxes, positions,
@@ -261,22 +261,20 @@ function M.update(dt, solids, collideables, collisionBoxes, positions,
             or collideable.rising == nil then
           collideRectangle(collideables, collisionBoxes, positions,
                            solid.slope, translatedSB, translatedCB,
-                           solidVelocity, solidPosition, dt)
+                           solidVelocity, dt)
         else
           collideTriangle(collideables, collisionBoxes, positions,
-                          translatedSB, translatedCB, solidVelocity,
-                          solidPosition, dt, collideable.normalPointingUp,
-                          collideable.rising, collideableEntity, solid,
-                          isGravitational)
+                          translatedSB, translatedCB, solidVelocity, dt,
+                          collideable.normalPointingUp, collideable.rising,
+                          collideableEntity, solid, isGravitational)
         end
       else
-        collideCloud(translatedSB, translatedCB, solidVelocity, solidPosition,
-                     dt)
+        collideCloud(translatedSB, translatedCB, solidVelocity, dt)
       end
     end
   end
 
-  
+
 end
 
 return M
