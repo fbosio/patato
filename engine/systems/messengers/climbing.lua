@@ -23,8 +23,23 @@ local function snapClimberToTrellis(cb, tb)
   end
 end
 
-function M.update(climbers, trellises, collisionBoxes, positions, velocities,
-                  gravitationals)
+local function stopClimber(dt, cb, tb, cv)
+  if cb.left >= tb.left and cb.left + cv.x*dt < tb.left then
+    cv.x = 0
+    translate.left(cb, tb.left)
+  end
+  if cb.right <= tb.right and cb.right + cv.x*dt > tb.right then
+    cv.x = 0
+    translate.right(cb, tb.right)
+  end
+  if cb.top >= tb.top and cb.top + cv.y*dt < tb.top then
+    cv.y = 0
+    translate.top(cb, tb.top)
+  end
+end
+
+function M.update(dt, climbers, trellises, collisionBoxes, positions,
+                  velocities, gravitationals)
   for climberEntity, climber in pairs(climbers or {}) do
     local climberBox = collisionBoxes[climberEntity]
     local climberPosition = positions[climberEntity]
@@ -42,6 +57,7 @@ function M.update(climbers, trellises, collisionBoxes, positions, velocities,
         isClimberCollidingWithNoTrellises = false
         if climber.climbing then
           snapClimberToTrellis(translatedCB, translatedTB)
+          stopClimber(dt, translatedCB, translatedTB, climberVelocity)
         end
       end
     end

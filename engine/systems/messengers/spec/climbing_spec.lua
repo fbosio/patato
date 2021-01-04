@@ -1,3 +1,4 @@
+local dt = 1 / 70
 local climbing, climbers, collisionBoxes
 
 before_each(function ()
@@ -41,7 +42,7 @@ describe("with a trellis", function ()
         player = {x = 0, y = 0}
       }
       climbers.player.climbing = true
-      climbing.update(climbers, trellises, collisionBoxes, positions,
+      climbing.update(dt, climbers, trellises, collisionBoxes, positions,
                       velocities)
       assert.is.falsy(climbers.player.climbing)
     end)
@@ -54,7 +55,7 @@ describe("with a trellis", function ()
         player = {x = 0, y = 0}
       }
       climbers.player.climbing = false
-      climbing.update(climbers, trellises, collisionBoxes, positions,
+      climbing.update(dt, climbers, trellises, collisionBoxes, positions,
                       velocities)
       assert.are.same(-32, positions.player.x)
       assert.are.same(-16, positions.player.y)
@@ -65,52 +66,104 @@ describe("with a trellis", function ()
     before_each(function ()
       climbers.player.climbing = true
     end)
+
     describe("and overlapping the trellis bottom left", function ()
-      it("should match the climber and trellis left sides", function ()
+      local velocities
+      before_each(function ()
         positions.player = {x = -32, y = 32}
-        local velocities = {
+      end)
+      it("should match the climber and trellis left sides", function ()
+        velocities = {
           player = {x = 0, y = 0}
         }
-        climbing.update(climbers, trellises, collisionBoxes, positions,
+        climbing.update(dt, climbers, trellises, collisionBoxes, positions,
                         velocities)
         assert.are.same(-16, positions.player.x)
         assert.are.same(32, positions.player.y)
       end)
+      it("should prevent the player from moving left", function ()
+        velocities = {
+          player = {x = -700, y = 700}
+        }
+        climbing.update(dt, climbers, trellises, collisionBoxes, positions,
+                        velocities)
+        assert.are.same(0, velocities.player.x)
+        assert.are.same(700, velocities.player.y)
+      end)
     end)
+
     describe("and overlapping the trellis bottom right", function ()
-      it("should match the climber and trellis right sides", function ()
+      local velocities
+      before_each(function ()
         positions.player = {x = 32, y = 32}
-        local velocities = {
+      end)
+      it("should match the climber and trellis right sides", function ()
+        velocities = {
           player = {x = 0, y = 0}
         }
-        climbing.update(climbers, trellises, collisionBoxes, positions,
+        climbing.update(dt, climbers, trellises, collisionBoxes, positions,
                         velocities)
         assert.are.same(16, positions.player.x)
         assert.are.same(32, positions.player.y)
       end)
+      it("should prevent the player from moving right", function ()
+        velocities = {
+          player = {x = 700, y = 700}
+        }
+        climbing.update(dt, climbers, trellises, collisionBoxes, positions,
+                        velocities)
+        assert.are.same(0, velocities.player.x)
+        assert.are.same(700, velocities.player.y)
+      end)
     end)
+
     describe("and overlapping the trellis top left", function ()
-      it("should match the climber and trellis top left sides", function ()
+      local velocities
+      before_each(function ()
         positions.player = {x = -32, y = -96}
-        local velocities = {
+      end)
+      it("should match the climber and trellis top left sides", function ()
+        velocities = {
           player = {x = 0, y = 0}
         }
-        climbing.update(climbers, trellises, collisionBoxes, positions,
+        climbing.update(dt, climbers, trellises, collisionBoxes, positions,
                         velocities)
         assert.are.same(-16, positions.player.x)
         assert.are.same(-64, positions.player.y)
       end)
+      it("should prevent the player from moving up left", function ()
+        velocities = {
+          player = {x = -700, y = -700}
+        }
+        climbing.update(dt, climbers, trellises, collisionBoxes, positions,
+                        velocities)
+        assert.are.same(0, velocities.player.x)
+        assert.are.same(0, velocities.player.y)
+      end)
     end)
+    
     describe("and overlapping the trellis top right", function ()
-      it("should match the climber and trellis top right sides", function ()
+      local velocities
+      before_each(function ()
         positions.player = {x = 32, y = -96}
-        local velocities = {
+      end)
+      it("should match the climber and trellis top right sides", function ()
+        velocities = {
           player = {x = 0, y = 0}
         }
-        climbing.update(climbers, trellises, collisionBoxes, positions,
+        climbing.update(dt, climbers, trellises, collisionBoxes, positions,
                         velocities)
         assert.are.same(16, positions.player.x)
         assert.are.same(-64, positions.player.y)
+      end)
+      it("should prevent the player from moving up right", function ()
+        velocities = {
+          player = {x = 700, y = -700}
+        }
+        climbing.update(dt, climbers, trellises, collisionBoxes, positions,
+                        velocities)
+        assert.are.same(0, velocities.player.x)
+        assert.are.same(0, velocities.player.y)
       end)
     end)
   end)
