@@ -16,4 +16,9 @@ function M.getTranslatedBox(position, box)
   }
 end
 
+function M.areOverlapped(tbox1, tbox2)
+  return tbox1.left <= tbox2.right and tbox1.right >= tbox2.left
+    and tbox1.top <= tbox2.bottom and tbox1.bottom >= tbox2.top
+end
+
 return M

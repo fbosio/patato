@@ -1,5 +1,7 @@
 local helpers = require "engine.systems.messengers.helpers"
 local getTranslatedBox = helpers.getTranslatedBox
+local areOverlapped = helpers.areOverlapped
+
 
 local M = {}
 
@@ -11,21 +13,21 @@ function M.update(climbers, trellises, collisionBoxes, positions, velocities,
     local climberVelocity = velocities[climberEntity]
     local isGravitational = (gravitationals or {})[climberEntity]
     local translatedCB = getTranslatedBox(climberPosition, climberBox)
-    
+
     local isClimberCollidingWithNoTrellises = true
     for trellisEntity, trellis in pairs(trellises or {}) do
       local trellisBox = collisionBoxes[trellisEntity]
       local trellisPosition = positions[trellisEntity]
       local translatedTB = getTranslatedBox(trellisPosition, trellisBox)
-      
-      if translatedCB.left <= translatedTB.right
-          and translatedCB.right >= translatedTB.left
-          and translatedCB.top <= translatedTB.bottom
-          and translatedCB.bottom >= translatedTB.top then
+
+      if areOverlapped(translatedCB, translatedTB) then
         isClimberCollidingWithNoTrellises = false
+        if climber.climbing then
+          climberPosition.x = translatedTB.left + translatedCB.origin.x
+        end
       end
     end
-  
+
     if isClimberCollidingWithNoTrellises then
       climber.climbing = false
     end
