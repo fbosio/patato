@@ -13,7 +13,8 @@ function M.update(dt, components, collectableEffects)
                     components.position, components.garbage)
   collision.update(dt, components.solid, components.collideable,
                    components.collisionBox, components.position,
-                   components.velocity, components.gravitational)
+                   components.velocity, components.gravitational,
+                   components.climber)
 end
 
 return M

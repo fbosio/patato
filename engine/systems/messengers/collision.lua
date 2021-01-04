@@ -39,6 +39,12 @@ local function mustCollideSides(collideables, collisionBoxes, positions,
   return mustCollideLeft, mustCollideRight
 end
 
+local function unblockClimber(climber)
+  climber = climber or {}
+  climber.climbing = false
+  climber.trellis = nil
+end
+
 local function collideRight(sb, cb, sv, dt)
   if sb.top < cb.bottom and sb.bottom > cb.top
       and sb.left >= cb.right and sb.left + sv.x*dt < cb.right then
@@ -47,11 +53,12 @@ local function collideRight(sb, cb, sv, dt)
   end
 end
 
-local function collideTop(sb, cb, sv, dt)
+local function collideTop(sb, cb, sv, dt, climber)
   if sb.bottom <= cb.top and sb.bottom + sv.y*dt > cb.top
       and sb.left < cb.right and sb.right > cb.left then
     sv.y = 0
     translate.bottom(sb, cb.top)
+    unblockClimber(climber)
   end
 end
 
@@ -72,24 +79,25 @@ local function collideBottom(sb, cb, sv, dt)
 end
 
 local function collideRectangleSides(mustCollideLeftSide, mustCollideRightSide,
-                                     sb, cb, sv, dt)
+                                     sb, cb, sv, dt, climber)
   if mustCollideLeftSide then
     collideLeft(sb, cb, sv, dt)
   end
   if mustCollideRightSide then
     collideRight(sb, cb, sv, dt)
   end
-  collideTop(sb, cb, sv, dt)
+  collideTop(sb, cb, sv, dt, climber)
   collideBottom(sb, cb, sv, dt)
 end
 
-local function collideRectangleCorners(sb, cb, sv)
+local function collideRectangleCorners(sb, cb, sv, climber)
   -- Avoid box overlapping
   if sb.left < cb.right and sb.right > cb.left then
     -- Top
     if sb.bottom > cb.top and sb.bottom < cb.verticalCenter then
       sv.y = 0
       translate.bottom(sb, cb.top)
+      unblockClimber(climber)
     -- Bottom
     elseif sb.top < cb.bottom and sb.top > cb.verticalCenter then
       sv.y = 0
@@ -99,12 +107,12 @@ local function collideRectangleCorners(sb, cb, sv)
 end
 
 local function collideRectangle(collideables, collisionBoxes, positions,
-                                slope, sb, cb, sv, dt)
+                                slope, sb, cb, sv, dt, climber)
   local left, right = mustCollideSides(collideables, collisionBoxes, positions,
                                        slope, cb)
-  collideRectangleSides(left, right, sb, cb, sv, dt)
+  collideRectangleSides(left, right, sb, cb, sv, dt, climber)
   if left and right then
-    collideRectangleCorners(sb, cb, sv)
+    collideRectangleCorners(sb, cb, sv, climber)
   end
 end
 
@@ -224,7 +232,7 @@ end
 
 local function collideTriangle(collideables, collisionBoxes, positions,
                                sb, cb, sv, dt, normalPointingUp, rising,
-                               slope, solid, gravitational)
+                               slope, solid, gravitational, climber)
   local left, right = mustCollideSides(collideables, collisionBoxes, positions,
                                        solid.slope, cb)
   local m = cb.height / cb.width
@@ -237,18 +245,19 @@ local function collideTriangle(collideables, collisionBoxes, positions,
   end
 end
 
-local function collideCloud(sb, cb, sv, dt)
+local function collideCloud(sb, cb, sv, dt, climber)
   collideTop(sb, cb, sv, dt)
 end
 
 function M.update(dt, solids, collideables, collisionBoxes, positions,
-                  velocities, gravitationals)
+                  velocities, gravitationals, climbers)
   for solidEntity, solid in pairs(solids or {}) do
     local solidBox = collisionBoxes[solidEntity]
     local solidPosition = positions[solidEntity]
     local solidVelocity = velocities[solidEntity]
     gravitationals = gravitationals or {}
     local isGravitational = (gravitationals[solidEntity] or {}).enabled
+    local climber = (climbers or {})[solidEntity]
     local translatedSB = getTranslatedBox(solidPosition, solidBox)
 
     for collideableEntity, collideable in pairs(collideables or {}) do
@@ -262,15 +271,15 @@ function M.update(dt, solids, collideables, collisionBoxes, positions,
             or collideable.rising == nil then
           collideRectangle(collideables, collisionBoxes, positions,
                            solid.slope, translatedSB, translatedCB,
-                           solidVelocity, dt)
+                           solidVelocity, dt, climber)
         else
           collideTriangle(collideables, collisionBoxes, positions,
                           translatedSB, translatedCB, solidVelocity, dt,
                           collideable.normalPointingUp, collideable.rising,
-                          collideableEntity, solid, isGravitational)
+                          collideableEntity, solid, isGravitational, climber)
         end
       else
-        collideCloud(translatedSB, translatedCB, solidVelocity, dt)
+        collideCloud(translatedSB, translatedCB, solidVelocity, dt, climber)
       end
     end
   end

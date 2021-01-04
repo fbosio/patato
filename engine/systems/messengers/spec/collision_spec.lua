@@ -1,5 +1,5 @@
 local dt = 1 / 70
-local collider, solids, collisionBoxes, gravitationals
+local collider, solids, collisionBoxes, gravitationals, climbers
 
 before_each(function ()
   collider = require "engine.systems.messengers.collision"
@@ -34,6 +34,7 @@ before_each(function ()
     }
   }
   gravitationals = {}
+  climbers = {}
 end)
 
 after_each(function ()
@@ -124,35 +125,53 @@ describe("with a block", function ()
       collider.update(dt, solids, collideables, collisionBoxes, positions,
                       velocities)
 
-    assert.are.same(476, positions.player.y)
-    assert.are.same(0, velocities.player.y)
+      assert.are.same(476, positions.player.y)
+      assert.are.same(0, velocities.player.y)
     end)
   end)
 
   describe("and a player contacting its top", function ()
-    local positions = {
-      player = {
-        x = 346,
-        y = 338
-      },
-      block = {
-        x = 320,
-        y = 380
+    local positions, velocities
+    
+    before_each(function ()
+      positions = {
+        player = {
+          x = 346,
+          y = 338
+        },
+        block = {
+          x = 320,
+          y = 380
+        }
       }
-    }
-    local velocities = {
-      player = {
-        x = 0,
-        y = 1400
+      velocities = {
+        player = {
+          x = 0,
+          y = 1400
+        }
       }
-    }
+      climbers = {
+        player = {
+          climbing = true,
+          trellis = "trellis"
+        }
+      }
+    end)
 
     it("should stop the player and push it to the top", function ()
       collider.update(dt, solids, collideables, collisionBoxes, positions,
                       velocities)
 
-    assert.are.same(348, positions.player.y)
-    assert.are.same(0, velocities.player.y)
+      assert.are.same(348, positions.player.y)
+      assert.are.same(0, velocities.player.y)
+    end)
+
+    it("should not snap the the climber to the trellis", function ()
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                      velocities, nil, climbers)
+      
+      assert.is.falsy(climbers.player.climbing)
+      assert.is.falsy(climbers.player.trellis)
     end)
   end)
 
@@ -184,29 +203,46 @@ describe("with a block", function ()
   end)
 
   describe("and a player overlapping it from top right", function ()
-    local positions = {
-      player = {
-        x = 426,
-        y = 290
-      },
-      block = {
-        x = 400,
-        y = 300
+    local positions, velocities
+    before_each(function ()
+      positions = {
+        player = {
+          x = 426,
+          y = 290
+        },
+        block = {
+          x = 400,
+          y = 300
+        }
       }
-    }
-    local velocities = {
-      player = {
-        x = 0,
-        y = 0
+      velocities = {
+        player = {
+          x = 0,
+          y = 0
+        }
       }
-    }
+      climbers = {
+        player = {
+          climbing = true,
+          trellis = "trellis"
+        }
+      }
+    end)
 
     it("should push the player to the top", function ()
       collider.update(dt, solids, collideables, collisionBoxes, positions,
                       velocities)
 
-    assert.are.same(426, positions.player.x)
-    assert.are.same(268, positions.player.y)
+      assert.are.same(426, positions.player.x)
+      assert.are.same(268, positions.player.y)
+    end)
+
+    it("should not snap the the climber to the trellis", function ()
+      collider.update(dt, solids, collideables, collisionBoxes, positions,
+                      velocities, nil, climbers)
+      
+      assert.is.falsy(climbers.player.climbing)
+      assert.is.falsy(climbers.player.trellis)
     end)
   end)
 
