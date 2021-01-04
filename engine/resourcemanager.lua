@@ -367,8 +367,18 @@ function M.setInputs(world, entityName, actionCommands)
       end
     end
     if mustBeSet then
-      commands[command] = commands[command] or {}
-      commands[command][entityName] = action
+      local isCommandStored = false
+      for k, actionEntities in pairs(commands) do
+        if k == command then
+          actionEntities[entityName] = action
+          isCommandStored = true
+          break
+        end
+      end
+      if not isCommandStored then
+        commands[command] = commands[command] or {}
+        commands[command][entityName] = action
+      end
       local entities = M.entityTagger.getIds(entityName)
       for _, entity in ipairs(entities or {}) do
         setComponentAttribute(world, "input", entity, action, false)

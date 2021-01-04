@@ -187,7 +187,7 @@ describe("setting input to an entity that is not in config", function ()
   before_each(function ()
     world = resourcemanager.buildWorld{}
 
-    walkLeft = command.new{hold = true, key = "left"}
+    walkLeft = command.new{key = "left"}
     resourcemanager.setInputs(world, "player", {walkLeft = walkLeft})
   end)
 
@@ -213,10 +213,10 @@ describe("loading an entity with an input", function ()
     }
     world = resourcemanager.buildWorld(config)
     
-    walkLeft = command.new{hold = true, key = "left"}
-    walkRight = command.new{hold = true, key = "right"}
-    walkUp = command.new{hold = true, key = "up"}
-    walkDown = command.new{hold = true, key = "down"}
+    walkLeft = command.new{key = "left"}
+    walkRight = command.new{key = "right"}
+    walkUp = command.new{key = "up"}
+    walkDown = command.new{key = "down"}
     resourcemanager.setInputs(world, "player", {
       walkLeft = walkLeft,
       walkRight = walkRight,
@@ -265,8 +265,8 @@ describe("loading two entities that share the same input", function ()
     }
     local world = resourcemanager.buildWorld(config)
     
-    local walkLeft = command.new{hold = true, key = "left"}
-    local walkRight = command.new{hold = true, key = "right"}
+    local walkLeft = command.new{key = "left"}
+    local walkRight = command.new{key = "right"}
     resourcemanager.setInputs(world, "ryu", {
       walkLeft = walkLeft,
       walkRight = walkRight
@@ -280,6 +280,42 @@ describe("loading two entities that share the same input", function ()
                      world.hid.commands[walkLeft])
     assert.are.same({ryu = "walkRight", ken = "walkRight"},
                      world.hid.commands[walkRight])
+  end)
+end)
+
+describe("setting two equal commands with different references", function ()
+  it("should map all the actions to the first command", function ()
+    local config = {
+      entities = {
+        ryu = {
+          input = true
+        },
+        ken = {
+          input = true
+        }
+      }
+    }
+    local world = resourcemanager.buildWorld(config)
+    
+    local walkLeftRyu = command.new{key = "left"}
+    local walkLeftKen = command.new{key = "left"}
+    local walkRightRyu = command.new{key = "right"}
+    local walkRightKen = command.new{key = "right"}
+    resourcemanager.setInputs(world, "ryu", {
+      walkLeft = walkLeftRyu,
+      walkRight = walkRightRyu
+    })
+    resourcemanager.setInputs(world, "ken", {
+      walkLeft = walkLeftKen,
+      walkRight = walkRightKen
+    })
+
+    assert.are.same({ryu = "walkLeft", ken = "walkLeft"},
+                     world.hid.commands[walkLeftRyu])
+    assert.are.same({ryu = "walkRight", ken = "walkRight"},
+                     world.hid.commands[walkRightRyu])
+    assert.is.falsy(world.hid.commands[walkLeftKen])
+    assert.is.falsy(world.hid.commands[walkRightKen])
   end)
 end)
 
@@ -300,10 +336,10 @@ describe("loading an entity with movement input and lacking keys", function ()
     local world = resourcemanager.buildWorld(config)
 
     resourcemanager.setInputs(world, "player", {
-      walkLeft = command.new{hold = true, key = "left2"},
-      walkRight = command.new{hold = true, key = "right2"},
-      walkUp = command.new{hold = true, key = "up2"},
-      walkDown = command.new{hold = true, key = "down2"}
+      walkLeft = command.new{key = "left2"},
+      walkRight = command.new{key = "right2"},
+      walkUp = command.new{key = "up2"},
+      walkDown = command.new{key = "down2"}
     })
 
     local playerId = entityTagger.getId("player")
@@ -333,10 +369,10 @@ describe("loading an entity with movement input and keys", function ()
     local world = resourcemanager.buildWorld(config)
 
     resourcemanager.setInputs(world, "player", {
-      walkLeft = command.new{hold = true, key = "left2"},
-      walkRight = command.new{hold = true, key = "right2"},
-      walkUp = command.new{hold = true, key = "up2"},
-      walkDown = command.new{hold = true, key = "down2"}
+      walkLeft = command.new{key = "left2"},
+      walkRight = command.new{key = "right2"},
+      walkUp = command.new{key = "up2"},
+      walkDown = command.new{key = "down2"}
     })
 
     local playerId = entityTagger.getId("player")
@@ -425,10 +461,10 @@ describe("bulding world with nonempty menu and other entities", function ()
     }
     world = resourcemanager.buildWorld(config)
     resourcemanager.setInputs(world, "playerOne", {
-      walkLeft =  command.new{hold = "true", key = "left"},
-      walkRight = command.new{hold = "true", key = "right"},
-      walkUp = command.new{hold = "true", key = "up"},
-      walkDown = command.new{hold = "true", key = "down"}
+      walkLeft =  command.new{key = "left"},
+      walkRight = command.new{key = "right"},
+      walkUp = command.new{key = "up"},
+      walkDown = command.new{key = "down"}
     })
     resourcemanager.setInputs(world, "mainMenu", {
       menuPrevious = command.new{key = "up"},
@@ -494,8 +530,8 @@ describe("loading a level with defined entity and position", function ()
 
     local world = resourcemanager.buildWorld(config)
     resourcemanager.setInputs(world, "sonic", {
-      walkLeft = command.new{hold = true, key = "left"},
-      walkRight = command.new{hold = true, key = "right"}
+      walkLeft = command.new{key = "left"},
+      walkRight = command.new{key = "right"}
     })
 
     local playerId = entityTagger.getId("sonic")
@@ -526,8 +562,8 @@ describe("load two levels and the name of the first one", function ()
 
     local world = resourcemanager.buildWorld(config)
     resourcemanager.setInputs(world, "sonic", {
-      walkLeft = command.new{hold = true, key = "left"},
-      walkRight = command.new{hold = true, key = "right"}
+      walkLeft = command.new{key = "left"},
+      walkRight = command.new{key = "right"}
     })
 
     local playerId = entityTagger.getId("sonic")
