@@ -61,7 +61,12 @@ function M.update(dt, climbers, trellises, collisionBoxes, positions,
             snapClimberToTrellis(translatedCB, translatedTB)
             stopClimber(dt, translatedCB, translatedTB, climberVelocity)
             gravitationalEntity.enabled = false
+            climber.trellis = trellisEntity
+          else
+            climber.trellis = nil
           end
+        else
+          climber.trellis = nil
         end
       end
     end

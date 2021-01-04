@@ -15,56 +15,61 @@ function love.load()
     engine.startGame("secretLevel")
   end)
 
-  engine.setAction("showCustomMessage", function ()
-    message = "Flashlight!"
-  end)
-  engine.setAction("hideCustomMessage", function ()
-    message = ""
-  end)
   engine.setAction("walkLeft", function (c)
     c.velocity.x = -c.impulseSpeed.walk
     c.animation.name = "walking"
   end)
-  engine.setAction("walkUp", function (c)
-    c.velocity.y = -c.impulseSpeed.walk
-    c.animation.name = "walking"
-  end)
-  engine.setAction("walkDown", function (c)
-    c.velocity.y = c.impulseSpeed.walk
+  engine.setAction("walkRight", function (c)
+    c.velocity.x = c.impulseSpeed.walk
     c.animation.name = "walking"
   end)
   engine.setAction("stopWalkingHorizontally", function (c)
     c.velocity.x = 0
     c.animation.name = "standing"
   end)
-  engine.setAction("stopWalkingVertically", function (c)
-    c.velocity.y = 0
-    c.animation.name = "standing"
-  end)
   engine.setAction("jump", function (c)
-    if c.velocity.y == 0 then
+    if c.climber.climbing then
+      c.climber.climbing = false
+      c.velocity.y = -c.impulseSpeed.jump
+      c.gravitational.enabled = true
+    elseif c.velocity.y == 0 then
       c.velocity.y = -c.impulseSpeed.jump
     end
   end)
-
+  engine.setAction("startClimb", function (c)
+    c.climber.climbing = true
+  end)
+  engine.setAction("climbUp", function (c)
+    if c.climber.climbing and c.climber.trellis then
+      c.velocity.y = -c.impulseSpeed.climb
+    end
+  end)
+  engine.setAction("climbDown", function (c)
+    if c.climber.climbing and c.climber.trellis then
+      c.velocity.y = c.impulseSpeed.climb
+    end
+  end)
+  engine.setAction("stopClimbingVertically", function (c)
+    if c.climber.climbing then
+      c.velocity.y = 0
+    end
+  end)
+  
   engine.setInputs("patato", {
     walkLeft = engine.command{key = "left"},
     walkRight = engine.command{key = "right"},
+    startClimb = engine.command{keys = {"up", "down"}, oneShot = true},
     climbUp = engine.command{key = "up"},
     climbDown = engine.command{key = "down"},
---    walkUp = engine.command{key = "up"},
---    walkDown = engine.command{key = "down"},
     stopWalkingHorizontally = engine.command{
       keys = {"left", "right"},
       release = true
     },
-    stopWalkingVertically = engine.command{
+    stopClimbingVertically = engine.command{
       keys = {"up", "down"},
       release = true
     },
-    jump = engine.command{key = "jump", oneShot = true},
-    showCustomMessage = engine.command{key = "message"},
-    hideCustomMessage = engine.command{key = "message", release = true}
+    jump = engine.command{key = "jump", oneShot = true}
   })
   engine.setInputs("mainMenu", {
     menuPrevious = engine.command{key = "up", oneShot = true},
@@ -75,29 +80,6 @@ function love.load()
   score = 0
   engine.setCollectableEffect("bottle", function ()
     score = score + 1
-  end)
-
-  engine.setAction("walkRight", function (c)
-    c.velocity.x = c.impulseSpeed.walk
-    c.animation.name = "walking"
-  end)
-
-
-  engine.setAction("climbUp", function (c)
-    if c.climber.climbing then
-      c.velocity.y = -c.impulseSpeed.climb
---      c.animation.name = "climbingUp"
-    else
-      c.climber.climbing = true
-    end
-  end)
-  engine.setAction("climbDown", function (c)
-    if c.climber.climbing then
-      c.velocity.y = c.impulseSpeed.climb
---      c.animation.name = "climbingUp"
-    else
-      c.climber.climbing = true
-    end
   end)
 end
 

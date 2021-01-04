@@ -42,9 +42,11 @@ describe("with a trellis", function ()
         player = {x = 0, y = 0}
       }
       climbers.player.climbing = true
+      climbers.player.trellis = "trellis"
       climbing.update(dt, climbers, trellises, collisionBoxes, positions,
                       velocities)
       assert.is.falsy(climbers.player.climbing)
+      assert.is.falsy(climbers.player.trellis)
     end)
   end)
 
@@ -59,6 +61,7 @@ describe("with a trellis", function ()
                       velocities)
       assert.are.same(-32, positions.player.x)
       assert.are.same(-16, positions.player.y)
+      assert.is.falsy(climbers.player.trellis)
     end)
   end)
 
@@ -80,6 +83,7 @@ describe("with a trellis", function ()
                         velocities)
         assert.are.same(-16, positions.player.x)
         assert.are.same(32, positions.player.y)
+        assert.are.same("trellis", climbers.player.trellis)
       end)
       it("should prevent the player from moving left", function ()
         velocities = {
@@ -105,6 +109,7 @@ describe("with a trellis", function ()
                         velocities)
         assert.are.same(16, positions.player.x)
         assert.are.same(32, positions.player.y)
+        assert.are.same("trellis", climbers.player.trellis)
       end)
       it("should prevent the player from moving right", function ()
         velocities = {
@@ -130,6 +135,7 @@ describe("with a trellis", function ()
                         velocities)
         assert.are.same(-16, positions.player.x)
         assert.are.same(-64, positions.player.y)
+        assert.are.same("trellis", climbers.player.trellis)
       end)
       it("should prevent the player from moving up left", function ()
         velocities = {
@@ -155,6 +161,7 @@ describe("with a trellis", function ()
                         velocities)
         assert.are.same(16, positions.player.x)
         assert.are.same(-64, positions.player.y)
+        assert.are.same("trellis", climbers.player.trellis)
       end)
       it("should prevent the player from moving up right", function ()
         velocities = {
@@ -199,6 +206,24 @@ describe("with a trellis", function ()
                       velocities, gravitationals)
       
       assert.is.truthy(gravitationals.player.enabled)
+    end)
+  end)
+
+  describe("and a gravitational entity jumping off the trellis", function ()
+    it("should unset trellis reference of the climber", function ()
+      local gravitationals = {
+        player = {enabled = false}
+      }
+      positions.player = {x = 0, y = 0}
+      climbers.player.climbing = false
+      climbers.player.trellis = "trellis"
+      local velocities = {
+        player = {x = 0, y = -100}
+      }
+      climbing.update(dt, climbers, trellises, collisionBoxes, positions,
+                      velocities, gravitationals)
+      
+      assert.is.falsy(climbers.player.trellis)
     end)
   end)
 end)

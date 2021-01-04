@@ -32,6 +32,9 @@ before_each(function ()
       },
       [command.new{key = "start", oneShot = true}] = {
         mainMenu = "menuSelect"
+      },
+      [command.new{keys = {"up", "down"}, oneShot = true}] = {
+        playerOne = "startClimb"
       }
     },
     actions = {
@@ -58,7 +61,10 @@ before_each(function ()
       end,
       changeAnimationToWalking = function (c)
         c.animation.name = "walking"
-      end
+      end,
+      startClimb = function (c)
+        c.climber.climbing = true
+      end,
     }
   }
   entityTaggerMock = {}
@@ -366,7 +372,7 @@ describe("with a menu", function ()
   end)
 end)
 
-describe("loading a player wih animation and one without it", function ()
+describe("loading a player with animation and one without it", function ()
   local components
 
   before_each(function ()
@@ -392,18 +398,59 @@ describe("loading a player wih animation and one without it", function ()
   end)
 
   describe("and pressing D key", function ()
-    before_each(function ()
+    it("should change player one animation", function ()
       local loveMock = {keyboard = {}}
       loveMock.keyboard.isDown = function (key)
         return key == "d"
       end
       controller.load(loveMock, entityTaggerMock)
-    end)
-
-    it("should change player one animation", function ()
+      
       controller.update(hid, components)
 
       assert.are.same("walking", components.animation.playerOne.name)
+    end)
+  end)
+end)
+
+describe("loading a climber player", function ()
+  local components
+
+  before_each(function ()
+    components = {
+      input = {
+        playerOne = {
+          startClimb = false
+        }
+      },
+      velocity = {
+        playerOne = {x = 0, y = 0}
+      },
+      impulseSpeed = {
+        playerOne = {walk = 400}
+      },
+      climber = {
+        playerOne = {climbing = false}
+      }
+    }
+  end)
+
+  describe("and pressing W key", function ()
+    it("should start climbing", function ()
+      controller.load({}, entityTaggerMock)
+      
+      controller.keypressed("w", hid, components)
+
+      assert.is.truthy(components.climber.playerOne.climbing)
+    end)
+  end)
+
+  describe("and pressing S key", function ()
+    it("should start climbing", function ()
+      controller.load({}, entityTaggerMock)
+      
+      controller.keypressed("s", hid, components)
+
+      assert.is.truthy(components.climber.playerOne.climbing)
     end)
   end)
 end)

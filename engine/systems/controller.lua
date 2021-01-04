@@ -46,11 +46,12 @@ end
 function M.update(hid, components)
   for command, commandActions in pairs(hid.commands or {}) do
     if not command.oneShot and not command.release then
-      local mustExecute = true
+      
+      local mustExecute = false
       for _, commandKey in ipairs(command.keys or {}) do
         local physicalKey = hid.keys[commandKey]
-        if not M.love.keyboard.isDown(physicalKey) then
-          mustExecute = false
+        if M.love.keyboard.isDown(physicalKey) then
+          mustExecute = true
           break
         end
       end

@@ -37,7 +37,8 @@ M.entities = {
     gravitational = true,
     climber = true,
     impulseSpeed = {
-      climb = 200
+      climb = 200,
+      climbJump = 700
     }
   },
    bee = {
@@ -87,7 +88,7 @@ M.levels = {
       {200, 250, 300, 350},  -- block: x1, y1, x2, y2
       {100, 450, 700, 350},
       {200, 450, 300, 550},
-      {300, 80, 600}  -- cloud: x1, y1, x2
+      {300, 80, 500}  -- cloud: x1, y1, x2
     },
     slopes = {
       {100, 90, 20, 200},
@@ -96,7 +97,7 @@ M.levels = {
       {100, 450, 200, 550},
       {400, 450, 300, 550},
     },
-    trellises = {420, 120, 680, 200},
+    trellises = {420, 20, 680, 200},
   },
   secretLevel = {
     patato = {200, 500},
