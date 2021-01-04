@@ -2,7 +2,7 @@ M = {}
 
 function M.drag(dt, velocities, gravitationals, gravity)
   for entity, gravitational in pairs(gravitationals or {}) do
-    if gravitational then
+    if gravitational.enabled then
       local velocity = velocities[entity]
       velocity.y = velocity.y + gravity*dt
     end

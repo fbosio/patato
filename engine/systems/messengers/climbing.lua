@@ -45,25 +45,30 @@ function M.update(dt, climbers, trellises, collisionBoxes, positions,
     local climberPosition = positions[climberEntity]
     local climberVelocity = velocities[climberEntity]
     local translatedCB = getTranslatedBox(climberPosition, climberBox)
-    local gravitationals = gravitationals or {}
+    gravitationals = gravitationals or {}
+    local gravitationalEntity = gravitationals[climberEntity] or {}
 
     local isClimberCollidingWithNoTrellises = true
-    for trellisEntity, trellis in pairs(trellises or {}) do
-      local trellisBox = collisionBoxes[trellisEntity]
-      local trellisPosition = positions[trellisEntity]
-      local translatedTB = getTranslatedBox(trellisPosition, trellisBox)
+    for trellisEntity, isTrellis in pairs(trellises or {}) do
+      if isTrellis then
+        local trellisBox = collisionBoxes[trellisEntity]
+        local trellisPosition = positions[trellisEntity]
+        local translatedTB = getTranslatedBox(trellisPosition, trellisBox)
 
-      if areOverlapped(translatedCB, translatedTB) then
-        isClimberCollidingWithNoTrellises = false
-        if climber.climbing then
-          snapClimberToTrellis(translatedCB, translatedTB)
-          stopClimber(dt, translatedCB, translatedTB, climberVelocity)
+        if areOverlapped(translatedCB, translatedTB) then
+          isClimberCollidingWithNoTrellises = false
+          if climber.climbing then
+            snapClimberToTrellis(translatedCB, translatedTB)
+            stopClimber(dt, translatedCB, translatedTB, climberVelocity)
+            gravitationalEntity.enabled = false
+          end
         end
       end
     end
 
     if isClimberCollidingWithNoTrellises then
       climber.climbing = false
+      gravitationalEntity.enabled = true
     end
   end
 end

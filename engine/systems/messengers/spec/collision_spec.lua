@@ -527,7 +527,7 @@ describe("with a slope", function ()
       end)
       describe("and a non-gravitational entity going left", function ()
         before_each(function ()
-          gravitationals.player = false
+          gravitationals.player = {enabled = false}
           positions.player = {
             x = 336,
             y = 348
@@ -547,7 +547,7 @@ describe("with a slope", function ()
       end)
       describe("and a gravitational entity going left", function ()
         before_each(function ()
-          gravitationals.player = true
+          gravitationals.player = {enabled = true}
           positions.player = {
             x = 336,
             y = 348
@@ -833,7 +833,7 @@ describe("with a slope", function ()
       end)
       describe("and a non-gravitational entity going right", function ()
         before_each(function ()
-          gravitationals.player = false
+          gravitationals.player = {enabled = false}
           positions.player = {
             x = 304,
             y = 348
@@ -853,7 +853,7 @@ describe("with a slope", function ()
       end)
       describe("and a gravitational entity going right", function ()
         before_each(function ()
-          gravitationals.player = true
+          gravitationals.player = {enabled = true}
           positions.player = {
             x = 304,
             y = 348

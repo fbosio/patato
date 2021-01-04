@@ -132,7 +132,8 @@ local stateBuilders = {
            .. name .. "\"")
   end,
   gravitational = function (world, isGravitational, entity)
-    setComponent(world, "gravitational", entity, isGravitational)
+    setComponentAttribute(world, "gravitational", entity, "enabled",
+                          isGravitational)
     createDefaultPosition(world, entity)
     createDefaultVelocity(world, entity)
   end,

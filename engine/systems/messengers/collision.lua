@@ -247,7 +247,8 @@ function M.update(dt, solids, collideables, collisionBoxes, positions,
     local solidBox = collisionBoxes[solidEntity]
     local solidPosition = positions[solidEntity]
     local solidVelocity = velocities[solidEntity]
-    local isGravitational = (gravitationals or {})[solidEntity]
+    gravitationals = gravitationals or {}
+    local isGravitational = (gravitationals[solidEntity] or {}).enabled
     local translatedSB = getTranslatedBox(solidPosition, solidBox)
 
     for collideableEntity, collideable in pairs(collideables or {}) do

@@ -46,7 +46,7 @@ describe("receiving an entity with nonzero velocity", function ()
 
 end)
 
-describe("receiving gravity and a gravitational entity", function ()
+describe("receiving gravity and a enabled gravitational entity", function ()
   it("should upate the velocity of the entity", function ()
     local velocities = {
       anvil = {
@@ -54,7 +54,19 @@ describe("receiving gravity and a gravitational entity", function ()
         y = 0
       }
     }
-    local positions = {
+    local gravity = 7000
+    local gravitationals = {
+      anvil = {enabled = true}
+    }
+    transporter.drag(dt, velocities, gravitationals, gravity)
+
+    assert.are.same(100, velocities.anvil.y)
+  end)
+end)
+
+describe("receiving gravity and a disabled gravitational entity", function ()
+  it("should upate the velocity of the entity", function ()
+    local velocities = {
       anvil = {
         x = 0,
         y = 0
@@ -62,10 +74,10 @@ describe("receiving gravity and a gravitational entity", function ()
     }
     local gravity = 7000
     local gravitationals = {
-      anvil = true
+      anvil = {enabled = false}
     }
     transporter.drag(dt, velocities, gravitationals, gravity)
 
-    assert.are.same(100, velocities.anvil.y)
+    assert.are.same(0, velocities.anvil.y)
   end)
 end)

@@ -141,7 +141,7 @@ describe("with a trellis", function ()
         assert.are.same(0, velocities.player.y)
       end)
     end)
-    
+
     describe("and overlapping the trellis top right", function ()
       local velocities
       before_each(function ()
@@ -165,6 +165,40 @@ describe("with a trellis", function ()
         assert.are.same(0, velocities.player.x)
         assert.are.same(0, velocities.player.y)
       end)
+    end)
+  end)
+
+  describe("and a gravitational climber climbing", function ()
+    it("should disable the gravitational component", function ()
+      local gravitationals = {
+        player = {enabled = true}
+      }
+      positions.player = {x = 0, y = -16}
+      climbers.player.climbing = true
+      local velocities = {
+        player = {x = 0, y = 0}
+      }
+      climbing.update(dt, climbers, trellises, collisionBoxes, positions,
+                      velocities, gravitationals)
+      
+      assert.is.falsy(gravitationals.player.enabled)
+    end)
+  end)
+
+  describe("and a gravitational climber not climbing", function ()
+    it("should enable the gravitational component", function ()
+      local gravitationals = {
+        player = {enabled = false}
+      }
+      positions.player = {x = 96, y = 0}
+      climbers.player.climbing = false
+      local velocities = {
+        player = {x = 0, y = 0}
+      }
+      climbing.update(dt, climbers, trellises, collisionBoxes, positions,
+                      velocities, gravitationals)
+      
+      assert.is.truthy(gravitationals.player.enabled)
     end)
   end)
 end)
