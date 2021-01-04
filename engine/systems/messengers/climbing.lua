@@ -6,6 +6,23 @@ local translate = helpers.translate
 
 local M = {}
 
+--[[
+  cb = climber box,
+  tb = trellis box,
+]]
+
+local function snapClimberToTrellis(cb, tb)
+  if cb.left < tb.left then
+    translate.left(cb, tb.left)
+  end
+  if cb.right > tb.right then
+    translate.right(cb, tb.right)
+  end
+  if cb.top < tb.top then
+    translate.top(cb, tb.top)
+  end
+end
+
 function M.update(climbers, trellises, collisionBoxes, positions, velocities,
                   gravitationals)
   for climberEntity, climber in pairs(climbers or {}) do
@@ -24,7 +41,7 @@ function M.update(climbers, trellises, collisionBoxes, positions, velocities,
       if areOverlapped(translatedCB, translatedTB) then
         isClimberCollidingWithNoTrellises = false
         if climber.climbing then
-          translate.left(translatedCB, translatedTB.left)
+          snapClimberToTrellis(translatedCB, translatedTB)
         end
       end
     end
