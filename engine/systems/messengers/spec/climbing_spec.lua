@@ -68,6 +68,7 @@ describe("with a trellis", function ()
   describe("and a climber climbing", function ()
     before_each(function ()
       climbers.player.climbing = true
+      climbers.player.trellis = "trellis"
     end)
 
     describe("and overlapping the trellis bottom left", function ()

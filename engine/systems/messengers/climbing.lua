@@ -61,6 +61,9 @@ function M.update(dt, climbers, trellises, collisionBoxes, positions,
             snapClimberToTrellis(translatedCB, translatedTB)
             stopClimber(dt, translatedCB, translatedTB, climberVelocity)
             gravitationalEntity.enabled = false
+            if not climber.trellis then
+              climberVelocity.y = 0
+            end
             climber.trellis = trellisEntity
           else
             climber.trellis = nil
