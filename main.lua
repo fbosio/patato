@@ -91,6 +91,14 @@ function love.load()
       c.climber.climbing = true
     end
   end)
+  engine.setAction("climbDown", function (c)
+    if c.climber.climbing then
+      c.velocity.y = c.impulseSpeed.climb
+--      c.animation.name = "climbingUp"
+    else
+      c.climber.climbing = true
+    end
+  end)
 end
 
 function love.update(dt)

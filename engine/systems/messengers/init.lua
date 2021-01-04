@@ -7,7 +7,7 @@ local M = {}
 function M.update(dt, components, collectableEffects)
   climbing.update(components.climber, components.trellis,
                   components.collisionBox, components.position,
-                  components.velocity)
+                  components.velocity, components.gravitational)
   collection.update(components.collector, components.collectable,
                     collectableEffects, components.collisionBox,
                     components.position, components.garbage)

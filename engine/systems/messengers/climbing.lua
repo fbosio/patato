@@ -29,8 +29,8 @@ function M.update(climbers, trellises, collisionBoxes, positions, velocities,
     local climberBox = collisionBoxes[climberEntity]
     local climberPosition = positions[climberEntity]
     local climberVelocity = velocities[climberEntity]
-    local isGravitational = (gravitationals or {})[climberEntity]
     local translatedCB = getTranslatedBox(climberPosition, climberBox)
+    local gravitationals = gravitationals or {}
 
     local isClimberCollidingWithNoTrellises = true
     for trellisEntity, trellis in pairs(trellises or {}) do
