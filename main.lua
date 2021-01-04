@@ -14,7 +14,7 @@ function love.load()
   engine.setMenuOptionEffect("mainMenu", 3, function ()
     engine.startGame("secretLevel")
   end)
-  
+
   engine.setAction("showCustomMessage", function ()
     message = "Flashlight!"
   end)
@@ -50,8 +50,10 @@ function love.load()
   engine.setInputs("patato", {
     walkLeft = engine.command{key = "left"},
     walkRight = engine.command{key = "right"},
-    walkUp = engine.command{key = "up"},
-    walkDown = engine.command{key = "down"},
+    climbUp = engine.command{key = "up"},
+    climbDown = engine.command{key = "down"},
+--    walkUp = engine.command{key = "up"},
+--    walkDown = engine.command{key = "down"},
     stopWalkingHorizontally = engine.command{
       keys = {"left", "right"},
       release = true
@@ -84,7 +86,7 @@ function love.load()
   engine.setAction("climbUp", function (c)
     if c.climber.climbing then
       c.velocity.y = -c.impulseSpeed.climb
-      c.animation.name = "climbingUp"
+--      c.animation.name = "climbingUp"
     else
       c.climber.climbing = true
     end

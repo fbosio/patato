@@ -29,28 +29,35 @@ M.entities = {
     input = true,
     collector = true,
     collisionBox = {20, 120, 40, 120},
-   animations = {
-     walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
-     standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
-   },
+    animations = {
+      walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
+      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
+    },
     solid = true,
-    gravitational = true
+    gravitational = true,
+    climber = true,
+    impulseSpeed = {
+      climb = 200
+    }
   },
    bee = {
      input = true
    },
-  bottle = {
+  bottles = {
     collectable = true,
     collisionBox = {15, 45, 35, 45},
     animations = {
       idle = {5, 1, false}
     }
   },
-  surface = {
+  surfaces = {
     collideable = "rectangle"
   },
-  slope = {
+  slopes = {
     collideable = "triangle"
+  },
+  trellises = {
+    trellis = true
   },
   mainMenu = {
     input = {
@@ -68,7 +75,7 @@ M.levels = {
   garden = {
     patato = {250, 100},
     bee = {450, 105},
-    bottle = {
+    bottles = {
       {325, 80},
       {385, 80},
       {445, 80},
@@ -76,22 +83,24 @@ M.levels = {
       {565, 80},
       {600, 500},
     },
-    surface = {
-      {200, 200, 300, 300},  -- block: x1, y1, x2, y2
-      {100, 400, 700, 300},
-      {200, 400, 300, 500},
+    surfaces = {
+      {200, 250, 300, 350},  -- block: x1, y1, x2, y2
+      {100, 450, 700, 350},
+      {200, 450, 300, 550},
       {300, 80, 600}  -- cloud: x1, y1, x2
     },
-    slope = {
-      {100, 40, 20, 150},
-      {100, 300, 200, 200},
-      {400, 300, 300, 200},
-      {100, 400, 200, 500},
-      {400, 400, 300, 500},
-    }
+    slopes = {
+      {100, 90, 20, 200},
+      {100, 350, 200, 250},
+      {400, 350, 300, 250},
+      {100, 450, 200, 550},
+      {400, 450, 300, 550},
+    },
+    trellises = {420, 120, 680, 270},
   },
   secretLevel = {
     patato = {200, 500},
+    surfaces = {20, 540, 400, 600},
   },
 }
 M.firstLevel = "garden"
