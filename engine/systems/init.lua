@@ -30,4 +30,20 @@ function M.keyreleased(key, hid, components)
   controller.keyreleased(key, hid, components)
 end
 
+function M.joystickpressed(joystick, button, hid, components)
+  controller.joystickpressed(joystick, button, hid, components)
+end
+
+function M.joystickhat(joystick, hat, direction, hid, components)
+  controller.joystickhat(joystick, hat, direction, hid, components)
+end
+
+function M.joystickadded(joystick, hid)
+  controller.joystickadded(joystick, hid)
+end
+
+function M.joystickremoved(joystick, hid)
+  controller.joystickremoved(joystick, hid)
+end
+
 return M

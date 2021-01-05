@@ -162,6 +162,21 @@ function M.keyreleased(key)
   systems.keyreleased(key, M.hid, M.gameState.components)
 end
 
+function M.joystickpressed(joystick, button)
+  systems.joystickpressed(joystick, button, M.hid, M.gameState.components)
+end
+
+function M.joystickhat(joystick, hat, direction)
+  systems.joystickhat(joystick, hat, direction, M.hid, M.gameState.components)
+end
+
+function M.joystickadded(joystick)
+  systems.joystickadded(joystick, M.hid)
+end
+
+function M.joystickremoved(joystick)
+  systems.joystickremoved(joystick, M.hid)
+end
 
 --[[--
  API

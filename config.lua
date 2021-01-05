@@ -14,6 +14,20 @@ M.keys = {
   jump = "space"
 }
 
+M.joystick = {
+  hats = {
+    left = "l",
+    right = "r",
+    up = "u",
+    down = "d"
+  },
+  buttons = {
+    jump = 3,
+    message = 2,
+    start = 10
+  }
+}
+
 M.spriteSheet = "resources/sprites/patato.png"
 M.spriteScale = 0.5
 M.sprites = {

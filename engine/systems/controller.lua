@@ -46,11 +46,15 @@ end
 function M.update(hid, components)
   for command, commandActions in pairs(hid.commands or {}) do
     if not command.oneShot and not command.release then
-      
       local mustExecute = false
       for _, commandKey in ipairs(command.keys or {}) do
         local physicalKey = hid.keys[commandKey]
-        if M.love.keyboard.isDown(physicalKey) then
+        local joystickHat = (hid.joystick.hats or {})[commandKey]
+        local directions = hid.joystick.current
+                           and hid.joystick.current:getHat(1) or ""
+        local isHatInDirection = joystickHat == string.sub(directions, 1, 1)
+                                 or joystickHat == string.sub(directions, 2, 2)
+        if M.love.keyboard.isDown(physicalKey) or isHatInDirection then
           mustExecute = true
           break
         end
@@ -69,7 +73,20 @@ function M.update(hid, components)
   end
 end
 
-local function executeAction(key, commandKeys, hid, commandActions, components)
+local function executeAction(hid, commandActions, components)
+  for entityName, action in pairs(commandActions) do
+    local entities = M.entityTagger.getIds(entityName)
+    for _, entity in ipairs(entities or {}) do
+      if components.input[entity] then
+        local entityComponents = buildActionArguments(entity, components)
+        hid.actions[action](entityComponents)
+      end
+    end
+  end
+end
+
+local function checkAndExecuteAction(key, commandKeys, hid, commandActions,
+                                     components)
   local mustExecute = false
   for _, commandKey in ipairs(commandKeys or {}) do
     local physicalKey = hid.keys[commandKey]
@@ -79,23 +96,14 @@ local function executeAction(key, commandKeys, hid, commandActions, components)
     end
   end
   if mustExecute then
-    for entityName, action in pairs(commandActions) do
-      local entities = M.entityTagger.getIds(entityName)
-      for _, entity in ipairs(entities or {}) do
-        if components.input[entity] then
-          local entityComponents = buildActionArguments(entity, components)
-          hid.actions[action](entityComponents)
-        end
-      end
-    end
+    executeAction(hid, commandActions, components)
   end
 end
-
 
 function M.keypressed(key, hid, components)
   for command, commandActions in pairs(hid.commands or {}) do
     if command.oneShot then
-      executeAction(key, command.keys, hid, commandActions, components)
+      checkAndExecuteAction(key, command.keys, hid, commandActions, components)
     end
   end
 end
@@ -103,7 +111,58 @@ end
 function M.keyreleased(key, hid, components)
   for command, commandActions in pairs(hid.commands or {}) do
     if command.release then
-      executeAction(key, command.keys, hid, commandActions, components)
+      checkAndExecuteAction(key, command.keys, hid, commandActions, components)
+    end
+  end
+end
+
+function M.joystickadded(joystick, hid)
+  hid.joystick.current = hid.joystick.current or joystick
+end
+
+function M.joystickremoved(joystick, hid)
+  hid.joystick.current = hid.joystick.current == joystick and nil
+                         or hid.joystick.current
+end
+
+function M.joystickhat(joystick, hat, direction, hid, components)
+  if joystick == hid.joystick.current and hat == 1 then
+    for command, commandActions in pairs(hid.commands or {}) do
+      if command.release and direction == "c" then
+        executeAction(hid, commandActions, components)
+      elseif command.oneShot and direction ~= "c" then
+        local mustExecute = false
+        for _, commandKey in ipairs(command.keys or {}) do
+          local joystickHat = (hid.joystick.hats or {})[commandKey]
+          if joystickHat == direction then
+            mustExecute = true
+            break
+          end
+        end
+        if mustExecute then
+          executeAction(hid, commandActions, components)
+        end
+      end
+    end
+  end
+end
+
+function M.joystickpressed(joystick, button, hid, components)
+  if joystick == hid.joystick.current then
+    for command, commandActions in pairs(hid.commands or {}) do
+      if command.oneShot then
+        local mustExecute = false
+        for _, commandKey in ipairs(command.keys or {}) do
+          local joystickButton = (hid.joystick.buttons or {})[commandKey]
+          if joystickButton == button then
+            mustExecute = true
+            break
+          end
+        end
+        if mustExecute then
+          executeAction(hid, commandActions, components)
+        end
+      end
     end
   end
 end

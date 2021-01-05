@@ -350,6 +350,8 @@ function M.buildWorld(config)
   world.hid.keys.down = world.hid.keys.down or "s"
   world.hid.keys.start = world.hid.keys.start or "return"
 
+  world.hid.joystick = config.joystick or {}
+
   buildActions(world)
   buildResources(config, world)
   M.buildState(config, world)

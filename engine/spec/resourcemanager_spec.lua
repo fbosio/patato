@@ -45,6 +45,10 @@ describe("loading an empty config", function ()
     assert.are.same("s", emptyWorld.hid.keys.down)
   end)
 
+  it("should create an empty joystick table", function ()
+    assert.are.same({}, emptyWorld.hid.joystick)
+  end)
+
   it("should create a garbage component table", function ()
     assert.are.truthy(emptyWorld.gameState.components.garbage)
   end)

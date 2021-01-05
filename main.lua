@@ -118,3 +118,19 @@ end
 function love.keyreleased(key)
   engine.keyreleased(key)
 end
+
+function love.joystickadded(joystick)
+  engine.joystickadded(joystick)
+end
+
+function love.joystickremoved(joystick)
+  engine.joystickremoved(joystick)
+end
+
+function love.joystickpressed(joystick, button)
+  engine.joystickpressed(joystick, button)
+end
+
+function love.joystickhat(joystick, hat, direction)
+  engine.joystickhat(joystick, hat, direction)
+end
