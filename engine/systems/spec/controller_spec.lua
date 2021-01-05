@@ -25,31 +25,31 @@ before_each(function ()
       }
     },
     commands = {
-      [command.new{key = "left"}] = {playerOne = "walkLeft"},
-      [command.new{key = "left2"}] = {playerTwo = "walkLeft"},
-      [command.new{key = "right"}] = {playerOne = "walkRight"},
-      [command.new{key = "right2"}] = {playerTwo = "walkRight"},
-      [command.new{key = "up"}] = {playerOne = "walkUp"},
-      [command.new{key = "down"}] = {playerOne = "walkDown"},
-      [command.new{keys = {"left", "right"}, release = true}] = {
+      [command.new{input = "left"}] = {playerOne = "walkLeft"},
+      [command.new{input = "left2"}] = {playerTwo = "walkLeft"},
+      [command.new{input = "right"}] = {playerOne = "walkRight"},
+      [command.new{input = "right2"}] = {playerTwo = "walkRight"},
+      [command.new{input = "up"}] = {playerOne = "walkUp"},
+      [command.new{input = "down"}] = {playerOne = "walkDown"},
+      [command.new{input = {"left", "right"}, release = true}] = {
         playerOne = "stopWalkingHorizontally"
       },
-      [command.new{keys = {"left2", "right2"}, release = true}] = {
+      [command.new{input = {"left2", "right2"}, release = true}] = {
         playerTwo = "stopWalkingHorizontally"
       },
-      [command.new{keys = {"up", "down"}, release = true}] = {
+      [command.new{input = {"up", "down"}, release = true}] = {
         playerOne = "stopWalkingVertically"
       },
-      [command.new{key = "up", oneShot = true}] = {
+      [command.new{input = "up", oneShot = true}] = {
         mainMenu = "menuPrevious"
       },
-      [command.new{key = "down", oneShot = true}] = {
+      [command.new{input = "down", oneShot = true}] = {
         mainMenu = "menuNext"
       },
-      [command.new{key = "start", oneShot = true}] = {
+      [command.new{input = "start", oneShot = true}] = {
         mainMenu = "menuSelect"
       },
-      [command.new{keys = {"up", "down"}, oneShot = true}] = {
+      [command.new{input = {"up", "down"}, oneShot = true}] = {
         playerOne = "startClimb"
       }
     },
@@ -524,7 +524,7 @@ describe("loading a player with animation and one without it", function ()
         playerOne = {name = "idle"}
       },
     }
-    hid.commands[command.new{key = "right"}] = {
+    hid.commands[command.new{input = "right"}] = {
       playerOne = "changeAnimationToWalking"
     }
   end)

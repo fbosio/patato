@@ -20,7 +20,7 @@ end
 local mt = {
   __eq = function (a, b)
     return not a.release == not b.release and not a.oneShot == not b.oneShot
-      and isIncluded(a.keys, b.keys) and isIncluded(b.keys, a.keys)
+      and isIncluded(a.input, b.input) and isIncluded(b.input, a.input)
   end
 }
 
@@ -28,7 +28,7 @@ function M.new(args)
   local newCommand = {
     release = args.release,
     oneShot = args.oneShot,
-    keys = args.keys or {args.key}
+    input = type(args.input) == "table" and args.input or {args.input}
   }
   setmetatable(newCommand, mt)
   return newCommand

@@ -8,7 +8,7 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
     resourcemanager = require "engine.resourcemanager"
     controller = require "engine.systems.controller"
     config = {
-      keys = {
+      input = {
         start = "return"
       },
       entities = {
@@ -48,12 +48,12 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
     resourcemanager.load(loveMock, entityTagger)
     world = resourcemanager.buildWorld(config)
     resourcemanager.setInputs(world, "sonic", {
-      walkLeft = command.new{key = "left"}
+      walkLeft = command.new{input = "left"}
     })
     resourcemanager.setInputs(world, "mainMenu", {
-      menuPrevious = command.new{key = "up", oneShot = true},
-      menuNext = command.new{key = "down", oneShot = true},
-      menuSelect = command.new{key = "start", oneShot = true}
+      menuPrevious = command.new{input = "up", oneShot = true},
+      menuNext = command.new{input = "down", oneShot = true},
+      menuSelect = command.new{input = "start", oneShot = true}
     })
     drankCoffee = false
     local mainMenuId = entityTagger.getId("mainMenu")

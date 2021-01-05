@@ -82,16 +82,16 @@ function M.load()
 
   if emptyConfig then
     M.setInputs("player", {
-      walkLeft = M.command{key = "left"},
-      walkRight = M.command{key = "right"},
-      walkUp = M.command{key = "up"},
-      walkDown = M.command{key = "down"},
+      walkLeft = M.command{input = "left"},
+      walkRight = M.command{input = "right"},
+      walkUp = M.command{input = "up"},
+      walkDown = M.command{input = "down"},
       stopWalkingHorizontally = M.command{
-        keys = {"left", "right"},
+        input = {"left", "right"},
         release = true
       },
       stopWalkingVertically = M.command{
-        keys = {"up", "down"},
+        input = {"up", "down"},
         release = true
       },
     })
@@ -343,10 +343,10 @@ end
   commands as values.
   @usage
   engine.setInputs("hero", {
-    walkLeft = engine.command{key = "left"},
-    walkRight = engine.command{key = "right"},
-    stopWalking = engine.command{keys = {"left", "right"}, release = true},
-    jump = engine.command{key = "jump", oneShot = true}
+    walkLeft = engine.command{input = "left"},
+    walkRight = engine.command{input = "right"},
+    stopWalking = engine.command{input = {"left", "right"}, release = true},
+    jump = engine.command{input = "jump", oneShot = true}
   })
 ]]
 function M.setInputs(entity, actionCommands)

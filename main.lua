@@ -56,25 +56,25 @@ function love.load()
   end)
   
   engine.setInputs("patato", {
-    walkLeft = engine.command{key = "left"},
-    walkRight = engine.command{key = "right"},
-    startClimb = engine.command{keys = {"up", "down"}, oneShot = true},
-    climbUp = engine.command{key = "up"},
-    climbDown = engine.command{key = "down"},
+    walkLeft = engine.command{input = "left"},
+    walkRight = engine.command{input = "right"},
+    startClimb = engine.command{input = {"up", "down"}, oneShot = true},
+    climbUp = engine.command{input = "up"},
+    climbDown = engine.command{input = "down"},
     stopWalkingHorizontally = engine.command{
-      keys = {"left", "right"},
+      input = {"left", "right"},
       release = true
     },
     stopClimbingVertically = engine.command{
-      keys = {"up", "down"},
+      input = {"up", "down"},
       release = true
     },
-    jump = engine.command{key = "jump", oneShot = true}
+    jump = engine.command{input = "jump", oneShot = true}
   })
   engine.setInputs("mainMenu", {
-    menuPrevious = engine.command{key = "up", oneShot = true},
-    menuNext = engine.command{key = "down", oneShot = true},
-    menuSelect = engine.command{key = "start", oneShot = true}
+    menuPrevious = engine.command{input = "up", oneShot = true},
+    menuNext = engine.command{input = "down", oneShot = true},
+    menuSelect = engine.command{input = "start", oneShot = true}
   })
 
   score = 0

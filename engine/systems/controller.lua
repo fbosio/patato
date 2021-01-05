@@ -47,9 +47,9 @@ function M.update(hid, components)
   for command, commandActions in pairs(hid.commands or {}) do
     if not command.oneShot and not command.release then
       local mustExecute = false
-      for _, commandKey in ipairs(command.keys or {}) do
-        local physicalKey = hid.keys[commandKey]
-        local joystickHat = (hid.joystick.hats or {})[commandKey]
+      for _, commandInput in ipairs(command.input or {}) do
+        local physicalKey = hid.keys[commandInput]
+        local joystickHat = (hid.joystick.hats or {})[commandInput]
         local directions = hid.joystick.current
                            and hid.joystick.current:getHat(1) or ""
         local isHatInDirection = joystickHat == string.sub(directions, 1, 1)
@@ -86,11 +86,11 @@ local function executeAction(hid, commandActions, components)
   end
 end
 
-local function checkAndExecuteAction(key, commandKeys, hid, commandActions,
+local function checkAndExecuteAction(key, commandInput, hid, commandActions,
                                      components)
   local mustExecute = false
-  for _, commandKey in ipairs(commandKeys or {}) do
-    local physicalKey = hid.keys[commandKey]
+  for _, input in ipairs(commandInput or {}) do
+    local physicalKey = hid.keys[input]
     if physicalKey == key then
       mustExecute = true
       break
@@ -104,7 +104,7 @@ end
 function M.keypressed(key, hid, components)
   for command, commandActions in pairs(hid.commands or {}) do
     if command.oneShot then
-      checkAndExecuteAction(key, command.keys, hid, commandActions, components)
+      checkAndExecuteAction(key, command.input, hid, commandActions, components)
     end
   end
 end
@@ -112,7 +112,7 @@ end
 function M.keyreleased(key, hid, components)
   for command, commandActions in pairs(hid.commands or {}) do
     if command.release then
-      checkAndExecuteAction(key, command.keys, hid, commandActions, components)
+      checkAndExecuteAction(key, command.input, hid, commandActions, components)
     end
   end
 end
@@ -133,8 +133,8 @@ function M.joystickhat(joystick, hat, direction, hid, components)
         executeAction(hid, commandActions, components)
       elseif command.oneShot and direction ~= "c" then
         local mustExecute = false
-        for _, commandKey in ipairs(command.keys or {}) do
-          local joystickHat = (hid.joystick.hats or {})[commandKey]
+        for _, commandInput in ipairs(command.input or {}) do
+          local joystickHat = (hid.joystick.hats or {})[commandInput]
           if joystickHat == direction then
             mustExecute = true
             break
@@ -153,8 +153,8 @@ function M.joystickpressed(joystick, button, hid, components)
     for command, commandActions in pairs(hid.commands or {}) do
       if command.oneShot then
         local mustExecute = false
-        for _, commandKey in ipairs(command.keys or {}) do
-          local joystickButton = (hid.joystick.buttons or {})[commandKey]
+        for _, commandInput in ipairs(command.input or {}) do
+          local joystickButton = (hid.joystick.buttons or {})[commandInput]
           if joystickButton == button then
             mustExecute = true
             break
