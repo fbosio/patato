@@ -19,7 +19,7 @@ end
 
 local mt = {
   __eq = function (a, b)
-    return a.release == b.release and a.oneShot == b.oneShot
+    return not a.release == not b.release and not a.oneShot == not b.oneShot
       and isIncluded(a.keys, b.keys) and isIncluded(b.keys, a.keys)
   end
 }
