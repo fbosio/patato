@@ -44,33 +44,56 @@ local function copyMenuToState(world, menu, entity)
   world.gameState.inMenu = true  -- cambiar por escena
 end
 
-local stateBuilders = {
-  controllable = function (world, isControllable, entity)
-    if isControllable then
-      setComponent(world, "controllable", entity, {})
-      for _, commandActions in pairs(world.hid.commands or {}) do
-        for k, action in pairs(commandActions) do
-          if k == M.entityTagger.getName(entity) then
-            setComponentAttribute(world, "controllable", entity, action, false)
-          end
+local flagStateBuilders = {
+  controllable = function (world, entity)
+    setComponent(world, "controllable", entity, {})
+    for _, commandActions in pairs(world.hid.commands or {}) do
+      for k, action in pairs(commandActions) do
+        if k == M.entityTagger.getName(entity) then
+          setComponentAttribute(world, "controllable", entity, action, false)
         end
       end
-      createDefaults(world, entity)
+    end
+    createDefaults(world, entity)
+  end,
+  collector = function (world, entity)
+    setComponent(world, "collector", entity, true)
+  end,
+  collectable = function (world, entity)
+    setComponent(world, "collectable", entity,
+                 {name = M.entityTagger.getName(entity)})
+  end,
+  solid = function (world, entity)
+    setComponent(world, "solid", entity, {})
+    createDefaultPosition(world, entity)
+    createDefaultVelocity(world, entity)
+  end,
+  gravitational = function (world, entity)
+    setComponentAttribute(world, "gravitational", entity, "enabled", true)
+    createDefaultPosition(world, entity)
+    createDefaultVelocity(world, entity)
+  end,
+  climber = function (world, entity)
+    setComponent(world, "climber", entity, {})
+    createDefaultPosition(world, entity)
+    createDefaultVelocity(world, entity)
+  end,
+  trellis = function (world, entity)
+    local name = M.entityTagger.getName(entity)
+    setComponentAttribute(world, "trellis", entity, "name", name)
+  end,
+}
+
+local stateBuilders = {
+  flags = function (world, flags, entity)
+    for _, flag in ipairs(flags) do
+      flagStateBuilders[flag](world, entity)
     end
   end,
   impulseSpeed = function (world, component, entity)
     for impulseName, speed in pairs(component) do
       setComponentAttribute(world, "impulseSpeed", entity, impulseName,
                             speed)
-    end
-  end,
-  collector = function (world, isCollector, entity)
-    setComponent(world, "collector", entity, isCollector)
-  end,
-  collectable = function (world, isCollectable, entity)
-    if isCollectable then
-      setComponent(world, "collectable", entity,
-                    {name = M.entityTagger.getName(entity)})
     end
   end,
   collisionBox = function (world, component, entity)
@@ -117,13 +140,6 @@ local stateBuilders = {
 
     world.resources.animations = animations
   end,
-  solid = function (world, isSolid, entity)
-    if isSolid then
-      setComponent(world, "solid", entity, {})
-      createDefaultPosition(world, entity)
-      createDefaultVelocity(world, entity)
-    end
-  end,
   collideable = function (world, type, entity)
     local name = M.entityTagger.getName(entity)
     setComponentAttribute(world, "collideable", entity, "name", name)
@@ -131,29 +147,25 @@ local stateBuilders = {
            "Unexpected collideable type \"" .. type .. "\" for entity \""
            .. name .. "\"")
   end,
-  gravitational = function (world, isGravitational, entity)
-    setComponentAttribute(world, "gravitational", entity, "enabled",
-                          isGravitational)
-    createDefaultPosition(world, entity)
-    createDefaultVelocity(world, entity)
-  end,
-  climber = function (world, isClimber, entity)
-    if isClimber then
-      setComponent(world, "climber", entity, {})
-      createDefaultPosition(world, entity)
-      createDefaultVelocity(world, entity)
-    end
-  end,
-  trellis = function (world, isTrellis, entity)
-    if isTrellis then
-      local name = M.entityTagger.getName(entity)
-      setComponentAttribute(world, "trellis", entity, "name", name)
-    end
-  end,
 }
 
+local function getComponentNames(components)
+  local componentNames = {}
+  for k, v in pairs(components) do
+    if k == "flags" then
+      for _, flag in ipairs(v) do
+        componentNames[flag] = true
+      end
+    else
+      componentNames[k] = true
+    end
+  end
+  return componentNames
+end
+
 local function buildFromVertex(entity, entityComponents, vertex, world)
-  if entityComponents.collideable or entityComponents.trellis then
+  local names = getComponentNames(entityComponents)
+  if entityComponents.collideable or names.trellis then
     local x1 = math.min(vertex[1], vertex[3])
     local x2 = math.max(vertex[1], vertex[3])
     local y1 = math.min(vertex[2], vertex[4] or vertex[2])
@@ -168,7 +180,7 @@ local function buildFromVertex(entity, entityComponents, vertex, world)
                           width)
     setComponentAttribute(world, "collisionBox", entity, "height",
                           height)
-    if not entityComponents.trellis
+    if not names.trellis
         and entityComponents.collideable == "triangle"
         and vertex[2] ~= vertex[4] then
       setComponentAttribute(world, "collideable", entity, "normalPointingUp",
@@ -193,9 +205,9 @@ local function buildNonMenu(entityName, entityComponents, world)
         createDefaults(world, entity)
       end
       assert(stateBuilders[componentName],
-              "Entity \"" .. entityName .. "\" has a component named \""
-              .. componentName .. "\" that was not expected in config.lua")
-              stateBuilders[componentName](world, component, entity)
+             "Entity \"" .. entityName .. "\" has a component named \""
+             .. componentName .. "\" that was not expected in config.lua")
+             stateBuilders[componentName](world, component, entity)
     end
   end
   return entity
@@ -289,20 +301,20 @@ local function buildResources(config, world)
   end
 end
 
-local function entityCanBeBuilt(config, entityName, componentPairs)
+local function entityCanBeBuilt(componentNames, componentPairs)
   local canBeBuilt = true
   for _, t in ipairs(componentPairs) do
-    canBeBuilt = canBeBuilt and not config.entities[entityName][t[1]]
+    canBeBuilt = canBeBuilt and not componentNames[t[1]]
   end
   
   return canBeBuilt
 end
 
-local function checkComponentsCompatibility(config, entityName, componentPairs)
+local function checkComponentsCompatibility(componentNames, componentPairs,
+                                            entityName)
   for _, t in ipairs(componentPairs) do
-    local components = config.entities[entityName]
     local v1, v2 = unpack(t)
-    assert(not components[v1] or not components[v2],
+    assert(not componentNames[v1] or not componentNames[v2],
            "Entities must not be " .. v1 .. "s and " .. v2 .. "s at the same"
            .. "time, but entity \"" .. entityName .. "\" has both "
            .. "components declared in config.lua")
@@ -321,11 +333,13 @@ function M.buildState(config, world, levelName)
         {"trellis", "climber"}
       }
       for entityName, entityComponents in pairs(config.entities) do
-        checkComponentsCompatibility(config, entityName, componentPairs)
+        local componentNames = getComponentNames(entityComponents)
+        checkComponentsCompatibility(componentNames, componentPairs,
+                                     entityName)
         if config.levels then
           buildNonMenuIfInLevel(config, world, levelName, entityName,
                                 entityComponents)
-        elseif entityCanBeBuilt(config, entityName, componentPairs) then
+        elseif entityCanBeBuilt(componentNames, componentPairs) then
           buildNonMenu(entityName, entityComponents, world)
         end
       end

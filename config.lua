@@ -40,26 +40,28 @@ M.sprites = {
 
 M.entities = {
   patato = {
-    controllable = true,
-    collector = true,
+    flags = {
+      "controllable",
+      "collector",
+      "solid",
+      "gravitational",
+      "climber"
+    },
     collisionBox = {20, 120, 40, 120},
     animations = {
       walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
       standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
     },
-    solid = true,
-    gravitational = true,
-    climber = true,
     impulseSpeed = {
       climb = 200,
       climbJump = 700
     }
   },
    bee = {
-     controllable = true
+     flags = {"controllable"}
    },
   bottles = {
-    collectable = true,
+    flags = {"collectable"},
     collisionBox = {15, 45, 35, 45},
     animations = {
       idle = {5, 1, false}
@@ -72,10 +74,10 @@ M.entities = {
     collideable = "triangle"
   },
   trellises = {
-    trellis = true
+    flags = {"trellis"}
   },
   mainMenu = {
-    controllable = true,
+    flags = {"controllable"},
     menu = {
       options = {"Start", "Show message", "Secret level"},
     },

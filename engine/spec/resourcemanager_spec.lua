@@ -211,7 +211,7 @@ describe("loading a controllable entity", function ()
     config = {
       entities = {
         player = {
-          controllable = true
+          flags = {"controllable"}
         }
       }
     }
@@ -260,10 +260,10 @@ describe("loading two entities that share the same input", function ()
     local config = {
       entities = {
         ryu = {
-          controllable = true
+          flags = {"controllable"}
         },
         ken = {
-          controllable = true
+          flags = {"controllable"}
         }
       }
     }
@@ -292,10 +292,10 @@ describe("setting two equal commands with different references", function ()
     local config = {
       entities = {
         ryu = {
-          controllable = true
+          flags = {"controllable"}
         },
         ken = {
-          controllable = true
+          flags = {"controllable"}
         }
       }
     }
@@ -333,7 +333,7 @@ describe("loading an entity with movement inputs and lacking keys", function ()
       },
       entities = {
         player = {
-          controllable = true
+          flags = {"controllable"}
         }
       }
     }
@@ -366,7 +366,7 @@ describe("loading a controllable entity and keys", function ()
       },
       entities = {
         player = {
-          controllable = true
+          flags = {"controllable"}
         }
       }
     }
@@ -505,7 +505,7 @@ describe("loading entities and an empty levels table", function ()
     local config = {
       entities = {
         player = {
-          controllable = true
+          flags = {"controllable"}
         }
       },
       levels = {}
@@ -522,7 +522,7 @@ describe("loading a level with defined entity and position", function ()
     local config = {
       entities = {
         sonic = {
-          controllable = true
+          flags = {"controllable"}
         }
       },
       levels = {
@@ -550,7 +550,7 @@ describe("load two levels and the name of the first one", function ()
     local config = {
       entities = {
         sonic = {
-          controllable = true
+          flags = {"controllable"}
         }
       },
       levels = {
@@ -582,7 +582,7 @@ describe("loading a collector entity", function ()
     local config = {
       entities = {
         player = {
-          collector = true
+          flags = {"collector"}
         }
       }
     }
@@ -599,7 +599,7 @@ describe("loading a collectable entity that is not in any level", function ()
     local config = {
       entities = {
         item = {
-          collectable = true
+          flags = {"collectable"}
         }
       }
     }
@@ -614,7 +614,7 @@ describe("loading collectable entities that are in a level", function ()
   local config = {
     entities = {
       bottle = {
-        collectable = true
+        flags = {"collectable"}
       }
     },
     levels = {
@@ -654,8 +654,7 @@ describe("loading an entity that is both collector and collectable", function ()
     config = {
       entities = {
         absurdSpecimen = {
-          collector = true,
-          collectable = true
+          flags = {"collector", "collectable"}
         }
       }
     }
@@ -870,7 +869,7 @@ describe("loading a solid entity", function ()
     local config = {
       entities = {
         player = {
-          solid = true
+          flags = {"solid"}
         }
       }
     }
@@ -1039,7 +1038,7 @@ describe("loading an entity that is both collideable and solid", function ()
       entities = {
         absurdSpecimen = {
           collideable = "rectangle",
-          solid = true
+          flags = {"solid"}
         }
       }
     }
@@ -1069,7 +1068,7 @@ describe("loading a gravitational entity", function ()
     local config = {
       entities = {
         anvil = {
-          gravitational = true
+          flags = {"gravitational"}
         }
       }
     }
@@ -1086,7 +1085,7 @@ describe("loading a climber entity", function ()
     local config = {
       entities = {
         player = {
-          climber = true
+          flags = {"climber"}
         }
       }
     }
@@ -1103,7 +1102,7 @@ describe("loading a trellis entity that is not in any level", function ()
     local config = {
       entities = {
         trellis = {
-          trellis = true
+          flags = {"trellis"}
         }
       }
     }
@@ -1121,7 +1120,7 @@ describe("loading trellis entities that are in a level", function ()
     config = {
       entities = {
         trellises = {
-          trellis = true
+          flags = {"trellis"}
         }
       },
       levels = {
@@ -1157,8 +1156,7 @@ describe("loading an entity that is both climber and trellis", function ()
     config = {
       entities = {
         absurdSpecimen = {
-          climber = true,
-          trellis = true
+          flags = {"climber", "trellis"}
         }
       }
     }
