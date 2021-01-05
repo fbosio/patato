@@ -1,6 +1,7 @@
 --[[--
- The engine itself.
- Contains callbacks and functions that constitute its API.
+ Contains callbacks for general use and specific functions that constitute its
+ API.
+
  @module engine
 ]]
 
@@ -18,19 +19,30 @@ local M = {}
 
 
 --[[--
-Callbacks.
+ Callbacks.
 
-Similar to those in [Löve2D](https://love2d.org/wiki/love).
+ Similar to those in [Löve2D](https://love2d.org/wiki/love).
 
-Call them inside the [Löve2D](https://love2d.org/wiki/love) callbacks of
+ Call them inside the [Löve2D](https://love2d.org/wiki/love) callbacks of
  the same name.
- 
+
+ A typical project starts just with the @{load}, @{update} and @{draw}
+ callbacks. As the game is developed the need for new functionality arises and,
+ with it, more specific callbacks are needed as well.
+
+ `oneShot` and `release` keyboard commands require the @{keypressed} and @{keyreleased}
+ callbacks, respectively.
+ Joystick handling requires @{joystickadded} and @{joystickremoved}.
+ `oneShot` and `release` _joystick_ commands require the additional @{joystickhat} and
+ @{joystickpressed} callbacks.
+
+ See @{command} for an explanation of the `oneShot` and `release` parameters.
+
  @section callbacks
  ]]
 
 --[[--
- Should be called exactly once inside
- [love.load](https://love2d.org/wiki/love.load).
+ Call it inside [love.load](https://love2d.org/wiki/love.load).
 
  Required if you call @{engine.update}.
 
@@ -42,7 +54,7 @@ Call them inside the [Löve2D](https://love2d.org/wiki/love) callbacks of
 function M.load()
   systems.load(love, entityTagger)
   resourcemanager.load(love, entityTagger)
-  
+
   local emptyConfig = not config
   if emptyConfig then
     config = {
@@ -53,7 +65,7 @@ function M.load()
       }
     }
   end
-    
+
   if type(config) ~= "table" then
     local message = "Incorrect config, received " .. type(config) .. "."
     if type(config) == "boolean" and config then
@@ -67,7 +79,7 @@ function M.load()
   for k, v in pairs(resourcemanager.buildWorld(config)) do
     M[k] = v
   end
-  
+
   if emptyConfig then
     M.setInputs("player", {
       walkLeft = M.command{key = "left"},
@@ -84,7 +96,7 @@ function M.load()
       },
     })
   end
-  
+
   M.collectableEffects = {}
   setmetatable(M.collectableEffects, {
     __index = function ()
@@ -95,7 +107,7 @@ function M.load()
 end
 
 --[[--
- Should be called inside [love.update](https://love2d.org/wiki/love.update).
+ Call it inside [love.update](https://love2d.org/wiki/love.update).
 
  A previous call to @{engine.load} is required by this callback in order to
  work.
@@ -116,8 +128,7 @@ function M.update(dt)
 end
 
 --[[--
- Should be called inside [love.draw](https://love2d.org/wiki/love.draw) to
- actually see the game.
+ Call it inside [love.draw](https://love2d.org/wiki/love.draw).
 
  @usage
   function love.draw()
@@ -129,11 +140,11 @@ function M.draw()
 end
 
 --[[--
- Add it inside [love.keypressed](https://love2d.org/wiki/love.keypressed)
- to capture an event only when a key is pressed and not while it is held down.
+ Call it inside [love.keypressed](https://love2d.org/wiki/love.keypressed).
 
- Needed for _one shot commands_.
- These commands are used often for jumping or selecting options in a menu.
+ Capture an event only when a key is pressed and not while it is held down.
+
+ Required for _one shot keyboard commands_.
  @tparam string key Character of the pressed key.
  @usage
   function love.keypressed(key)
@@ -147,9 +158,9 @@ function M.keypressed(key)
 end
 
 --[[--
- Add it inside [love.keyreleased](https://love2d.org/wiki/love.keyreleased)
+ Call it inside [love.keyreleased](https://love2d.org/wiki/love.keyreleased).
 
- Needed for _release_ commands.
+ Needed for _release keyboard commands_.
  @tparam string key Character of the pressed key.
  @usage
   function love.keyreleased(key)
@@ -162,18 +173,64 @@ function M.keyreleased(key)
   systems.keyreleased(key, M.hid, M.gameState.components)
 end
 
-function M.joystickpressed(joystick, button)
-  systems.joystickpressed(joystick, button, M.hid, M.gameState.components)
-end
+--[[--
+ Call it inside
+ [love.joystickadded](https://love2d.org/wiki/love.joystickadded).
 
-function M.joystickhat(joystick, hat, direction)
-  systems.joystickhat(joystick, hat, direction, M.hid, M.gameState.components)
-end
-
+ @tparam Joystick joystick The newly connected
+  [Joystick object](https://love2d.org/wiki/Joystick).
+ @usage
+  function love.joystickadded(joystick)
+    engine.joystickadded(joystick)
+  end
+]]
 function M.joystickadded(joystick)
   systems.joystickadded(joystick, M.hid)
 end
 
+--[[--
+ Call it inside
+ [love.joystickpressed](https://love2d.org/wiki/love.joystickpressed).
+
+ @tparam Joystick joystick The
+  [joystick object](https://love2d.org/wiki/Joystick).
+ @tparam number button The button number.
+ @usage
+  function love.joystickpressed(joystick, button)
+    engine.joystickpressed(joystick, button)
+  end
+]]
+function M.joystickpressed(joystick, button)
+  systems.joystickpressed(joystick, button, M.hid, M.gameState.components)
+end
+
+--[[--
+ Call it inside [love.joystickhat](https://love2d.org/wiki/love.joystickhat).
+
+ @tparam Joystick joystick The
+  [joystick object](https://love2d.org/wiki/Joystick).
+ @tparam number hat The hat number.
+ @tparam JoystickHat direction The new [hat direction](https://love2d.org/wiki/JoystickHat).
+ @usage
+  function love.joystickhat(joystick, hat, direction)
+    engine.joystickhat(joystick, hat, direction)
+  end
+]]
+function M.joystickhat(joystick, hat, direction)
+  systems.joystickhat(joystick, hat, direction, M.hid, M.gameState.components)
+end
+
+--[[--
+ Call it inside
+ [love.joystickremoved](https://love2d.org/wiki/love.joystickremoved).
+
+ @tparam Joystick joystick Called when a
+  [Joystick](https://love2d.org/wiki/Joystick) is disconnected.
+ @usage
+  function love.joystickremoved(joystick)
+    engine.joystickremoved(joystick)
+  end
+]]
 function M.joystickremoved(joystick)
   systems.joystickremoved(joystick, M.hid)
 end
@@ -277,9 +334,9 @@ end
 
 --[[--
   Associate actions of an entity to commands.
-  
-  A command must be created using @{command}.
-  Set a callback for an action using @{setAction}.
+
+  Callbacks for actions are set using @{setAction}.
+  Commands are created using @{command}.
   @tparam string entity
    The identifier of the entity, as defined in `config.lua`
   @tparam table actionCommands Table that has action names as fields and
@@ -300,21 +357,33 @@ end
 --[[--
   Create a new command.
 
-  A command is a table that represents a keyboard gesture.
+  A command is a table that represents a keyboard or joystick gesture.
 
   See @{setInputs} for examples of use.
 
   @tparam table args Arguments for building the command. Valid arguments are:
-  
-  - **key:** String that represents a key, defined in the `keys` table in 
+
+  - **key:** String that represents a key, defined in the `keys` table in
     `config.lua`. If this argument is set, do not set the `keys` argument.
   - **keys:** Table of strings that represent keys, defined in the `keys`
     table in `config.lua`. If this argument is set, do not set the `key`
     argument.
-  - **release:** `true` if the command represents a key-up gesture. `false`
+  - **release:** `true` if the command represents an "up" gesture. `false`
     otherwise.
+
+    `release` commands are used often to stop moving characters.
   - **oneShot:** `true` if the command must be detected in one frame only.
     `false` otherwise.
+
+    Declaring a command as `oneShot` will _only_ trigger an event when its
+    associated input (e.g.: key, pad or button) is _pressed_, and _not_ while
+    it is _held down_.
+
+    `oneShot` commands are used often for selecting options in a menu and for
+    making a character jump or grab something in a level that needs subsequent
+    control, like a ladder or a trellis.
+    Note that this kind of command prevents the player from, for example,
+    holding the "jump button" to make the character continuosly hop.
 ]]
 function M.command(args)
   return command.new(args)
