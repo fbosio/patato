@@ -45,13 +45,13 @@ local function copyMenuToState(world, menu, entity)
 end
 
 local stateBuilders = {
-  input = function (world, hasInput, entity)
-    if hasInput then
-      setComponent(world, "input", entity, {})
+  controllable = function (world, isControllable, entity)
+    if isControllable then
+      setComponent(world, "controllable", entity, {})
       for _, commandActions in pairs(world.hid.commands or {}) do
         for k, action in pairs(commandActions) do
           if k == M.entityTagger.getName(entity) then
-            setComponentAttribute(world, "input", entity, action, false)
+            setComponentAttribute(world, "controllable", entity, action, false)
           end
         end
       end
@@ -188,7 +188,8 @@ local function buildNonMenu(entityName, entityComponents, world)
   if not entityComponents.menu then
     for componentName, component in pairs(entityComponents) do
       entity = entity or M.entityTagger.tag(entityName)
-      if componentName == "input" and entityComponents.gravitational then
+      if componentName == "controllable"
+          and entityComponents.gravitational then
         createDefaults(world, entity)
       end
       assert(stateBuilders[componentName],
@@ -208,10 +209,10 @@ local function buildMenu(config, world)
         local entity = M.entityTagger.tag(entityName)
         foundMenu = true
         copyMenuToState(world, component, entity)
-        world.gameState.components.input =
-          world.gameState.components.input or {}
-        world.gameState.components.input[entity] =
-          entityComponents.input and {}
+        world.gameState.components.controllable =
+          world.gameState.components.controllable or {}
+        world.gameState.components.controllable[entity] =
+          entityComponents.controllable and {}
       end
     end
   end
@@ -383,7 +384,7 @@ function M.setInputs(world, entityName, actionCommands)
       end
       local entities = M.entityTagger.getIds(entityName)
       for _, entity in ipairs(entities or {}) do
-        setComponentAttribute(world, "input", entity, action, false)
+        setComponentAttribute(world, "controllable", entity, action, false)
       end
     end
   end

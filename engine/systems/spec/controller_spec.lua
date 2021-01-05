@@ -97,12 +97,12 @@ after_each(function ()
   package.loaded["engine.command"] = nil
 end)
 
-describe("with one player with input for walking", function ()
+describe("with one player with actions for walking", function ()
   local components
 
   before_each(function ()
     components = {
-      input = {
+      controllable = {
         playerOne = {
           walkLeft = false,
           walkRight = false,
@@ -304,7 +304,7 @@ describe("with two players with AD and JL as walking input", function ()
 
   before_each(function ()
     components = {
-      input = {
+      controllable = {
         playerOne = {
           walkLeft = false,
           walkRight = false,
@@ -432,7 +432,7 @@ describe("with a menu", function ()
 
   before_each(function ()
     components = {
-      input = {
+      controllable = {
         mainMenu = {
           menuPrevious = false,
           menuNext = false,
@@ -509,7 +509,7 @@ describe("loading a player with animation and one without it", function ()
 
   before_each(function ()
     components = {
-      input = {
+      controllable = {
         playerOne = {
           changeAnimationToWalking = false
         }
@@ -548,7 +548,7 @@ describe("loading a climber player", function ()
 
   before_each(function ()
     components = {
-      input = {
+      controllable = {
         playerOne = {
           startClimb = false
         }

@@ -185,7 +185,7 @@ describe("loading an entity with a nonexistent component", function ()
   end)
 end)
 
-describe("setting input to an entity that is not in config", function ()
+describe("setting inputs to an entity that is not in config", function ()
   local world, walkLeft
 
   before_each(function ()
@@ -195,8 +195,8 @@ describe("setting input to an entity that is not in config", function ()
     resourcemanager.setInputs(world, "player", {walkLeft = walkLeft})
   end)
 
-  it("should not create an input component", function ()
-    assert.is.falsy(world.gameState.components.input)
+  it("should not create a controllable component", function ()
+    assert.is.falsy(world.gameState.components.controllable)
   end)
 
   it("should create a commands table", function ()
@@ -204,14 +204,14 @@ describe("setting input to an entity that is not in config", function ()
   end)
 end)
 
-describe("loading an entity with an input", function ()
+describe("loading a controllable entity", function ()
   local config, world, walkLeft, walkRight, walkUp, walkDown, playerId
 
   before_each(function ()
     config = {
       entities = {
         player = {
-          input = true
+          controllable = true
         }
       }
     }
@@ -231,11 +231,11 @@ describe("loading an entity with an input", function ()
   end)
 
   it("should create a component for the entity", function ()    
-    local playerInput = world.gameState.components.input[playerId]
-    assert.are.same(false, playerInput.walkLeft)
-    assert.are.same(false, playerInput.walkRight)
-    assert.are.same(false, playerInput.walkUp)
-    assert.are.same(false, playerInput.walkDown)
+    local playerActions = world.gameState.components.controllable[playerId]
+    assert.are.same(false, playerActions.walkLeft)
+    assert.are.same(false, playerActions.walkRight)
+    assert.are.same(false, playerActions.walkUp)
+    assert.are.same(false, playerActions.walkDown)
   end)
 
   it("should map the defined commands with the entity", function ()
@@ -260,10 +260,10 @@ describe("loading two entities that share the same input", function ()
     local config = {
       entities = {
         ryu = {
-          input = true
+          controllable = true
         },
         ken = {
-          input = true
+          controllable = true
         }
       }
     }
@@ -292,10 +292,10 @@ describe("setting two equal commands with different references", function ()
     local config = {
       entities = {
         ryu = {
-          input = true
+          controllable = true
         },
         ken = {
-          input = true
+          controllable = true
         }
       }
     }
@@ -323,7 +323,7 @@ describe("setting two equal commands with different references", function ()
   end)
 end)
 
-describe("loading an entity with movement input and lacking keys", function ()
+describe("loading an entity with movement inputs and lacking keys", function ()
   it("should copy the defined keys and ignore the rest", function ()
     local config = {
       keys = {
@@ -333,7 +333,7 @@ describe("loading an entity with movement input and lacking keys", function ()
       },
       entities = {
         player = {
-          input = true
+          controllable = true
         }
       }
     }
@@ -347,15 +347,15 @@ describe("loading an entity with movement input and lacking keys", function ()
     })
 
     local playerId = entityTagger.getId("player")
-    local playerInput = world.gameState.components.input[playerId]
-    assert.are.same(false, playerInput.walkLeft)
-    assert.are.same(false, playerInput.walkRight)
-    assert.is.falsy(playerInput.walkUp)
-    assert.are.same(false, playerInput.walkDown)
+    local playerActions = world.gameState.components.controllable[playerId]
+    assert.are.same(false, playerActions.walkLeft)
+    assert.are.same(false, playerActions.walkRight)
+    assert.is.falsy(playerActions.walkUp)
+    assert.are.same(false, playerActions.walkDown)
   end)
 end)
 
-describe("loading an entity with movement input and keys", function ()
+describe("loading a controllable entity and keys", function ()
   it("should copy the defined keys to the component", function ()
     local config = {
       keys = {
@@ -366,7 +366,7 @@ describe("loading an entity with movement input and keys", function ()
       },
       entities = {
         player = {
-          input = true
+          controllable = true
         }
       }
     }
@@ -380,11 +380,11 @@ describe("loading an entity with movement input and keys", function ()
     })
 
     local playerId = entityTagger.getId("player")
-    local playerInput = world.gameState.components.input[playerId]
-    assert.are.same(false, playerInput.walkLeft)
-    assert.are.same(false, playerInput.walkRight)
-    assert.are.same(false, playerInput.walkUp)
-    assert.are.same(false, playerInput.walkDown)
+    local playerActions = world.gameState.components.controllable[playerId]
+    assert.are.same(false, playerActions.walkLeft)
+    assert.are.same(false, playerActions.walkRight)
+    assert.are.same(false, playerActions.walkUp)
+    assert.are.same(false, playerActions.walkDown)
   end)
 end)
 
@@ -483,19 +483,19 @@ describe("bulding world with nonempty menu and other entities", function ()
   it("should load components with menu entity", function ()
     assert.are.same({"Start"},
                     world.gameState.components.menu[mainMenuId].options)
-    assert.are.truthy(world.gameState.components.input[mainMenuId])
+    assert.are.truthy(world.gameState.components.controllable[mainMenuId])
   end)
 
-  it("should copy menu with its input", function ()
-    local menuInput = world.gameState.components.input[mainMenuId]
-    assert.are.same(false, menuInput.menuPrevious)
-    assert.are.same(false, menuInput.menuNext)
-    assert.are.same(false, menuInput.menuSelect)
+  it("should copy menu with its actions", function ()
+    local menuActions = world.gameState.components.controllable[mainMenuId]
+    assert.are.same(false, menuActions.menuPrevious)
+    assert.are.same(false, menuActions.menuNext)
+    assert.are.same(false, menuActions.menuSelect)
   end)
 
   it("should not copy entities that have not the menu component", function ()
-    assert.is.falsy(world.gameState.components.input[playerOneId])
-    assert.is.falsy(world.gameState.components.input[playerTwoId])
+    assert.is.falsy(world.gameState.components.controllable[playerOneId])
+    assert.is.falsy(world.gameState.components.controllable[playerTwoId])
     assert.is.falsy(world.gameState.components.position)
   end)
 end)
@@ -505,7 +505,7 @@ describe("loading entities and an empty levels table", function ()
     local config = {
       entities = {
         player = {
-          input = true
+          controllable = true
         }
       },
       levels = {}
@@ -513,7 +513,7 @@ describe("loading entities and an empty levels table", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.is.falsy(world.gameState.components.input)
+    assert.is.falsy(world.gameState.components.controllable)
   end)
 end)
 
@@ -522,7 +522,7 @@ describe("loading a level with defined entity and position", function ()
     local config = {
       entities = {
         sonic = {
-          input = true
+          controllable = true
         }
       },
       levels = {
@@ -539,7 +539,7 @@ describe("loading a level with defined entity and position", function ()
     })
 
     local playerId = entityTagger.getId("sonic")
-    assert.is.truthy(world.gameState.components.input[playerId])
+    assert.is.truthy(world.gameState.components.controllable[playerId])
     assert.are.same(200, world.gameState.components.position[playerId].x)
     assert.are.same(300, world.gameState.components.position[playerId].y)
   end)
@@ -550,7 +550,7 @@ describe("load two levels and the name of the first one", function ()
     local config = {
       entities = {
         sonic = {
-          input = true
+          controllable = true
         }
       },
       levels = {
@@ -571,7 +571,7 @@ describe("load two levels and the name of the first one", function ()
     })
 
     local playerId = entityTagger.getId("sonic")
-    assert.is.truthy(world.gameState.components.input[playerId])
+    assert.is.truthy(world.gameState.components.controllable[playerId])
     assert.are.same(200, world.gameState.components.position[playerId].x)
     assert.are.same(300, world.gameState.components.position[playerId].y)
   end)

@@ -40,7 +40,7 @@ M.sprites = {
 
 M.entities = {
   patato = {
-    input = true,
+    controllable = true,
     collector = true,
     collisionBox = {20, 120, 40, 120},
     animations = {
@@ -56,7 +56,7 @@ M.entities = {
     }
   },
    bee = {
-     input = true
+     controllable = true
    },
   bottles = {
     collectable = true,
@@ -75,11 +75,7 @@ M.entities = {
     trellis = true
   },
   mainMenu = {
-    input = {
-      menuPrevious = "up",
-      menuNext = "down",
-      menuSelect = "start"
-    },
+    controllable = true,
     menu = {
       options = {"Start", "Show message", "Secret level"},
     },

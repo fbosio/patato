@@ -1,10 +1,10 @@
 local M = {}
 
-local function setInputActions(inputs, commandActions, value)
+local function setInputActions(controllables, commandActions, value)
   for entityName, action in pairs(commandActions) do
     local entities = M.entityTagger.getIds(entityName)
     for _, entity in ipairs(entities or {}) do
-      (inputs[entity] or {})[action] = value
+      (controllables[entity] or {})[action] = value
     end
   end
 end
@@ -59,13 +59,14 @@ function M.update(hid, components)
           break
         end
       end
-      setInputActions(components.input or {}, commandActions, mustExecute)
+      setInputActions(components.controllable or {}, commandActions,
+                      mustExecute)
     end
   end
 
-  for entity, input in pairs(components.input or {}) do
+  for entity, actions in pairs(components.controllable or {}) do
     local entityComponents = buildActionArguments(entity, components)
-    for actionName, enabled in pairs(input) do
+    for actionName, enabled in pairs(actions) do
       if enabled then
         hid.actions[actionName](entityComponents)
       end
@@ -77,7 +78,7 @@ local function executeAction(hid, commandActions, components)
   for entityName, action in pairs(commandActions) do
     local entities = M.entityTagger.getIds(entityName)
     for _, entity in ipairs(entities or {}) do
-      if components.input[entity] then
+      if components.controllable[entity] then
         local entityComponents = buildActionArguments(entity, components)
         hid.actions[action](entityComponents)
       end

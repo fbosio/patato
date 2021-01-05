@@ -13,10 +13,10 @@ describe("loading 3 levels with players, a menu with 4 options", function ()
       },
       entities = {
         sonic = {
-          input = true
+          controllable = true
         },
         mainMenu = {
-          input = true,
+          controllable = true,
           menu = {
             options = {
               "Go to Green hill zone",
