@@ -355,6 +355,8 @@ end
 function M.buildWorld(config)
   local world = {hid = {}}
 
+  world.release = config.release
+
   world.physics = config.physics or {}
   world.physics.gravity = world.physics.gravity or 0
 

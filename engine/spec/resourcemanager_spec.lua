@@ -54,6 +54,16 @@ describe("loading an empty config", function ()
   end)
 end)
 
+describe("loading a config with a release hoisted flag", function ()
+  it("it should copy the flag", function ()
+    local config = {release = true}
+    
+    local world = resourcemanager.buildWorld(config)
+
+    assert.is.truthy(world.release)
+  end)
+end)
+
 describe("loading an empty physics table", function ()
   it("should load physics with zero gravity", function ()
     local config = {physics = {}}

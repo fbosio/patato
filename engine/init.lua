@@ -136,7 +136,8 @@ end
   end
 ]]
 function M.draw()
-  renderer.draw(M.gameState.components, M.gameState.inMenu, M.resources)
+  renderer.draw(M.gameState.components, M.gameState.inMenu, M.resources,
+                M.release)
 end
 
 --[[--
