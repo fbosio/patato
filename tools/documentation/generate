@@ -1,0 +1,5 @@
+#!/bin/bash
+ldoc .
+echo Moving README to directory "engine"
+mv README.markdown ../../engine/README.md
+

@@ -1,0 +1,42 @@
+@ local function markup(text)
+@   return text:gsub("@{(.-)}", function (reference)
+@     return "[" .. reference .. "](#"
+@            .. reference:gsub(module.name .. ".", "") .. ")"
+@   end)
+@ end
+# $(module.name)
+$(markup(module.summary))
+$(markup(module.description))
+
+@ if module.usage then
+```lua
+$(module.usage)
+```
+@ end
+
+@ for kind, items in module.kinds() do
+## $(kind)
+$(markup(ldoc.descript(module.kinds:get_item(kind))))
+@   for item in items() do
+### $(item.name)
+$(markup(item.summary))
+$(markup(item.description))
+
+`$(ldoc.display_name(item))`
+
+@     for parm in ldoc.modules.iter(item.params) do
+@       for p in ldoc.modules.iter(item:subparam(parm)) do
+* _$(item:display_name_of(p))_ (**$(item:type_of_param(p))**):
+  $(item.params.map[p])
+@       end
+@     end
+
+@     if item.usage then
+```lua
+@     for usage in ldoc.modules.iter(item.usage) do
+$(usage)
+```
+@     end
+@     end
+@   end
+@ end
