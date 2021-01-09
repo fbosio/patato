@@ -37,25 +37,32 @@ do
     for frameNumber = tag.fromFrame.frameNumber, tag.toFrame.frameNumber do
       if frameNumber == tag.fromFrame.frameNumber then
         local cel = originLayer:cel(frameNumber)
-        origin.x = cel.position.x
-        origin.y = cel.position.y
+        if not cel then
+          app.alert("No cel in " .. tostring(frameNumber) .. "."
+                    .. "Using (0, 0) as origin.")
+          origin.x, origin.y = 0, 0
+        else
+          origin.x, origin.y = cel.position.x, cel.position.y
+        end
       end
       -- Check if the frame data was already added
       local isNewFrameData = false
       for _, layer in ipairs(spr.layers) do
         if layer ~= originLayer then
           local cel = layer:cel(frameNumber)
-          local isNewCelData = true
-          for _, celImage in ipairs(celImages) do
-            if celImage:isEqual(cel.image) then
-              isNewCelData = false
-              break
+          if cel then
+            local isNewCelData = true
+            for _, celImage in ipairs(celImages) do
+              if celImage:isEqual(cel.image) then
+                isNewCelData = false
+                break
+              end
             end
-          end
-          if isNewCelData or #celImages == 0 then
-            frameRectangle = frameRectangle:union(cel.bounds)
-            isNewFrameData = true
-            celImages[#celImages+1] = cel.image
+            if isNewCelData or #celImages == 0 then
+              frameRectangle = frameRectangle:union(cel.bounds)
+              isNewFrameData = true
+              celImages[#celImages+1] = cel.image
+            end
           end
         end
       end
@@ -81,34 +88,32 @@ end
 
 -- Build animations buffer
 local animBuffer = {}
-do
-  local loopSuffix = "_loop"
-  for tagName, frameNumbers in pairs(tagsMap) do
-    local animDataBuffer = {}
-    for _, frameNumber in ipairs(frameNumbers) do
-      animDataBuffer[#animDataBuffer+1] = frameNumber
-      animDataBuffer[#animDataBuffer+1] = spr.frames[frameNumber].duration
-    end
-    local suffixIndex = tagName:find(loopSuffix)
-    local nameWithoutSuffix = tagName:sub(1, suffixIndex and suffixIndex - 1)
-    local looping = false
-    if nameWithoutSuffix ~= tagName then
-      tagName = nameWithoutSuffix
-      looping = true
-    end
-    animBuffer[#animBuffer+1] = "\t" .. tagName .. " = {"
-      .. table.concat(animDataBuffer, ", ") .. ", " .. tostring(looping)
-    .. "}"
+for tagName, frameNumbers in pairs(tagsMap) do
+  local animDataBuffer = {}
+  for _, frameNumber in ipairs(frameNumbers) do
+    animDataBuffer[#animDataBuffer+1] = frameNumber
+    animDataBuffer[#animDataBuffer+1] = spr.frames[frameNumber].duration
   end
+  local suffixIndex = tagName:find("_loop")
+  local nameWithoutSuffix = tagName:sub(1, suffixIndex and suffixIndex - 1)
+  local looping = false
+  if nameWithoutSuffix ~= tagName then
+    tagName = nameWithoutSuffix
+    looping = true
+  end
+  animBuffer[#animBuffer+1] = "\t" .. tagName .. " = {"
+    .. table.concat(animDataBuffer, ", ") .. ", " .. tostring(looping)
+  .. "}"
 end
 
 -- Write output file
+local path, title = spr.filename:match("^(.+[/\\])(.-).([^.]*)$")
 do
   local sprOutput = "{\n" .. table.concat(sprBuffer, ",\n") .. "\n}"
   local animOutput = "{\n" .. table.concat(animBuffer, ",\n") .. "\n}"
   local output = "local M\nM.sprites = " .. sprOutput
                  .. "\nM.animations = " .. animOutput .. "\nreturn M\n"
-  local file = assert(io.open("resources.lua", "w+"))
+  local file = assert(io.open(path .. "/resources.lua", "w+"))
   file:write(output)
   file:close()
 end
@@ -116,7 +121,7 @@ end
 app.command.ExportSpriteSheet{
   ui = false,
   type = SpriteSheetType.ROWS,
-  textureFilename = "spritesheet.png",
+  textureFilename = path .. "/" .. title .. ".png",
   innerPadding = 1,
   trim = true,
   splitTags = true,
