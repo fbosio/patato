@@ -1,0 +1,34 @@
+# $(module.name)
+$(ldoc.descript(module))
+
+@ if module.usage then
+```lua
+$(module.usage)
+```
+@ end
+
+@ for kind, items in module.kinds() do
+## $(kind)
+$(ldoc.descript(module.kinds:get_item(kind)))
+@   for item in items() do
+### $(item.name)
+$(ldoc.descript(item))
+
+`$(ldoc.display_name(item))`
+
+@     for parm in ldoc.modules.iter(item.params) do
+@       for p in ldoc.modules.iter(item:subparam(parm)) do
+* _$(item:display_name_of(p))_ (**$(item:type_of_param(p))**):
+  $(item.params.map[p])
+@       end
+@     end
+
+@     if item.usage then
+```lua
+@     for usage in ldoc.modules.iter(item.usage) do
+$(usage)
+```
+@     end
+@     end
+@   end
+@ end
