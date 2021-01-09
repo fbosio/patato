@@ -7,63 +7,120 @@ elseif #spr.tags == 0 then
   return
 end
 -- #spr.layers is always greater than zero: no checking needed
-local resetOriginLayer, originLayer
+local originLayer, wasOriginLayerVisible
 for _, layer in ipairs(spr.layers) do
-  if string.find(string.lower(layer.name), "^origins?$") then
+  if layer.name:lower():find("^origins?$") then
     originLayer = layer
-    local wasVisible = layer.isVisible
-    resetOriginLayer = function ()
-      layer.isVisible = wasVisible
-    end
+    wasOriginLayerVisible = layer.isVisible
     layer.isVisible = false
     break
   end
 end
-if not resetOriginLayer then
+if not originLayer then
   app.alert('No "Origin" layer')
   return
 end
 
 -- Build sprites buffer
-local spritesBuffer = {}
-local origin = {x = 0, y = 0}
-local borderPadding = 1
-local spacing = 1
-local x, y = borderPadding, borderPadding
-local frameRectangle = Rectangle()
-for _, tag in ipairs(spr.tags) do
-  frameRectangle.x, frameRectangle.y = 0, 0
-  frameRectangle.width = 0
-  for frameNumber = tag.fromFrame.frameNumber, tag.toFrame.frameNumber do
-    if frameNumber == tag.fromFrame.frameNumber then
-      local cel = originLayer:cel(frameNumber)
-      origin.x = cel.position.x
-      origin.y = cel.position.y
-    end
-    for _, layer in ipairs(spr.layers) do
-      if layer ~= originLayer then
-        local cel = layer:cel(frameNumber)
-        frameRectangle = frameRectangle:union(cel.bounds)
+local sprBuffer = {}
+local tagsMap = {}
+do
+  local origin = {x = 0, y = 0}
+  local borderPadding = 1
+  local spacing = 1
+  local x, y = borderPadding, borderPadding
+  local frameRectangle = Rectangle()
+  local celImages = {}
+  for _, tag in ipairs(spr.tags) do
+    frameRectangle.x, frameRectangle.y = 0, 0
+    frameRectangle.width = 0
+    for frameNumber = tag.fromFrame.frameNumber, tag.toFrame.frameNumber do
+      if frameNumber == tag.fromFrame.frameNumber then
+        local cel = originLayer:cel(frameNumber)
+        origin.x = cel.position.x
+        origin.y = cel.position.y
+      end
+      -- Check if the frame data was already added
+      local isNewFrameData = false
+      for _, layer in ipairs(spr.layers) do
+        if layer ~= originLayer then
+          local cel = layer:cel(frameNumber)
+          local isNewCelData = true
+          for _, celImage in ipairs(celImages) do
+            if celImage:isEqual(cel.image) then
+              isNewCelData = false
+              break
+            end
+          end
+          if isNewCelData or #celImages == 0 then
+            frameRectangle = frameRectangle:union(cel.bounds)
+            isNewFrameData = true
+            celImages[#celImages+1] = cel.image
+          end
+        end
+      end
+      -- Add to the sprites buffer only data from unlinked frames
+      if isNewFrameData then
+        local tagFrameNumbers = tagsMap[tag.name] or {}
+        tagFrameNumbers[#tagFrameNumbers+1] = frameNumber
+        tagsMap[tag.name] = tagFrameNumbers
+        sprBuffer[#sprBuffer+1] = "\t{"
+          .. tostring(x) .. ", "
+          .. tostring(y) .. ", "
+          .. tostring(frameRectangle.width) .. ", "
+          .. tostring(frameRectangle.height) .. ", "
+          .. tostring(origin.x) .. ", "
+          .. tostring(origin.y)
+        .. "}"
+        x = x + frameRectangle.width + spacing
       end
     end
-    spritesBuffer[#spritesBuffer+1] = "\t{"
-      .. tostring(x) .. ", "
-      .. tostring(y) .. ", "
-      .. tostring(frameRectangle.width) .. ", "
-      .. tostring(frameRectangle.height) .. ", "
-      .. tostring(origin.x) .. ", "
-      .. tostring(origin.y)
-    .. "}"
-    x = x + frameRectangle.width + spacing
+    y = y + frameRectangle.height + spacing
   end
-  y = y + frameRectangle.height + spacing
+end
+
+-- Build animations buffer
+local animBuffer = {}
+do
+  local loopSuffix = "_loop"
+  for tagName, frameNumbers in pairs(tagsMap) do
+    local animDataBuffer = {}
+    for _, frameNumber in ipairs(frameNumbers) do
+      animDataBuffer[#animDataBuffer+1] = frameNumber
+      animDataBuffer[#animDataBuffer+1] = spr.frames[frameNumber].duration
+    end
+    local suffixIndex = tagName:find(loopSuffix)
+    local nameWithoutSuffix = tagName:sub(1, suffixIndex and suffixIndex - 1)
+    local looping = false
+    if nameWithoutSuffix ~= tagName then
+      tagName = nameWithoutSuffix
+      looping = true
+    end
+    animBuffer[#animBuffer+1] = "\t" .. tagName .. " = {"
+      .. table.concat(animDataBuffer, ", ") .. ", " .. tostring(looping)
+    .. "}"
+  end
 end
 
 -- Write output file
-local spritesOutput = "{\n" .. table.concat(spritesBuffer, ",\n") .. "\n}"
-local output = "local M\nM.sprites = " .. spritesOutput .. "\nreturn M\n"
-local file = assert(io.open("resources.lua", "w+"))
-file:write(output)
-file:close()
+do
+  local sprOutput = "{\n" .. table.concat(sprBuffer, ",\n") .. "\n}"
+  local animOutput = "{\n" .. table.concat(animBuffer, ",\n") .. "\n}"
+  local output = "local M\nM.sprites = " .. sprOutput
+                 .. "\nM.animations = " .. animOutput .. "\nreturn M\n"
+  local file = assert(io.open("resources.lua", "w+"))
+  file:write(output)
+  file:close()
+end
 
-resetOriginLayer()
+app.command.ExportSpriteSheet{
+  ui = false,
+  type = SpriteSheetType.ROWS,
+  textureFilename = "spritesheet.png",
+  innerPadding = 1,
+  trim = true,
+  splitTags = true,
+  mergeDuplicates = true
+}
+
+originLayer.isVisible = wasOriginLayerVisible
