@@ -113,7 +113,7 @@ do
   local animOutput = "{\n" .. table.concat(animBuffer, ",\n") .. "\n}"
   local output = "local M\nM.sprites = " .. sprOutput
                  .. "\nM.animations = " .. animOutput .. "\nreturn M\n"
-  local file = assert(io.open(path .. "/resources.lua", "w+"))
+  local file = assert(io.open(path .. "resources.lua", "w+"))
   file:write(output)
   file:close()
 end
