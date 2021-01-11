@@ -30,19 +30,11 @@ do
   local x, y = innerPadding, innerPadding
   local uniqueCelsSprNumber = {}
   local spriteNumber = 1
+  local frameRectangle = Rectangle()
   for _, tag in ipairs(spr.tags) do
     for frameNumber = tag.fromFrame.frameNumber, tag.toFrame.frameNumber do
-      -- Get sprite origin
-      if frameNumber == tag.fromFrame.frameNumber then
-        local cel = originLayer:cel(frameNumber)
-        if not cel then
-          print("No cel in " .. tostring(frameNumber) .. "."
-                .. " Using (0, 0) as origin.")
-          origin.x, origin.y = 0, 0
-        else
-          origin.x, origin.y = cel.position.x, cel.position.y
-        end
-      end
+      frameRectangle.x, frameRectangle.y = 0, 0
+      frameRectangle.width = 0
       -- Check if the frame data was already added
       local isNewFrameData = false
       local uniqueSpriteNumber = spriteNumber
@@ -62,6 +54,9 @@ do
                 end
               end
             end
+            frameRectangle = frameRectangle.isEmpty
+                             and cel.bounds
+                             or frameRectangle:union(cel.bounds)
             if isNewCelData then
               isNewFrameData = true
               uniqueCelsSprNumber[cel] = spriteNumber
@@ -69,6 +64,16 @@ do
             end
           end
         end
+      end
+      -- Get sprite origin
+      local cel = originLayer:cel(frameNumber)
+      if not cel then
+        print("No cel in " .. tostring(frameNumber) .. "."
+              .. " Using (0, 0) as origin.")
+        origin.x, origin.y = 0, 0
+      else
+        origin.x = cel.position.x - frameRectangle.x
+        origin.y = cel.position.y - frameRectangle.y
       end
       local tagSpriteNumbers = tagsMap[tag.name] or {}
       tagSpriteNumbers[#tagSpriteNumbers+1] = uniqueSpriteNumber
@@ -78,17 +83,17 @@ do
         sprBuffer[#sprBuffer+1] = "\t{"
           .. tostring(x) .. ", "
           .. tostring(y) .. ", "
-          .. tostring(spr.width) .. ", "
-          .. tostring(spr.height) .. ", "
+          .. tostring(frameRectangle.width) .. ", "
+          .. tostring(frameRectangle.height) .. ", "
           .. tostring(origin.x) .. ", "
           .. tostring(origin.y)
         .. "}"
         spriteNumber = spriteNumber + 1
-        x = x + spr.width + innerPadding
+        x = x + frameRectangle.width + innerPadding
       end
     end
     x = innerPadding
-    y = y + spr.height + innerPadding
+    y = y + frameRectangle.height + innerPadding
   end
 end
 
@@ -129,6 +134,7 @@ app.command.ExportSpriteSheet{
   type = SpriteSheetType.ROWS,
   textureFilename = path .. "/" .. title .. ".png",
   innerPadding = innerPadding,
+  trim = true,
   splitTags = true,
   mergeDuplicates = true
 }
