@@ -175,12 +175,12 @@ local function buildFromVertex(entity, entityComponents, vertex, world)
     local x2 = math.max(vertex[1], vertex[3])
     local y1 = math.min(vertex[2], vertex[4] or vertex[2])
     local y2 = math.max(vertex[2], vertex[4] or vertex[2])
-    setComponentAttribute(world, "position", entity, "x", (x1+x2)/2)
-    setComponentAttribute(world, "position", entity, "y", (y1+y2)/2)
+    setComponentAttribute(world, "position", entity, "x", x1)
+    setComponentAttribute(world, "position", entity, "y", y1)
     local width = x2 - x1
     local height = y2 - y1
     setComponentAttribute(world, "collisionBox", entity, "origin",
-                          {x = width/2, y = height/2})
+                          {x = 0, y = 0})
     setComponentAttribute(world, "collisionBox", entity, "width",
                           width)
     setComponentAttribute(world, "collisionBox", entity, "height",

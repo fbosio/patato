@@ -957,8 +957,8 @@ describe("loading surface entities that are in a level", function ()
 
   it("should create collision boxes for each entity", function ()
     assert.are.same({
-      {origin = {x = 150, y = 75}, width = 300, height = 150},
-      {origin = {x = 150, y = 75}, width = 300, height = 150},
+      {origin = {x = 0, y = 0}, width = 300, height = 150},
+      {origin = {x = 0, y = 0}, width = 300, height = 150},
     }, world.gameState.components.collisionBox)
   end)
 end)
@@ -985,8 +985,8 @@ describe("loading cloud entities that are in a level", function ()
     
     local collisionBox = world.gameState.components.collisionBox
     assert.are.same({
-      {origin = {x = 150, y = 0}, width = 300, height = 0},
-      {origin = {x = 150, y = 0}, width = 300, height = 0},
+      {origin = {x = 0, y = 0}, width = 300, height = 0},
+      {origin = {x = 0, y = 0}, width = 300, height = 0},
     }, collisionBox)
   end)
 end)
@@ -1018,10 +1018,10 @@ describe("loading slope entities that are in a level", function ()
 
   it("should create collision boxes for each entity", function ()
     assert.are.same({
-      {origin = {x = 5, y = 5}, width = 10, height = 10},
-      {origin = {x = 5, y = 5}, width = 10, height = 10},
-      {origin = {x = 5, y = 5}, width = 10, height = 10},
-      {origin = {x = 5, y = 5}, width = 10, height = 10},
+      {origin = {x = 0, y = 0}, width = 10, height = 10},
+      {origin = {x = 0, y = 0}, width = 10, height = 10},
+      {origin = {x = 0, y = 0}, width = 10, height = 10},
+      {origin = {x = 0, y = 0}, width = 10, height = 10},
     }, world.gameState.components.collisionBox)
   end)
 
@@ -1173,8 +1173,8 @@ describe("loading trellis entities that are in a level", function ()
 
   it("should create collision boxes for each entity", function ()
     assert.are.same({
-      {origin = {x = 150, y = 75}, width = 300, height = 150},
-      {origin = {x = 150, y = 75}, width = 300, height = 150},
+      {origin = {x = 0, y = 0}, width = 300, height = 150},
+      {origin = {x = 0, y = 0}, width = 300, height = 150},
     }, world.gameState.components.collisionBox)
   end)
 end)

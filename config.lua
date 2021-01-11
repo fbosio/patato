@@ -46,7 +46,6 @@ M.entities = {
     collisionBox = {20, 120, 40, 120},
     animations = resources.animations,
     impulseSpeed = {
-      walk = 100,
       jump = 1500,
       climb = 200,
       climbJump = 700
