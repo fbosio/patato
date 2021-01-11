@@ -56,10 +56,7 @@ M.entities = {
   },
   bottles = {
     flags = {"collectable"},
-    collisionBox = {15, 45, 35, 45},
-    animations = {
-      idle = {5, 1, false}
-    }
+    collisionBox = {15, 45, 35, 45}
   },
   surfaces = {
     collideable = "rectangle"
