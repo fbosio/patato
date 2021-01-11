@@ -32,7 +32,7 @@ M.joystick = {
 
 M.spriteSheet = "resources/patato.png"
 M.spriteScale = 2
-M.sprites = resources.sprites
+M.sprites = resources.patato.sprites
 
 M.entities = {
   patato = {
@@ -44,7 +44,7 @@ M.entities = {
       "climber"
     },
     collisionBox = {20, 120, 40, 120},
-    animations = resources.animations,
+    animations = resources.patato.animations,
     impulseSpeed = {
       jump = 1500,
       climb = 200,
@@ -58,11 +58,11 @@ M.entities = {
     flags = {"collectable"},
     collisionBox = {15, 45, 35, 45}
   },
-  surfaces = {
-    collideable = "rectangle"
+  soilSurfaces = {
+    collideable = "rectangle",
   },
-  slopes = {
-    collideable = "triangle"
+  soilSlopes = {
+    collideable = "triangle",
   },
   trellises = {
     flags = {"trellis"}
@@ -87,13 +87,13 @@ M.levels = {
       {565, 80},
       {600, 500},
     },
-    surfaces = {
+    soilSurfaces = {
       {200, 250, 300, 350},  -- block: x1, y1, x2, y2
       {100, 450, 700, 350},
       {200, 450, 300, 550},
       {300, 80, 500}  -- cloud: x1, y1, x2
     },
-    slopes = {
+    soilSlopes = {
       {100, 90, 20, 200},
       {100, 350, 200, 250},
       {400, 350, 300, 250},
@@ -104,7 +104,7 @@ M.levels = {
   },
   secretLevel = {
     patato = {200, 500},
-    surfaces = {20, 540, 400, 600},
+    soilSurfaces = {20, 540, 400, 600},
   },
 }
 M.firstLevel = "garden"
