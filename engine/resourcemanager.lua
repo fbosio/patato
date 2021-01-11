@@ -27,8 +27,13 @@ local function createDefaultVelocity(world, entity)
 end
 
 local function createDefaults(world, entity)
-  setComponentAttribute(world, "impulseSpeed", entity, "walk", 400)
-  setComponentAttribute(world, "impulseSpeed", entity, "jump", 1500)
+  world.gameState.components.impulseSpeed =
+    world.gameState.components.impulseSpeed or {}
+  world.gameState.components.impulseSpeed[entity] =
+    world.gameState.components.impulseSpeed[entity] or {}
+  if not world.gameState.components.impulseSpeed[entity].walk then
+    setComponentAttribute(world, "impulseSpeed", entity, "walk", 400)
+  end
   createDefaultPosition(world, entity)
   createDefaultVelocity(world, entity)
 end
@@ -41,7 +46,7 @@ local function copyMenuToState(world, menu, entity)
   setComponentAttribute(world, "menu", entity, "options", menuOptions)
   setComponentAttribute(world, "menu", entity, "callbacks", {})
   setComponentAttribute(world, "menu", entity, "selected", 1)
-  world.gameState.inMenu = true  -- cambiar por escena
+  world.gameState.inMenu = true  -- change when scenes are added
 end
 
 local flagStateBuilders = {
@@ -207,7 +212,7 @@ local function buildNonMenu(entityName, entityComponents, world)
       assert(stateBuilders[componentName],
              "Entity \"" .. entityName .. "\" has a component named \""
              .. componentName .. "\" that was not expected in config.lua")
-             stateBuilders[componentName](world, component, entity)
+      stateBuilders[componentName](world, component, entity)
     end
   end
   return entity

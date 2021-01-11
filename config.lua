@@ -1,3 +1,5 @@
+local resources = require "resources"
+
 local M = {}
 
 M.physics = {
@@ -28,15 +30,9 @@ M.joystick = {
   }
 }
 
-M.spriteSheet = "resources/sprites/patato.png"
-M.spriteScale = 0.5
-M.sprites = {
-  {1, 1, 137, 266, 72.35, 256.5}, -- {x, y, width, height, originX, originY}
-  {138, 1, 205, 251, 96.35, 251.5},
-  {343, 1, 134, 282, 55.349999999999994, 271.5},
-  {477, 1, 190, 264, 101.35, 259.5},
-  {917, 833, 61, 83, 28.349999999999994, 80.5}
-}
+M.spriteSheet = "resources/patato.png"
+M.spriteScale = 2
+M.sprites = resources.sprites
 
 M.entities = {
   patato = {
@@ -47,19 +43,17 @@ M.entities = {
       "gravitational",
       "climber"
     },
-    collisionBox = {20, 120, 40, 120},
-    animations = {
-      walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
-      standing = {1, 1, false} -- {spr1, t1, spr2, t2, ..., looping}
-    },
+    collisionBox = {20, 120, 40, 115},
+    animations = resources.animations,
     impulseSpeed = {
+      jump = 1500,
       climb = 200,
       climbJump = 700
     }
   },
-   bee = {
-     flags = {"controllable"}
-   },
+  bee = {
+    flags = {"controllable"}
+  },
   bottles = {
     flags = {"collectable"},
     collisionBox = {15, 45, 35, 45},

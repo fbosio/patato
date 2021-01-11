@@ -60,7 +60,7 @@ function M.load()
     config = {
       entities = {
         player = {
-          input = true
+          flags = {"controllable"}
         }
       }
     }

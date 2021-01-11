@@ -225,6 +225,7 @@ describe("loading a controllable entity", function ()
         }
       }
     }
+
     world = resourcemanager.buildWorld(config)
     
     walkLeft = command.new{input = "left"}
@@ -240,7 +241,7 @@ describe("loading a controllable entity", function ()
     playerId = entityTagger.getId("player")
   end)
 
-  it("should create a component for the entity", function ()    
+  it("should create a component for the entity", function ()
     local playerActions = world.gameState.components.controllable[playerId]
     assert.are.same(false, playerActions.walkLeft)
     assert.are.same(false, playerActions.walkRight)
@@ -260,7 +261,25 @@ describe("loading a controllable entity", function ()
                     world.gameState.components.position[playerId])
     assert.are.same({x = 0, y = 0},
                     world.gameState.components.velocity[playerId])
-    assert.are.same({walk = 400, jump = 1500},
+    assert.are.same({walk = 400},
+                    world.gameState.components.impulseSpeed[playerId])
+  end)
+
+end)
+
+describe("loading a controllable entity with a walk speed defined", function ()
+  it("should not overwrite the speed", function ()
+    local config = {
+      entities = {
+        player = {
+          flags = {"controllable"},
+          impulseSpeed = {walk = 800}
+        }
+      }
+    }
+    local world = resourcemanager.buildWorld(config)
+    local playerId = entityTagger.getId("player")
+    assert.are.same({walk = 800},
                     world.gameState.components.impulseSpeed[playerId])
   end)
 end)

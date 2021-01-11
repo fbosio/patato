@@ -21,25 +21,23 @@ if not originLayer then
   return
 end
 
--- Build sprites buffer
+-- Build sprites buffer and tags map for animations buffer
 local sprBuffer = {}
 local tagsMap = {}
+local innerPadding = 1
 do
   local origin = {x = 0, y = 0}
-  local borderPadding = 1
-  local spacing = 1
-  local x, y = borderPadding, borderPadding
-  local frameRectangle = Rectangle()
-  local celImages = {}
+  local x, y = innerPadding, innerPadding
+  local uniqueCelsSprNumber = {}
+  local spriteNumber = 1
   for _, tag in ipairs(spr.tags) do
-    frameRectangle.x, frameRectangle.y = 0, 0
-    frameRectangle.width = 0
     for frameNumber = tag.fromFrame.frameNumber, tag.toFrame.frameNumber do
+      -- Get sprite origin
       if frameNumber == tag.fromFrame.frameNumber then
         local cel = originLayer:cel(frameNumber)
         if not cel then
-          app.alert("No cel in " .. tostring(frameNumber) .. "."
-                    .. "Using (0, 0) as origin.")
+          print("No cel in " .. tostring(frameNumber) .. "."
+                .. " Using (0, 0) as origin.")
           origin.x, origin.y = 0, 0
         else
           origin.x, origin.y = cel.position.x, cel.position.y
@@ -47,46 +45,54 @@ do
       end
       -- Check if the frame data was already added
       local isNewFrameData = false
+      local uniqueSpriteNumber = spriteNumber
       for _, layer in ipairs(spr.layers) do
         if layer ~= originLayer then
           local cel = layer:cel(frameNumber)
           if cel then
             local isNewCelData = true
-            for _, celImage in ipairs(celImages) do
-              if celImage:isEqual(cel.image) then
-                isNewCelData = false
-                break
+            if not isNewFrameData then
+              for uniqueCel, celSprNumber in pairs(uniqueCelsSprNumber) do
+                if uniqueCel.image:isEqual(cel.image)
+                    and uniqueCel.position.x == cel.position.x
+                    and uniqueCel.position.y == cel.position.y then
+                  isNewCelData = false
+                  uniqueSpriteNumber = celSprNumber
+                  break
+                end
               end
             end
-            if isNewCelData or #celImages == 0 then
-              frameRectangle = frameRectangle:union(cel.bounds)
+            if isNewCelData then
               isNewFrameData = true
-              celImages[#celImages+1] = cel.image
+              uniqueCelsSprNumber[cel] = spriteNumber
+              uniqueSpriteNumber = spriteNumber
             end
           end
         end
       end
-      -- Add to the sprites buffer only data from unlinked frames
+      local tagSpriteNumbers = tagsMap[tag.name] or {}
+      tagSpriteNumbers[#tagSpriteNumbers+1] = uniqueSpriteNumber
+      tagsMap[tag.name] = tagSpriteNumbers
+      -- Add to the sprites buffer only data from unique frames
       if isNewFrameData then
-        local tagFrameNumbers = tagsMap[tag.name] or {}
-        tagFrameNumbers[#tagFrameNumbers+1] = frameNumber
-        tagsMap[tag.name] = tagFrameNumbers
         sprBuffer[#sprBuffer+1] = "\t{"
           .. tostring(x) .. ", "
           .. tostring(y) .. ", "
-          .. tostring(frameRectangle.width) .. ", "
-          .. tostring(frameRectangle.height) .. ", "
+          .. tostring(spr.width) .. ", "
+          .. tostring(spr.height) .. ", "
           .. tostring(origin.x) .. ", "
           .. tostring(origin.y)
         .. "}"
-        x = x + frameRectangle.width + spacing
+        spriteNumber = spriteNumber + 1
+        x = x + spr.width + innerPadding
       end
     end
-    y = y + frameRectangle.height + spacing
+    x = innerPadding
+    y = y + spr.height + innerPadding
   end
 end
 
--- Build animations buffer
+-- Build animations buffer using tags map builded before
 local animBuffer = {}
 for tagName, frameNumbers in pairs(tagsMap) do
   local animDataBuffer = {}
@@ -111,9 +117,9 @@ local path, title = spr.filename:match("^(.+[/\\])(.-).([^.]*)$")
 do
   local sprOutput = "{\n" .. table.concat(sprBuffer, ",\n") .. "\n}"
   local animOutput = "{\n" .. table.concat(animBuffer, ",\n") .. "\n}"
-  local output = "local M\nM.sprites = " .. sprOutput
+  local output = "local M = {}\nM.sprites = " .. sprOutput
                  .. "\nM.animations = " .. animOutput .. "\nreturn M\n"
-  local file = assert(io.open(path .. "resources.lua", "w+"))
+  local file = assert(io.open(path .. "init.lua", "w+"))
   file:write(output)
   file:close()
 end
@@ -122,8 +128,7 @@ app.command.ExportSpriteSheet{
   ui = false,
   type = SpriteSheetType.ROWS,
   textureFilename = path .. "/" .. title .. ".png",
-  innerPadding = 1,
-  trim = true,
+  innerPadding = innerPadding,
   splitTags = true,
   mergeDuplicates = true
 }

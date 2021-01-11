@@ -32,26 +32,32 @@ function love.load()
       c.climber.climbing = false
       c.velocity.y = -c.impulseSpeed.jump
       c.gravitational.enabled = true
+      c.animation.name = "jumping"
     elseif c.velocity.y == 0 then
+      c.animation.name = "jumping"
       c.velocity.y = -c.impulseSpeed.jump
     end
   end)
   engine.setAction("startClimb", function (c)
     c.climber.climbing = true
+    c.animation.name = "climbingIdle"
   end)
   engine.setAction("climbUp", function (c)
     if c.climber.climbing and c.climber.trellis then
       c.velocity.y = -c.impulseSpeed.climb
+      c.animation.name = "climbingMove"
     end
   end)
   engine.setAction("climbDown", function (c)
     if c.climber.climbing and c.climber.trellis then
       c.velocity.y = c.impulseSpeed.climb
+      c.animation.name = "climbingMove"
     end
   end)
   engine.setAction("stopClimbingVertically", function (c)
     if c.climber.climbing then
       c.velocity.y = 0
+      c.animation.name = "climbingIdle"
     end
   end)
   
