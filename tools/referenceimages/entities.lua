@@ -16,7 +16,11 @@ local function newEntityGenerator(patterns)
     local data
     repeat
       k, data = next(t, k)
+      -- Stop iteration when there are no keys left in the table
       if not k then return nil end
+      -- Convert data to table when needed because it is easier to traverse
+      if type(data[1]) ~= "table" then data = {data} end
+      -- Traverse collideable entities only
       for _, collideable in ipairs(entities) do
         if k == collideable then
           return k, data
@@ -31,11 +35,9 @@ local patterns = {
     '([_%a][_%w]*)%s*=%s*{[^{]*collideable%s*=%s*%b"".-}',
     '([_%a][_%w]*)%s*=%s*{[^{]*flags%s*=%s*{[^}]*"trellis"[^}]*}'
   },
-  rectangle = {
-    '([_%a][_%w]*)%s*=%s*{[^{]*collideable%s*=%s*"rectangle".-}',
-    '([_%a][_%w]*)%s*=%s*{[^{]*flags%s*=%s*{[^}]*"trellis"[^}]*}'
-  },
-  triangle = '([_%a][_%w]*)%s*=%s*{[^{]*collideable%s*=%s*"triangle".-}'
+  rectangle = '([_%a][_%w]*)%s*=%s*{[^{]*collideable%s*=%s*"rectangle".-}',
+  triangle = '([_%a][_%w]*)%s*=%s*{[^{]*collideable%s*=%s*"triangle".-}',
+  trellis = '([_%a][_%w]*)%s*=%s*{[^{]*flags%s*=%s*{[^}]*"trellis"[^}]*}'
 }
 for entityType, pattern in pairs(patterns) do
   M[entityType] = {
