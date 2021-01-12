@@ -1,4 +1,6 @@
 local M = {}
+
+M.spriteSheet = "resources/patato.png"
 M.sprites = {
 	{1, 1, 28, 61, 14, 60},
 	{1, 63, 32, 58, 17, 59},
@@ -10,10 +12,10 @@ M.sprites = {
 	{32, 235, 30, 58, 15, 57}
 }
 M.animations = {
-	jumping = {5, 0.1, false},
-	climbingMove = {7, 0.1, 6, 0.1, 8, 0.1, 6, 0.1, true},
-	standing = {1, 0.1, false},
 	climbingIdle = {6, 0.1, false},
-	walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true}
+	standing = {1, 0.1, false},
+	walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
+	jumping = {5, 0.1, false},
+	climbingMove = {7, 0.1, 6, 0.1, 8, 0.1, 6, 0.1, true}
 }
 return M
