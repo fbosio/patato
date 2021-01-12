@@ -31,7 +31,7 @@ M.joystick = {
 }
 
 M.spriteSheet = "resources/patato.png"
-M.spriteScale = 2
+M.spriteScale = 1
 M.sprites = resources.patato.sprites
 
 M.entities = {
@@ -67,6 +67,12 @@ M.entities = {
   trellises = {
     flags = {"trellis"}
   },
+  gardenArtwork = {
+    animations = resources.levels.garden.animations
+  },
+  secretLevelArtwork = {
+    animations = resources.levels.secretLevel.animations
+  },
   mainMenu = {
     flags = {"controllable"},
     menu = {
@@ -77,6 +83,7 @@ M.entities = {
 
 M.levels = {
   garden = {
+    gardenArtwork = {0, 0},
     patato = {250, 100},
     bee = {450, 105},
     bottles = {
@@ -104,6 +111,7 @@ M.levels = {
     trellises = {420, 20, 680, 370},
   },
   secretLevel = {
+    secretLevelArtwork = {0, 0},
     patato = {200, 500},
     soilSurfaces = {20, 540, 400, 600},
   },
