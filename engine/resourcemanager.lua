@@ -96,6 +96,11 @@ local stateBuilders = {
     end
   end,
   resources = function (world, component, entity)
+    local entityName = M.entityTagger.getName(entity)
+    assert(component.sprites and component.spriteSheet
+           or not component.sprites,
+           "Entity \"" .. entityName .. "\" has sprites but no sprite sheet "
+           .. "declared in config.lua")
     if component.spriteSheet then
       local spriteSheet = M.love.graphics.newImage(component.spriteSheet)
       world.resources = world.resources or {}
@@ -103,6 +108,18 @@ local stateBuilders = {
         spriteSheet = spriteSheet,
         spriteScale = component.spriteScale or 1
       }
+      if component.sprites then
+        local entitySprites = {}
+        for _, spriteData in ipairs(component.sprites) do
+          local x, y, w, h, originX, originY = unpack(spriteData)
+          local newSprite = {}
+          newSprite.quad = M.love.graphics.newQuad(x, y, w, h,
+                                                   spriteSheet:getDimensions())
+          newSprite.origin = {x = originX, y = originY}
+          entitySprites[#entitySprites+1] = newSprite
+        end
+        world.resources[entity].sprites = entitySprites
+      end
     end
   end,
   impulseSpeed = function (world, component, entity)

@@ -743,18 +743,6 @@ describe("loading a collision box", function ()
   end)
 end)
 
-describe("loading a config with a spriteSheet and no sprites", function ()
-  it("should create an empty resources table", function ()
-    local config = {
-      spriteSheet = "path/to/mySpriteSheet.png"
-    }
-
-    local world = resourcemanager.buildWorld(config)
-
-    assert.are.same({}, world.resources)
-  end)
-end)
-
 describe("loading an entity with a spriteSheet", function ()
   local spriteSheetPath, config, world
 
@@ -781,30 +769,59 @@ describe("loading an entity with a spriteSheet", function ()
   end)
 end)
 
-describe("loading spriteSheet and some sprites", function ()
+describe("loading a config with sprites and no spriteSheet", function ()
+  it("should throw an error", function ()
+    local config = {
+      entities = {
+        player = {
+          resources = {
+            sprites = {
+              {1, 1, 32, 32, 16, 32},
+              {33, 1, 32, 32, 0, 0},
+              {1, 33, 32, 32, 16, 16}
+            }
+          }
+        }
+      }
+    }
+
+    assert.has_error(function () resourcemanager.buildWorld(config) end)
+  end)
+end)
+
+describe("loading an entity with spriteSheet and some sprites", function ()
   local spriteSheetPath, config, world
 
   before_each(function ()
     spriteSheetPath = "path/to/mySpriteSheet.png"
     config = {
-      spriteSheet = spriteSheetPath,
-      sprites = {
-        {1, 1, 32, 32, 16, 32},
-        {33, 1, 32, 32, 0, 0},
-        {1, 33, 32, 32, 16, 16}
+      entities = {
+        player = {
+          resources = {
+            spriteSheet = spriteSheetPath,
+            sprites = {
+              {1, 1, 32, 32, 16, 32},
+              {33, 1, 32, 32, 0, 0},
+              {1, 33, 32, 32, 16, 16}
+            }
+          }
+        }
       }
     }
     world = resourcemanager.buildWorld(config)
   end)
 
   it("should create the same number of quads as sprites", function ()
-    assert.stub(loveMock.graphics.newQuad).was.called(#config.sprites)
+    local numberSprites = #config.entities.player.resources.sprites
+    assert.stub(loveMock.graphics.newQuad).was.called(numberSprites)
   end)
 
   it("should create the sprites with their defined origins", function ()
-    assert.are.same({x = 16, y = 32}, world.resources.sprites[1].origin)
-    assert.are.same({x = 0, y = 0}, world.resources.sprites[2].origin)
-    assert.are.same({x = 16, y = 16}, world.resources.sprites[3].origin)
+    local playerId = entityTagger.getId("player")
+    local playerSprites = world.resources[playerId].sprites
+    assert.are.same({x = 16, y = 32}, playerSprites[1].origin)
+    assert.are.same({x = 0, y = 0}, playerSprites[2].origin)
+    assert.are.same({x = 16, y = 16}, playerSprites[3].origin)
   end)
 end)
 
