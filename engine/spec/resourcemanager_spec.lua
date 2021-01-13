@@ -755,14 +755,17 @@ describe("loading a config with a spriteSheet and no sprites", function ()
   end)
 end)
 
-describe("loading spriteSheet and empty sprites table", function ()
+describe("loading an entity with a spriteSheet", function ()
   local spriteSheetPath, config, world
 
   before_each(function ()
     spriteSheetPath = "path/to/mySpriteSheet.png"
     config = {
-      spriteSheet = spriteSheetPath,
-      sprites = {}
+      entities = {
+        player = {
+          resources = {spriteSheet = spriteSheetPath}
+        }
+      }
     }
 
     world = resourcemanager.buildWorld(config)
@@ -773,7 +776,8 @@ describe("loading spriteSheet and empty sprites table", function ()
   end)
 
   it("should load a default sprite scale", function ()
-    assert.are.same(1, world.resources.spriteScale)
+    local playerId = entityTagger.getId("player")
+    assert.are.same(1, world.resources[playerId].spriteScale)
   end)
 end)
 

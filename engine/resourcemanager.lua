@@ -95,6 +95,16 @@ local stateBuilders = {
       flagStateBuilders[flag](world, entity)
     end
   end,
+  resources = function (world, component, entity)
+    if component.spriteSheet then
+      local spriteSheet = M.love.graphics.newImage(component.spriteSheet)
+      world.resources = world.resources or {}
+      world.resources[entity] = {
+        spriteSheet = spriteSheet,
+        spriteScale = component.spriteScale or 1
+      }
+    end
+  end,
   impulseSpeed = function (world, component, entity)
     for impulseName, speed in pairs(component) do
       setComponentAttribute(world, "impulseSpeed", entity, impulseName,
