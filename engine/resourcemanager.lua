@@ -89,27 +89,29 @@ local flagStateBuilders = {
   end,
 }
 
-local function buildSpriteSheet(world, component, entityName)
-  local spriteSheet = M.love.graphics.newImage(component.spriteSheet)
+local function buildSpritesImage(world, component, entityName)
+  local spritesImage = M.love.graphics.newImage(component.image)
   world.resources = world.resources or {}
   world.resources[entityName] = {
-    spriteSheet = spriteSheet,
-    spriteScale = component.spriteScale or 1
+    sprites = {
+      image = spritesImage,
+      scale = component.scale or 1
+    }
   }
-  return spriteSheet
 end
 
-local function buildSprites(world, sprites, entityName, spriteSheet)
-  local entitySprites = {}
-  for _, spriteData in ipairs(sprites) do
-    local x, y, w, h, originX, originY = unpack(spriteData)
-    local newSprite = {}
-    newSprite.quad = M.love.graphics.newQuad(x, y, w, h,
-                                             spriteSheet:getDimensions())
-    newSprite.origin = {x = originX, y = originY}
-    entitySprites[#entitySprites+1] = newSprite
+local function buildSpritesQuads(world, sprites, entityName)
+  local entityQuads = {}
+  local origins = {}
+  local spritesImage = world.resources[entityName].sprites.image
+  for _, quadData in ipairs(sprites.quads) do
+    local x, y, w, h, originX, originY = unpack(quadData)
+    entityQuads[#entityQuads+1] = 
+      M.love.graphics.newQuad(x, y, w, h, spritesImage:getDimensions())
+    origins[#origins+1] = {x = originX, y = originY}
   end
-  world.resources[entityName].sprites = entitySprites
+  world.resources[entityName].sprites.quads = entityQuads
+  world.resources[entityName].sprites.origins = origins
 end
 
 local function buildAnimations(world, componentAnimations, entity, entityName)
@@ -152,14 +154,16 @@ local stateBuilders = {
   end,
   resources = function (world, component, entity)
     local entityName = M.entityTagger.getName(entity)
-    assert(component.sprites and component.spriteSheet
-           or not component.sprites,
-           "Entity \"" .. entityName .. "\" has sprites but no sprite sheet "
-           .. "declared in config.lua")
-    if component.spriteSheet then
-      local spriteSheet = buildSpriteSheet(world, component, entityName)
-      if component.sprites then
-        buildSprites(world, component.sprites, entityName, spriteSheet)
+    if component.sprites then
+      assert(component.sprites.quads and component.sprites.image
+             or not component.sprites.quads,
+             "Entity \"" .. entityName .. "\" has quads but no image "
+             .. "declared in config.lua")
+      if component.sprites.image then
+        buildSpritesImage(world, component.sprites, entityName)
+        if component.sprites.quads then
+          buildSpritesQuads(world, component.sprites, entityName)
+        end
       end
     end
     if component.animations then

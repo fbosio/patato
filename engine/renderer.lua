@@ -22,14 +22,16 @@ local function drawSprites(components, resources)
   for entity, animation in pairs(components.animation or {}) do
     local position = (components.position or {})[entity]
     local entityName = M.tagger.getName(entity)
-    if resources[entityName] then
-      local entityAnimations = resources[entityName].animations
+    local entityResources = resources[entityName]
+    if entityResources then
+      local entityAnimations = entityResources.animations
       local t = entityAnimations[animation.name]
-      local sprite = resources[entityName].sprites[t.frames[animation.frame]]
+      local quad = entityResources.sprites.quads[t.frames[animation.frame]]
+      local origin = entityResources.sprites.origins[t.frames[animation.frame]]
       local x, y = position.x, position.y
-      local scale = resources[entityName].spriteScale
-      love.graphics.draw(resources[entityName].spriteSheet, sprite.quad, x, y,
-                         0, scale, scale, sprite.origin.x, sprite.origin.y)
+      local scale = entityResources.spriteScale
+      love.graphics.draw(entityResources.sprites.image, quad, x, y,
+                         0, scale, scale, origin.x, origin.y)
     end
   end
 end

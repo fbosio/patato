@@ -743,7 +743,7 @@ describe("loading a collision box", function ()
   end)
 end)
 
-describe("loading an entity with a spriteSheet", function ()
+describe("loading an entity with a path as a sprite image", function ()
   local spriteSheetPath, config, world
 
   before_each(function ()
@@ -751,7 +751,11 @@ describe("loading an entity with a spriteSheet", function ()
     config = {
       entities = {
         player = {
-          resources = {spriteSheet = spriteSheetPath}
+          resources = {
+            sprites = {
+              image = spriteSheetPath
+            }
+          }
         }
       }
     }
@@ -764,20 +768,22 @@ describe("loading an entity with a spriteSheet", function ()
   end)
 
   it("should load a default sprite scale", function ()
-    assert.are.same(1, world.resources.player.spriteScale)
+    assert.are.same(1, world.resources.player.sprites.scale)
   end)
 end)
 
-describe("loading a config with sprites and no spriteSheet", function ()
+describe("loading a config with quads and no image", function ()
   it("should throw an error", function ()
     local config = {
       entities = {
         player = {
           resources = {
             sprites = {
-              {1, 1, 32, 32, 16, 32},
-              {33, 1, 32, 32, 0, 0},
-              {1, 33, 32, 32, 16, 16}
+              quads = {
+                {1, 1, 32, 32, 16, 32},
+                {33, 1, 32, 32, 0, 0},
+                {1, 33, 32, 32, 16, 16}
+              }
             }
           }
         }
@@ -788,7 +794,7 @@ describe("loading a config with sprites and no spriteSheet", function ()
   end)
 end)
 
-describe("loading an entity with spriteSheet and some sprites", function ()
+describe("loading an entity with image and some quads", function ()
   local spriteSheetPath, config, world
 
   before_each(function ()
@@ -797,11 +803,13 @@ describe("loading an entity with spriteSheet and some sprites", function ()
       entities = {
         player = {
           resources = {
-            spriteSheet = spriteSheetPath,
             sprites = {
-              {1, 1, 32, 32, 16, 32},
-              {33, 1, 32, 32, 0, 0},
-              {1, 33, 32, 32, 16, 16}
+              image = spriteSheetPath,
+              quads = {
+                {1, 1, 32, 32, 16, 32},
+                {33, 1, 32, 32, 0, 0},
+                {1, 33, 32, 32, 16, 16}
+              }
             }
           }
         }
@@ -811,15 +819,15 @@ describe("loading an entity with spriteSheet and some sprites", function ()
   end)
 
   it("should create the same number of quads as sprites", function ()
-    local numberSprites = #config.entities.player.resources.sprites
-    assert.stub(loveMock.graphics.newQuad).was.called(numberSprites)
+    local numberQuads = #config.entities.player.resources.sprites.quads
+    assert.stub(loveMock.graphics.newQuad).was.called(numberQuads)
   end)
 
   it("should create the sprites with their defined origins", function ()
-    local playerSprites = world.resources.player.sprites
-    assert.are.same({x = 16, y = 32}, playerSprites[1].origin)
-    assert.are.same({x = 0, y = 0}, playerSprites[2].origin)
-    assert.are.same({x = 16, y = 16}, playerSprites[3].origin)
+    local playerSpriteOrigins = world.resources.player.sprites.origins
+    assert.are.same({x = 16, y = 32}, playerSpriteOrigins[1])
+    assert.are.same({x = 0, y = 0}, playerSpriteOrigins[2])
+    assert.are.same({x = 16, y = 16}, playerSpriteOrigins[3])
   end)
 end)
 
@@ -831,11 +839,13 @@ describe("loading sprites and an entity with animations", function ()
       entities = {
         player = {
           resources = {
-            spriteSheet = "path/to/mySpriteSheet.png",
             sprites = {
-              {1, 1, 32, 32, 16, 32},
-              {33, 1, 32, 32, 0, 0},
-              {1, 33, 32, 32, 16, 16}
+              image = "path/to/mySpriteSheet.png",
+              quads = {
+                {1, 1, 32, 32, 16, 32},
+                {33, 1, 32, 32, 0, 0},
+                {1, 33, 32, 32, 16, 16}
+              },
             },
             animations = {
               standing = {1, 1},
@@ -878,9 +888,11 @@ describe("loading entities with animations with the same name", function ()
       entities = {
         coin = {
           resources = {
-            spriteSheet = spriteSheetPath,
             sprites = {
-              {1, 1, 32, 32, 16, 32},
+              image = spriteSheetPath,
+              quads = {
+                {1, 1, 32, 32, 16, 32},
+              }
             },
             animations = {
               idle = {1, 1}
@@ -889,9 +901,11 @@ describe("loading entities with animations with the same name", function ()
         },
         bottle = {
           resources = {
-            spriteSheet = spriteSheetPath,
             sprites = {
-              {33, 1, 32, 32, 0, 0},
+              image = spriteSheetPath,
+              quads = {
+                {33, 1, 32, 32, 0, 0}
+              }
             },
             animations = {
               idle = {1, 1}
@@ -914,8 +928,10 @@ describe("loading config with sprite scale", function ()
       entities = {
         player = {
           resources = {
-            spriteSheet = "path/to/mySpriteSheet.png",
-            spriteScale = 0.5
+            sprites = {
+              image = "path/to/mySpriteSheet.png",
+              scale = 0.5
+            }
           }
         }
       }
@@ -923,7 +939,7 @@ describe("loading config with sprite scale", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same(0.5, world.resources.player.spriteScale)
+    assert.are.same(0.5, world.resources.player.sprites.scale)
   end)
 end)
 
