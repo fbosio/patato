@@ -89,6 +89,61 @@ local flagStateBuilders = {
   end,
 }
 
+local function buildSpriteSheet(world, component, entityName)
+  local spriteSheet = M.love.graphics.newImage(component.spriteSheet)
+  world.resources = world.resources or {}
+  world.resources[entityName] = {
+    spriteSheet = spriteSheet,
+    spriteScale = component.spriteScale or 1
+  }
+  return spriteSheet
+end
+
+local function buildSprites(world, sprites, entityName, spriteSheet)
+  local entitySprites = {}
+  for _, spriteData in ipairs(sprites) do
+    local x, y, w, h, originX, originY = unpack(spriteData)
+    local newSprite = {}
+    newSprite.quad = M.love.graphics.newQuad(x, y, w, h,
+                                              spriteSheet:getDimensions())
+    newSprite.origin = {x = originX, y = originY}
+    entitySprites[#entitySprites+1] = newSprite
+  end
+  world.resources[entityName].sprites = entitySprites
+end
+
+local function buildAnimations(world, componentAnimations, entity, entityName)
+  local animations = world.resources[entityName].animations or {}
+  local name
+  for animationName, animation in pairs(componentAnimations) do
+    local t = {
+      frames = {},
+      durations = {},
+      looping = false
+    }
+    for k, v in ipairs(animation) do
+      if type(v) == "boolean" then
+        t.looping = v
+        break
+      end
+      local i = math.ceil(k/2)
+      if k % 2 == 0 then
+        t.durations[i] = v
+      else
+        t.frames[i] = v
+      end
+    end
+    animations[animationName] = t
+    name = name or animationName
+  end
+  setComponentAttribute(world, "animation", entity, "name", name)
+  setComponentAttribute(world, "animation", entity, "frame", 1)
+  setComponentAttribute(world, "animation", entity, "time", 0)
+  setComponentAttribute(world, "animation", entity, "ended", false)
+
+  world.resources[entityName].animations = animations
+end
+
 local stateBuilders = {
   flags = function (world, flags, entity)
     for _, flag in ipairs(flags) do
@@ -102,24 +157,13 @@ local stateBuilders = {
            "Entity \"" .. entityName .. "\" has sprites but no sprite sheet "
            .. "declared in config.lua")
     if component.spriteSheet then
-      local spriteSheet = M.love.graphics.newImage(component.spriteSheet)
-      world.resources = world.resources or {}
-      world.resources[entity] = {
-        spriteSheet = spriteSheet,
-        spriteScale = component.spriteScale or 1
-      }
+      local spriteSheet = buildSpriteSheet(world, component, entityName)
       if component.sprites then
-        local entitySprites = {}
-        for _, spriteData in ipairs(component.sprites) do
-          local x, y, w, h, originX, originY = unpack(spriteData)
-          local newSprite = {}
-          newSprite.quad = M.love.graphics.newQuad(x, y, w, h,
-                                                   spriteSheet:getDimensions())
-          newSprite.origin = {x = originX, y = originY}
-          entitySprites[#entitySprites+1] = newSprite
-        end
-        world.resources[entity].sprites = entitySprites
+        buildSprites(world, component.sprites, entityName, spriteSheet)
       end
+    end
+    if component.animations then
+      buildAnimations(world, component.animations, entity, entityName)
     end
   end,
   impulseSpeed = function (world, component, entity)
@@ -313,26 +357,6 @@ local function buildActions(world)
   }
 end
 
-local function buildResources(config, world)
-  world.resources = {}
-  if config.spriteSheet and config.sprites then
-    local spriteSheet = M.love.graphics.newImage(config.spriteSheet)
-    world.resources = {
-      spriteSheet = spriteSheet,
-      spriteScale = config.spriteScale or 1,
-      sprites = {}
-    }
-    for _, spriteData in ipairs(config.sprites) do
-      local x, y, w, h, originX, originY = unpack(spriteData)
-      local newSprite = {}
-      newSprite.quad = M.love.graphics.newQuad(x, y, w, h,
-                                               spriteSheet:getDimensions())
-      newSprite.origin = {x = originX, y = originY}
-      world.resources.sprites[#world.resources.sprites+1] = newSprite
-    end
-  end
-end
-
 local function entityCanBeBuilt(componentNames, componentPairs)
   local canBeBuilt = true
   for _, t in ipairs(componentPairs) do
@@ -402,7 +426,6 @@ function M.buildWorld(config)
   world.hid.joystick = config.joystick or {}
 
   buildActions(world)
-  buildResources(config, world)
   M.buildState(config, world)
 
   return world

@@ -764,8 +764,7 @@ describe("loading an entity with a spriteSheet", function ()
   end)
 
   it("should load a default sprite scale", function ()
-    local playerId = entityTagger.getId("player")
-    assert.are.same(1, world.resources[playerId].spriteScale)
+    assert.are.same(1, world.resources.player.spriteScale)
   end)
 end)
 
@@ -817,8 +816,7 @@ describe("loading an entity with spriteSheet and some sprites", function ()
   end)
 
   it("should create the sprites with their defined origins", function ()
-    local playerId = entityTagger.getId("player")
-    local playerSprites = world.resources[playerId].sprites
+    local playerSprites = world.resources.player.sprites
     assert.are.same({x = 16, y = 32}, playerSprites[1].origin)
     assert.are.same({x = 0, y = 0}, playerSprites[2].origin)
     assert.are.same({x = 16, y = 16}, playerSprites[3].origin)
@@ -826,44 +824,46 @@ describe("loading an entity with spriteSheet and some sprites", function ()
 end)
 
 describe("loading sprites and an entity with animations", function ()
-  local config, world
+  local config, world, playerId
 
   before_each(function ()
     config = {
-      spriteSheet = "path/to/mySpriteSheet.png",
-      sprites = {
-        {1, 1, 32, 32, 16, 32},
-        {33, 1, 32, 32, 0, 0},
-        {1, 33, 32, 32, 16, 16}
-      },
       entities = {
         player = {
-          animations = {
-            standing = {1, 1},
-            walking = {2, 0.5, 3, 0.5, 4, 0.5, 3, 0.5, true}
+          resources = {
+            spriteSheet = "path/to/mySpriteSheet.png",
+            sprites = {
+              {1, 1, 32, 32, 16, 32},
+              {33, 1, 32, 32, 0, 0},
+              {1, 33, 32, 32, 16, 16}
+            },
+            animations = {
+              standing = {1, 1},
+              walking = {2, 0.5, 3, 0.5, 4, 0.5, 3, 0.5, true}
+            }
           }
         }
       }
     }
 
     world = resourcemanager.buildWorld(config)
+    playerId = entityTagger.getId("player")
   end)
 
-  it ("should create an animations table", function ()
-    local animations = world.resources.animations
-    local standingAnimation = animations.player.standing
+  it ("should create an animations table for that entity", function ()
+    local animations = world.resources.player.animations
+    local standingAnimation = animations.standing
     assert.are.same({1}, standingAnimation.frames)
     assert.are.same({1}, standingAnimation.durations)
     assert.is.falsy(standingAnimation.looping)
 
-    local walkingAnimation = animations.player.walking
+    local walkingAnimation = animations.walking
     assert.are.same({2, 3, 4, 3}, walkingAnimation.frames)
     assert.are.same({0.5, 0.5, 0.5, 0.5}, walkingAnimation.durations)
     assert.is.truthy(walkingAnimation.looping)
   end)
 
   it("should create an animation component", function ()
-    local playerId = entityTagger.getId("player")
     local playerAnimation = world.gameState.components.animation[playerId]
     assert.are.same(1, playerAnimation.frame)
     assert.are.same(0, playerAnimation.time)
@@ -873,21 +873,29 @@ end)
 
 describe("loading entities with animations with the same name", function ()
   it("should load the animations separately", function ()
+    local spriteSheetPath = "path/to/mySpriteSheet.png"
     local config = {
-      spriteSheet = "path/to/mySpriteSheet.png",
-      sprites = {
-        {1, 1, 32, 32, 16, 32},
-        {33, 1, 32, 32, 0, 0},
-      },
       entities = {
         coin = {
-          animations = {
-            idle = {1, 1}
+          resources = {
+            spriteSheet = spriteSheetPath,
+            sprites = {
+              {1, 1, 32, 32, 16, 32},
+            },
+            animations = {
+              idle = {1, 1}
+            }
           }
         },
         bottle = {
-          animations = {
-            idle = {2, 1}
+          resources = {
+            spriteSheet = spriteSheetPath,
+            sprites = {
+              {33, 1, 32, 32, 0, 0},
+            },
+            animations = {
+              idle = {1, 1}
+            }
           }
         }
       }
@@ -895,22 +903,27 @@ describe("loading entities with animations with the same name", function ()
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.is.truthy(world.resources.animations.coin.idle)
-    assert.is.truthy(world.resources.animations.bottle.idle)
+    assert.is.truthy(world.resources.coin.animations.idle)
+    assert.is.truthy(world.resources.bottle.animations.idle)
   end)
 end)
 
 describe("loading config with sprite scale", function ()
   it("should store it in resources table", function ()
     local config = {
-      spriteSheet = "path/to/mySpriteSheet.png",
-      spriteScale = 0.5,
-      sprites = {}
+      entities = {
+        player = {
+          resources = {
+            spriteSheet = "path/to/mySpriteSheet.png",
+            spriteScale = 0.5
+          }
+        }
+      }
     }
 
     local world = resourcemanager.buildWorld(config)
 
-    assert.are.same(0.5, world.resources.spriteScale)
+    assert.are.same(0.5, world.resources.player.spriteScale)
   end)
 end)
 
