@@ -22,13 +22,15 @@ local function drawSprites(components, resources)
   for entity, animation in pairs(components.animation or {}) do
     local position = (components.position or {})[entity]
     local entityName = M.tagger.getName(entity)
-    local entityAnimations = resources.animations[entityName]
-    local t = entityAnimations[animation.name]
-    local sprite = resources.sprites[t.frames[animation.frame]]
-    local x, y = position.x, position.y
-    local scale = resources.spriteScale
-    love.graphics.draw(resources.spriteSheet, sprite.quad, x, y, 0,
-                       scale, scale, sprite.origin.x, sprite.origin.y)
+    if resources[entityName] then
+      local entityAnimations = resources[entityName].animations
+      local t = entityAnimations[animation.name]
+      local sprite = resources[entityName].sprites[t.frames[animation.frame]]
+      local x, y = position.x, position.y
+      local scale = resources[entityName].spriteScale
+      love.graphics.draw(resources[entityName].spriteSheet, sprite.quad, x, y,
+                         0, scale, scale, sprite.origin.x, sprite.origin.y)
+    end
   end
 end
 
@@ -77,9 +79,7 @@ function M.draw(components, inMenu, resources, release)
   if inMenu then
     drawMenu(components)
   else
-    if resources.sprites then
-      drawSprites(components, resources)
-    end
+    drawSprites(components, resources)
     if not release then
       drawDebugElements(components)
     end

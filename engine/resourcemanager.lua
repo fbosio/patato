@@ -105,7 +105,7 @@ local function buildSprites(world, sprites, entityName, spriteSheet)
     local x, y, w, h, originX, originY = unpack(spriteData)
     local newSprite = {}
     newSprite.quad = M.love.graphics.newQuad(x, y, w, h,
-                                              spriteSheet:getDimensions())
+                                             spriteSheet:getDimensions())
     newSprite.origin = {x = originX, y = originY}
     entitySprites[#entitySprites+1] = newSprite
   end

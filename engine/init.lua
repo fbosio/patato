@@ -6,7 +6,7 @@
 ]]
 
 local config
-pcall(function() config = require "config" end)
+config = require "config"
 
 local entityTagger = require "engine.tagger"
 local resourcemanager = require "engine.resourcemanager"
@@ -124,7 +124,7 @@ end
 ]]
 function M.update(dt)
   systems.update(dt, M.hid, M.gameState.components, M.collectableEffects,
-                 M.resources.animations, M.physics)
+                 M.resources, M.physics)
 end
 
 --[[--

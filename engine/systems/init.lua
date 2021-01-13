@@ -11,14 +11,14 @@ function M.load(love, entityTagger)
   animator.load(entityTagger)
 end
 
-function M.update(dt, hid, components, collectableEffects, animationResources,
+function M.update(dt, hid, components, collectableEffects, resources,
                   physics)
   controller.update(hid, components)
   transporter.drag(dt, components.velocity, components.gravitational,
                    physics.gravity)
   messengers.update(dt, components, collectableEffects)
   transporter.move(dt, components.velocity, components.position)
-  animator.update(dt, components.animation, animationResources)
+  animator.update(dt, components.animation, resources)
   garbagecollector.update(components)
 end
 

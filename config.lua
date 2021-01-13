@@ -30,10 +30,6 @@ M.joystick = {
   }
 }
 
-M.spriteSheet = "resources/patato.png"
-M.spriteScale = 1
-M.sprites = resources.patato.sprites
-
 M.entities = {
   patato = {
     flags = {
@@ -44,12 +40,12 @@ M.entities = {
       "climber"
     },
     collisionBox = {20, 120, 40, 120},
-    animations = resources.patato.animations,
     impulseSpeed = {
       jump = 1500,
       climb = 200,
       climbJump = 700
-    }
+    },
+    resources = resources.patato,
   },
   bee = {
     flags = {"controllable"}
@@ -68,10 +64,10 @@ M.entities = {
     flags = {"trellis"}
   },
   gardenArtwork = {
-    animations = resources.levels.garden.animations
+    resources = resources.levels.garden
   },
   secretLevelArtwork = {
-    animations = resources.levels.secretLevel.animations
+    resources = resources.levels.secretLevel
   },
   mainMenu = {
     flags = {"controllable"},
@@ -80,6 +76,7 @@ M.entities = {
     },
   }
 }
+M.entities.patato.resources.spriteScale = 2
 
 M.levels = {
   garden = {

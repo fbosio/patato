@@ -13,15 +13,17 @@ after_each(function ()
 end)
 
 describe("updating an animation with several frames", function ()
-  local animationResources, playerId, animationComponents, dt
+  local resources, playerId, animationComponents, dt
 
   before_each(function ()
-    animationResources = {
+    resources = {
       player = {
-        standing = {
-          frames = {1, 2, 3},
-          durations = {5, 8, 10},
-          looping = false
+        animations = {
+          standing = {
+            frames = {1, 2, 3},
+            durations = {5, 8, 10},
+            looping = false
+          }
         }
       }
     }
@@ -36,7 +38,7 @@ describe("updating an animation with several frames", function ()
     }
     dt = 2
 
-    animator.update(dt, animationComponents, animationResources)
+    animator.update(dt, animationComponents, resources)
   end)
 
   it("should advance a frame", function ()
@@ -50,12 +52,14 @@ end)
 
 describe("playing a looping animation until its end", function ()
   it("should go back to its first frame", function ()
-    local animationResources = {
+    local resources = {
       player = {
-        standing = {
-          frames = {1, 2, 3},
-          durations = {5, 8, 10},
-          looping = true
+        animations = {
+          standing = {
+            frames = {1, 2, 3},
+            durations = {5, 8, 10},
+            looping = true
+          }
         }
       }
     }
@@ -70,7 +74,7 @@ describe("playing a looping animation until its end", function ()
     }
     local dt = 2
 
-    animator.update(dt, animationComponents, animationResources)
+    animator.update(dt, animationComponents, resources)
 
     assert.are.same(1, animationComponents[playerId].frame)
   end)
@@ -78,12 +82,14 @@ end)
 
 describe("playing a nonlooping animation until its end", function ()
   it("should stop the animation", function ()
-    local animationResources = {
+    local resources = {
       player = {
-        standing = {
-          frames = {1, 2, 3},
-          durations = {5, 8, 10},
-          looping = false
+        animations = {
+          standing = {
+            frames = {1, 2, 3},
+            durations = {5, 8, 10},
+            looping = false
+          }
         }
       }
     }
@@ -98,7 +104,7 @@ describe("playing a nonlooping animation until its end", function ()
     }
     local dt = 2
 
-    animator.update(dt, animationComponents, animationResources)
+    animator.update(dt, animationComponents, resources)
 
     assert.are.same(3, animationComponents[playerId].frame)
     assert.is.truthy(animationComponents[playerId].ended)

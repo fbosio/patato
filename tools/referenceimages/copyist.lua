@@ -1,12 +1,13 @@
 local M = {}
 
-function M.write(origins)
+function M.write(data)
   local buffer = {"local M = {}\n"}
-  for k, v in pairs(origins) do
+  for k, v in pairs(data) do
     buffer[#buffer + 1] = "M." .. k .. " = {\n"
                           .. '  spriteSheet = "resources/' .. k .. '.png",\n'
                           .. "  sprites = {\n"
-                          .. "    {" .. v[1] .. ", " .. v[2] .. "}\n"
+                          .. "    {" .. -v[1] .. ", " .. -v[2] .. ", "
+                          .. v:getWidth() .. ", " .. v:getHeight() .. "}\n"
                           .. "  },\n"
                           .. "  animations = {\n"
                           .. "    {1, 1}\n"

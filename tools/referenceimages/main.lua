@@ -8,12 +8,12 @@ local surveyor = require "surveyor"
 local photographer = require "photographer"
 local copyist = require "copyist"
 
-local origins = {}
+local levelData = {}
 for name, level in pairs(levels) do
   local bounds = surveyor.measure(level)
-  origins[name] = {bounds[1], bounds[2]}
+  levelData[name] = bounds
   photographer.shoot(name, level, bounds)
 end
-copyist.write(origins)
+copyist.write(levelData)
 
 love.event.quit()
