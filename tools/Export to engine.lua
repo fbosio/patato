@@ -120,12 +120,12 @@ end
 -- Write output file
 local path, title = spr.filename:match("^(.+[/\\])(.-).([^.]*)$")
 do
-  local sprOutput = "{\n" .. table.concat(sprBuffer, ",\n") .. "\n}"
+  local sprOutput = "{\n\t" .. table.concat(sprBuffer, ",\n") .. "\n\t}"
   local animOutput = "{\n" .. table.concat(animBuffer, ",\n") .. "\n}"
-  local output = "local M = {}\n"
-                 .. "\nM.spriteSheet = \"resources/" .. title .. ".png\""
-                 .. "\nM.sprites = " .. sprOutput
-                 .. "\nM.animations = " .. animOutput .. "\nreturn M\n"
+  local output = "local M = {}\nM.sprites = {\n"
+                 .. "\timage = \"resources/" .. title .. ".png\",\n"
+                 .. "\tquads = " .. sprOutput .. "\n}\n"
+                 .. "M.animations = " .. animOutput .. "\nreturn M\n"
   local file = assert(io.open(path .. title .. ".lua", "w+"))
   file:write(output)
   file:close()

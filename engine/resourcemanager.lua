@@ -171,7 +171,7 @@ local stateBuilders = {
                                     M.love.graphics.getHeight(),
                                     image:getDimensions())
           }
-          world.resources[entityName].sprites.origins = {x = 0, y = 0}
+          world.resources[entityName].sprites.origins = {{x = 0, y = 0}}
         end
       end
     end

@@ -29,7 +29,7 @@ local function drawSprites(components, resources)
       local quad = entityResources.sprites.quads[t.frames[animation.frame]]
       local origin = entityResources.sprites.origins[t.frames[animation.frame]]
       local x, y = position.x, position.y
-      local scale = entityResources.spriteScale
+      local scale = entityResources.sprites.scale
       love.graphics.draw(entityResources.sprites.image, quad, x, y,
                          0, scale, scale, origin.x, origin.y)
     end

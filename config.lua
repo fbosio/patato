@@ -69,6 +69,9 @@ M.entities = {
   secretLevelArtwork = {
     resources = resources.levels.secretLevel
   },
+  background = {
+    resources = resources.background
+  },
   mainMenu = {
     flags = {"controllable"},
     menu = {
@@ -76,10 +79,13 @@ M.entities = {
     },
   }
 }
-M.entities.patato.resources.spriteScale = 2
+M.entities.patato.resources.sprites.scale = 2
+M.entities.background.resources.sprites.quads = nil
+M.entities.background.resources.sprites.tiled = true
 
 M.levels = {
   garden = {
+    background = {0, 0},
     gardenArtwork = {0, 0},
     patato = {250, 100},
     bee = {450, 105},
