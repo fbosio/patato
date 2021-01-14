@@ -3,12 +3,14 @@ local transporter = require "engine.systems.transporter"
 local messengers = require "engine.systems.messengers"
 local animator = require "engine.systems.animator"
 local garbagecollector = require "engine.systems.garbagecollector"
+local renderer = require "engine.systems.renderer"
 
 local M = {}
 
 function M.load(love, entityTagger)
   controller.load(love, entityTagger)
   animator.load(entityTagger)
+  renderer.load(love, entityTagger)
 end
 
 function M.update(dt, hid, components, collectableEffects, resources,
@@ -20,6 +22,10 @@ function M.update(dt, hid, components, collectableEffects, resources,
   transporter.move(dt, components.velocity, components.position)
   animator.update(dt, components.animation, resources)
   garbagecollector.update(components)
+end
+
+function M.draw(components, inMenu, resources, release)
+  renderer.draw(components, inMenu, resources, release)
 end
 
 function M.keypressed(key, hid, components)

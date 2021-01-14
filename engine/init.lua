@@ -11,7 +11,6 @@ config = require "config"
 local entityTagger = require "engine.tagger"
 local resourcemanager = require "engine.resourcemanager"
 local systems = require "engine.systems"
-local renderer = require "engine.renderer"
 local command = require "engine.command"
 
 
@@ -103,7 +102,6 @@ function M.load()
       return function () end
     end
   })
-  renderer.load(love, entityTagger)
 end
 
 --[[--
@@ -136,8 +134,8 @@ end
   end
 ]]
 function M.draw()
-  renderer.draw(M.gameState.components, M.gameState.inMenu, M.resources,
-                M.release)
+  systems.draw(M.gameState.components, M.gameState.inMenu, M.resources,
+               M.release)
 end
 
 --[[--
