@@ -88,9 +88,9 @@ local function drawDebugElements(components)
         local y3 = collideable.normalPointingUp and y or y+box.height
         M.love.graphics.polygon("fill", {x, y1, x + box.width, y1, x3, y3})
       else
-        if components.trellis[entity] then
+        if (components.trellis or {})[entity] then
           love.graphics.setColor(0.4, 0.4, 1, 0.3)
-        elseif components.collectable[entity] then
+        elseif (components.collectable or {})[entity] then
           love.graphics.setColor(0.4, 1, 0.4, 0.3)
         end
         M.love.graphics.rectangle("fill", x, y, box.width, box.height)
