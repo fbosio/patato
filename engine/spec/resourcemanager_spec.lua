@@ -866,6 +866,33 @@ describe("loading an entity with a tiled image", function ()
   end)
 end)
 
+describe("loading a tiled entity with quads", function ()
+  it("should create a quad with window dimensions", function ()
+    local config = {
+      entities = {
+        player = {
+          resources = {
+            sprites = {
+              image = "path/to/mySpriteSheet.png",
+              quads = {
+                {32, 64, 64, 128, 16, 16}
+              },
+              tiled = true
+            }
+          }
+        }
+      }
+    }
+    
+    resourcemanager.buildWorld(config)
+
+    local windowWidth, windowHeight = 800, 600
+    assert.stub(loveMock.graphics.newQuad).was.called(1)
+    assert.stub(loveMock.graphics.newQuad).was.called_with(0, 0, windowWidth,
+                                                           windowHeight, _)
+  end)
+end)
+
 describe("loading sprites and an entity with animations", function ()
   local config, world, playerId
 
