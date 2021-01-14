@@ -161,18 +161,19 @@ local stateBuilders = {
              .. "declared in config.lua")
       if component.sprites.image then
         buildSpritesImage(world, component.sprites, entityName)
+        local entitySprites = world.resources[entityName].sprites
         if component.sprites.tiled then
-          local image = world.resources[entityName].sprites.image
-          image:setWrap("repeat")
-          world.resources[entityName].sprites.quads = {
+          entitySprites.image:setWrap("repeat")
+          entitySprites.quads = {
             M.love.graphics.newQuad(0, 0, M.love.graphics.getWidth(),
                                     M.love.graphics.getHeight(),
-                                    image:getDimensions())
+                                    entitySprites.image:getDimensions())
           }
-          world.resources[entityName].sprites.origins = {{x = 0, y = 0}}
+          entitySprites.origins = {{x = 0, y = 0}}
         elseif component.sprites.quads then
           buildSpritesQuads(world, component.sprites, entityName)
         end
+        entitySprites.depth = component.sprites.depth or 1
       end
     end
     if component.animations then

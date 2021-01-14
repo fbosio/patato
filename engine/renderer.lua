@@ -18,20 +18,45 @@ local function drawMenu(components)
   end
 end
 
+local function getEntityNamesSortedByDepth(resources)
+  local entityNames = {}
+  local depths = {}
+  for entityName, resource in pairs(resources or {}) do
+    local depth = (resource.sprites or {}).depth
+    local equallyDepthEntities = entityNames[depth] or {}
+    equallyDepthEntities[#equallyDepthEntities+1] = entityName
+    entityNames[depth] = equallyDepthEntities
+    depths[#depths+1] = depth
+  end
+  table.sort(depths, function (a, b) return a > b end)
+  local sorted = {}
+  for _, depth in ipairs(depths) do
+    sorted[#sorted+1] = entityNames[depth]
+  end
+  return sorted
+end
+
 local function drawSprites(components, resources)
-  for entity, animation in pairs(components.animation or {}) do
-    local position = (components.position or {})[entity]
-    local entityName = M.tagger.getName(entity)
-    local entityResources = resources[entityName]
-    if entityResources then
-      local entityAnimations = entityResources.animations
-      local t = entityAnimations[animation.name]
-      local quad = entityResources.sprites.quads[t.frames[animation.frame]]
-      local origin = entityResources.sprites.origins[t.frames[animation.frame]]
-      local x, y = position.x, position.y
-      local scale = entityResources.sprites.scale
-      love.graphics.draw(entityResources.sprites.image, quad, x, y,
-                         0, scale, scale, origin.x, origin.y)
+  local sortedEntities = getEntityNamesSortedByDepth(resources)
+  for _, entityNames in pairs(sortedEntities) do
+    for _, entityName in ipairs(entityNames) do
+      local entityResources = resources[entityName]
+      if entityResources then
+        local entitySprites = entityResources.sprites
+        local entityAnimations = entityResources.animations
+        local entities = M.tagger.getIds(entityName)
+        for _, entity in ipairs(entities) do
+          local animation = (components.animation or {})[entity]
+          local position = (components.position or {})[entity]
+            local t = entityAnimations[animation.name]
+            local quad = entitySprites.quads[t.frames[animation.frame]]
+            local origin = entitySprites.origins[t.frames[animation.frame]]
+            local x, y = position.x, position.y
+            local scale = entitySprites.scale
+            love.graphics.draw(entitySprites.image, quad, x, y, 0, scale,
+                               scale, origin.x, origin.y)
+        end
+      end
     end
   end
 end

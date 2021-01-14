@@ -80,6 +80,7 @@ M.entities = {
   }
 }
 M.entities.patato.resources.sprites.scale = 2
+M.entities.background.resources.sprites.depth = 3
 M.entities.background.resources.sprites.tiled = true
 
 M.levels = {

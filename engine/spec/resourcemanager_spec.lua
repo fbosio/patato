@@ -781,6 +781,10 @@ describe("loading an entity with a path as a sprite image", function ()
   it("should load a default sprite scale", function ()
     assert.are.same(1, world.resources.player.sprites.scale)
   end)
+
+  it("should load a default sprite depth", function ()
+    assert.are.same(1, world.resources.player.sprites.depth)
+  end)
 end)
 
 describe("loading a config with quads and no image", function ()
@@ -890,6 +894,30 @@ describe("loading a tiled entity with quads", function ()
     assert.stub(loveMock.graphics.newQuad).was.called(1)
     assert.stub(loveMock.graphics.newQuad).was.called_with(0, 0, windowWidth,
                                                            windowHeight, _)
+  end)
+end)
+
+describe("loading an entity with an image and depth", function ()
+  it("should copy the depth attribute", function ()
+    local config = {
+      entities = {
+        player = {
+          resources = {
+            sprites = {
+              image = "path/to/mySpriteSheet.png",
+              quads = {
+                {32, 64, 64, 128, 16, 16}
+              },
+              depth = 0
+            }
+          }
+        }
+      }
+    }
+    
+    local world = resourcemanager.buildWorld(config)
+
+    assert.are.same(0, world.resources.player.sprites.depth)
   end)
 end)
 

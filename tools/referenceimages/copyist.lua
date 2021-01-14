@@ -4,10 +4,13 @@ function M.write(data)
   local buffer = {"local M = {}\n"}
   for k, v in pairs(data) do
     buffer[#buffer + 1] = "M." .. k .. " = {\n"
-                          .. '  spriteSheet = "resources/' .. k .. '.png",\n'
                           .. "  sprites = {\n"
-                          .. "    {" .. -v[1] .. ", " .. -v[2] .. ", "
+                          .. '    image = "resources/' .. k .. '.png",\n'
+                          .. "    quads = {\n"
+                          .. "      {" .. -v[1] .. ", " .. -v[2] .. ", "
                           .. v:getWidth() .. ", " .. v:getHeight() .. "}\n"
+                          .. "    },\n"
+                          .. "    depth = 2\n"
                           .. "  },\n"
                           .. "  animations = {\n"
                           .. "    {1, 1}\n"
