@@ -12,8 +12,8 @@ describe("loading a config with a release hoisted flag", function ()
   it("it should copy the flag", function ()
     local config = {release = true}
     
-    local loadedMode = mode.load(config)
+    local inReleaseMode = mode.load(config)
 
-    assert.is.truthy(loadedMode.release)
+    assert.is.truthy(inReleaseMode)
   end)
 end)

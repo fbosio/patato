@@ -1,7 +1,7 @@
 local M = {}
 
 function M.load(config)
-  return {release = config.release}
+  return config.release
 end
 
 return M
