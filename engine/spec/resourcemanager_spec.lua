@@ -1,16 +1,27 @@
-local resourcemanager, loveMock, entityTagger, command
+local resourcemanager, loveMock, entityTagger, command, _
 
 before_each(function ()
   resourcemanager = require "engine.resourcemanager"
   entityTagger = require "engine.tagger"
   command = require "engine.command"
+  local match = require "luassert.match"
+  _ = match._
 
   local love = {graphics = {}}
+  function love.graphics.getWidth()
+    return 800
+  end
+  function love.graphics.getHeight()
+    return 600
+  end
   function love.graphics.getDimensions()
-    return 800, 600
+    return love.graphics.getWidth(), love.graphics.getHeight()
   end
   function love.graphics.newImage()
-    return {getDimensions = function () end}
+    return {
+      getDimensions = function () return nil end,
+      setWrap = function () end
+    }
   end
   function love.graphics.newQuad()
   end
@@ -794,7 +805,7 @@ describe("loading a config with quads and no image", function ()
   end)
 end)
 
-describe("loading an entity with image and some quads", function ()
+describe("loading an entity with an image and some quads", function ()
   local spriteSheetPath, config, world
 
   before_each(function ()
@@ -828,6 +839,30 @@ describe("loading an entity with image and some quads", function ()
     assert.are.same({x = 16, y = 32}, playerSpriteOrigins[1])
     assert.are.same({x = 0, y = 0}, playerSpriteOrigins[2])
     assert.are.same({x = 16, y = 16}, playerSpriteOrigins[3])
+  end)
+end)
+
+describe("loading an entity with a tiled image", function ()
+  it("should create a quad with window dimensions", function ()
+    local config = {
+      entities = {
+        player = {
+          resources = {
+            sprites = {
+              image = "path/to/mySpriteSheet.png",
+              tiled = true
+            }
+          }
+        }
+      }
+    }
+    
+    resourcemanager.buildWorld(config)
+
+    local windowWidth, windowHeight = 800, 600
+    assert.stub(loveMock.graphics.newQuad).was.called(1)
+    assert.stub(loveMock.graphics.newQuad).was.called_with(0, 0, windowWidth,
+                                                           windowHeight, _)
   end)
 end)
 

@@ -163,6 +163,15 @@ local stateBuilders = {
         buildSpritesImage(world, component.sprites, entityName)
         if component.sprites.quads then
           buildSpritesQuads(world, component.sprites, entityName)
+        elseif component.sprites.tiled then
+          local image = world.resources[entityName].sprites.image
+          image:setWrap("repeat")
+          world.resources[entityName].sprites.quads = {
+            M.love.graphics.newQuad(0, 0, M.love.graphics.getWidth(),
+                                    M.love.graphics.getHeight(),
+                                    image:getDimensions())
+          }
+          world.resources[entityName].sprites.origins = {x = 0, y = 0}
         end
       end
     end
