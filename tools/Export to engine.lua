@@ -89,11 +89,11 @@ do
           .. tostring(origin.y)
         .. "}"
         spriteNumber = spriteNumber + 1
-        x = x + frameRectangle.width + innerPadding
+        x = x + frameRectangle.width + innerPadding * 2
       end
     end
     x = innerPadding
-    y = y + frameRectangle.height + innerPadding
+    y = y + frameRectangle.height + innerPadding * 2
   end
 end
 
