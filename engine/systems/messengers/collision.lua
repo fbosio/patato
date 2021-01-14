@@ -181,7 +181,7 @@ local function collideUpwardTriangle(mustCollideLeft, mustCollideRight, m,
       translate.bottom(sb, ySlope)
       solid.slope = slopeEntity
     end
-    if gravitational and sv.x ~= 0 and sv.y == 0 then
+    if gravitational.enabled and sv.x ~= 0 and sv.y == 0 then
       local newX = sb.position.x + sv.x*dt
       if newX <= cb.right and newX >= cb.left then
         local ySlope = m*(newX-cb.horizontalCenter) + cb.verticalCenter
