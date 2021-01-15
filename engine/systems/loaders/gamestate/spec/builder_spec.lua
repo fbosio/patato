@@ -1,4 +1,4 @@
-local builder, component, entityTagger, components
+local builder, entityTagger, components
 
 before_each(function ()
   builder = require "engine.systems.loaders.gamestate.builder"

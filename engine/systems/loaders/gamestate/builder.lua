@@ -8,6 +8,32 @@ function M.load(love, entityTagger, inMenu, components)
   M.inMenu = inMenu
 end
 
+function M.buildFromVertices(vertices, entity, entityData)
+  component.setAttribute("position", entity, "x", vertices[1])
+  component.setAttribute("position", entity, "y", vertices[2])
+  if #vertices > 2 then
+    local x1 = math.min(vertices[1], vertices[3])
+    local y1 = math.min(vertices[2], vertices[4] or vertices[2])
+    local x2 = math.max(vertices[1], vertices[3])
+    local y2 = math.max(vertices[2], vertices[4] or vertices[2])
+    component.setAttribute("position", entity, "x", x1)
+    component.setAttribute("position", entity, "y", y1)
+    component.setAttribute("collisionBox", entity, "origin",
+                            {x = 0, y = 0})
+    component.setAttribute("collisionBox", entity, "width", x2 - x1)
+    component.setAttribute("collisionBox", entity, "height", y2 - y1)
+    if entityData.collideable == "triangle"
+        and vertices[2] ~= vertices [4] then
+      component.setAttribute("collideable", entity, "normalPointingUp",
+                            vertices[2] > vertices[4])
+      local rising = (vertices[1]-vertices[3])
+                      * (vertices[2]-vertices[4]) < 0
+      component.setAttribute("collideable", entity, "rising",
+                            rising)
+    end
+  end
+end
+
 local flagStateBuilders = {
   controllable = function (entity, hid)
     component.set("controllable", entity, {})
@@ -77,32 +103,6 @@ function M.collideable(kind, entity)
          "Unexpected collideable type \"" .. kind .. "\" for entity \""
          .. name .. "\"")
   component.setAttribute("collideable", entity, "name", name)
-end
-
-function M.buildFromVertices(vertices, entity, entityData)
-  component.setAttribute("position", entity, "x", vertices[1])
-  component.setAttribute("position", entity, "y", vertices[2])
-  if #vertices > 2 then
-    local x1 = math.min(vertices[1], vertices[3])
-    local y1 = math.min(vertices[2], vertices[4] or vertices[2])
-    local x2 = math.max(vertices[1], vertices[3])
-    local y2 = math.max(vertices[2], vertices[4] or vertices[2])
-    component.setAttribute("position", entity, "x", x1)
-    component.setAttribute("position", entity, "y", y1)
-    component.setAttribute("collisionBox", entity, "origin",
-                            {x = 0, y = 0})
-    component.setAttribute("collisionBox", entity, "width", x2 - x1)
-    component.setAttribute("collisionBox", entity, "height", y2 - y1)
-    if entityData.collideable == "triangle"
-        and vertices[2] ~= vertices [4] then
-      component.setAttribute("collideable", entity, "normalPointingUp",
-                            vertices[2] > vertices[4])
-      local rising = (vertices[1]-vertices[3])
-                      * (vertices[2]-vertices[4]) < 0
-      component.setAttribute("collideable", entity, "rising",
-                            rising)
-    end
-  end
 end
 
 return M

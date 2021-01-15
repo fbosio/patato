@@ -2,18 +2,31 @@ local builder = require "engine.systems.loaders.gamestate.builder"
 
 local M = {}
 
-local function checkEntitiesCompatibility(entities)
-  for name, data in pairs(entities or {}) do
-    local foundCollectable = false
-    for _, flag in ipairs(data.flags or {}) do
-      if flag == "collectable" then
-        foundCollectable = true
+local function getFlattenedData(data)
+  local flattened = {}
+  for k, v in pairs(data) do
+    if k == "flags" then
+      for _, flag in ipairs(v) do
+        flattened[flag] = true
       end
+    else
+      flattened[k] = true
     end
-    for _, flag in ipairs(data.flags or {}) do
-      assert(foundCollectable and flag ~= "collector" or not foundCollectable,
-             "Entities must not be collectables and collectors at the same"
-             .. "time, but entity \"" .. name .. "\" has both "
+  end
+  return flattened
+end
+
+local function checkEntitiesCompatibility(entities)
+  local incompatiblePairs = {
+    {"collectable", "collector"},
+    {"collideable", "solid"}
+  }
+  for name, data in pairs(entities or {}) do
+    local flattened = getFlattenedData(data)
+    for _, pair in ipairs(incompatiblePairs) do
+      assert(not (flattened[pair[1]] and flattened[pair[2]]),
+             "Entities must not be " .. pair[1] .. "s and " .. pair[2]
+             .. "s at the same time, but entity \"" .. name .. "\" has both "
              .. "components declared in config.lua")
     end
   end

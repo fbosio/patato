@@ -395,3 +395,39 @@ describe("loading slope entities that are in a level", function ()
     assert.is.falsy(collideable[4].rising)
   end)
 end)
+
+describe("loading an entity that is both collideable and solid", function ()
+  local config
+  before_each(function ()
+    config = {
+      entities = {
+        absurdSpecimen = {
+          collideable = "rectangle",
+          flags = {"solid"}
+        }
+      }
+    }
+  end)
+
+  describe("without levels defined", function ()
+    it("should throw an error", function ()
+      assert.has_error(function ()
+        gamestate.load(loveMock, entityTagger, {}, config)
+      end)
+    end)
+  end)
+
+  describe("with a level defined", function ()
+    it("should throw an error", function ()
+      config.levels = {
+        absurdSpecimen = {
+          {400, 50, 700, 200},
+          {400, 400, 700, 550},
+        }
+      }
+      assert.has_error(function ()
+        gamestate.load(loveMock, entityTagger, {}, config)
+      end)
+    end)
+  end)
+end)
