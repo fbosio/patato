@@ -64,8 +64,11 @@ function M.collisionBox(box, entity)
   component.setDefaultPosition(entity)
 end
 
-function M.collideable(_, entity)
+function M.collideable(kind, entity)
   local name = M.entityTagger.getName(entity)
+  assert(kind == "rectangle" or kind == "triangle",
+         "Unexpected collideable type \"" .. kind .. "\" for entity \""
+         .. name .. "\"")
   M.component.setAttribute("collideable", entity, "name", name)
 end
 

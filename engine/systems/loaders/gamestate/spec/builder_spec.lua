@@ -151,3 +151,14 @@ describe("loading a solid entity", function ()
     assert.is.truthy(components.solid[playerId])
   end)
 end)
+
+describe("loading an entity that has a wrong collideable type", function ()
+  it("should throw an error", function ()
+    local collideableWithTypo = "rectanlgbe"
+    local surfaceId = entityTagger.tag("surface")
+
+    assert.has_error(function ()
+      builder.collideable(collideableWithTypo, surfaceId)
+    end)
+  end)
+end)
