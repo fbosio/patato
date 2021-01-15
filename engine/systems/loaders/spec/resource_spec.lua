@@ -28,11 +28,11 @@ after_each(function ()
 end)
 
 describe("loading an entity with a path as a sprite image", function ()
-  local spriteSheetPath, config, loadedResources
+  local spriteSheetPath, loadedResources
 
   before_each(function ()
     spriteSheetPath = "path/to/mySpriteSheet.png"
-    config = {
+    local config = {
       entities = {
         player = {
           resources = {
@@ -173,10 +173,10 @@ describe("loading an entity with an image and depth", function ()
 end)
 
 describe("loading sprites and an entity with animations", function ()
-  local config, loadedResources
+  local loadedResources
 
   before_each(function ()
-    config = {
+    local config = {
       entities = {
         player = {
           resources = {

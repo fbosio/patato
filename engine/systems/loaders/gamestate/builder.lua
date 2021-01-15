@@ -56,7 +56,7 @@ local flagStateBuilders = {
 }
 for _, k in ipairs{"collector", "solid", "gravitational", "climber"} do
   flagStateBuilders[k] = function (entity)
-    component.set(k, entity, true)
+    component.setAttribute(k, entity, "enabled", true)
     component.setDefaultPosition(entity)
     component.setDefaultVelocity(entity)
   end

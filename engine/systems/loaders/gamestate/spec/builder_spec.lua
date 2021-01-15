@@ -190,8 +190,8 @@ describe("loading a gravitational entity", function ()
     builder.flags(flags, anvilId)
   end)
 
-  it("should copy the component", function ()
-    assert.is.truthy(components.gravitational[anvilId])
+  it("should enable the component", function ()
+    assert.is.truthy(components.gravitational[anvilId].enabled)
   end)
 
   it("should set default components to the entity", function ()
