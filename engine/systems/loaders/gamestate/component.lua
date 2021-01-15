@@ -1,6 +1,7 @@
 local M = {}
 
-function M.load(components)
+function M.load(love, components)
+  M.love = love
   M.components = components
 end
 
@@ -26,13 +27,13 @@ local function setDefaultVelocity(entity)
   M.setAttribute("velocity", entity, "y", 0)
 end
 
-function M.setDefaults(love, entity)
+function M.setDefaults(entity)
   M.components.impulseSpeed = M.components.impulseSpeed or {}
   M.components.impulseSpeed[entity] = M.components.impulseSpeed[entity] or {}
   if not M.components.impulseSpeed[entity].walk then
     M.setAttribute("impulseSpeed", entity, "walk", 400)
   end
-  setDefaultPosition(love, entity)
+  setDefaultPosition(M.love, entity)
   setDefaultVelocity(entity)
 end
 

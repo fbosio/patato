@@ -10,7 +10,7 @@ local flagStateBuilders = {
         end
       end
     end
-    if not M.inMenu then M.component.setDefaults(M.love, entity) end
+    if not M.inMenu then M.component.setDefaults(entity) end
   end,
 }
 
@@ -32,8 +32,7 @@ function M.menu(data, entity, _)
   end
 end
 
-function M.load(love, entityTagger, inMenu, component)
-  M.love = love
+function M.load(entityTagger, inMenu, component)
   M.entityTagger = entityTagger
   M.inMenu = inMenu
   M.component = component

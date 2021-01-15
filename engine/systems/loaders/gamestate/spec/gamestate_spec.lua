@@ -51,53 +51,6 @@ describe("loading an entity without components", function ()
   end)
 end)
 
-describe("loading a nonmenu controllable entity", function ()
-  local config, loadedGameState, playerId
-
-  before_each(function ()
-    config = {
-      entities = {
-        player = {
-          flags = {"controllable"}
-        }
-      }
-    }
-
-    loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
-    playerId = entityTagger.getId("player")
-  end)
-
-  it("should create a component for the entity", function ()
-    assert.is.truthy(loadedGameState.components.controllable[playerId])
-  end)
-
-  it("should set default components to the entity", function ()
-    assert.are.same({x = 400, y = 300},
-                    loadedGameState.components.position[playerId])
-    assert.are.same({x = 0, y = 0},
-                    loadedGameState.components.velocity[playerId])
-    assert.are.same({walk = 400},
-                    loadedGameState.components.impulseSpeed[playerId])
-  end)
-end)
-
-describe("loading a controllable entity with a walk speed defined", function ()
-  it("should not overwrite the speed", function ()
-    local config = {
-      entities = {
-        player = {
-          flags = {"controllable"},
-          impulseSpeed = {walk = 800}
-        }
-      }
-    }
-    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
-    local playerId = entityTagger.getId("player")
-    assert.are.same({walk = 800},
-                    loadedGameState.components.impulseSpeed[playerId])
-  end)
-end)
-
 describe("loading an entity with only an empty speed list", function ()
   it("should create a game state", function ()
     local config = {
@@ -111,52 +64,6 @@ describe("loading an entity with only an empty speed list", function ()
     local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
 
     assert.are.same({garbage = {}}, loadedGameState.components)
-  end)
-end)
-
-describe("loading an entity with impulse speeds", function ()
-  it("should copy the define speeds to the component", function ()
-    local config = {
-      entities = {
-        player = {
-          impulseSpeed = {
-            walk = 400,
-            crouchWalk = 200,
-            jump = 1200,
-            climb = 400
-          }
-        }
-      }
-    }
-
-    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
-
-    local playerId = entityTagger.getId("player")
-    local playerSpeed = loadedGameState.components.impulseSpeed[playerId]
-    assert.are.same(400, playerSpeed.walk)
-    assert.are.same(200, playerSpeed.crouchWalk)
-    assert.are.same(1200, playerSpeed.jump)
-    assert.are.same(400, playerSpeed.climb)
-  end)
-end)
-
-describe("loading config with nonempty menu", function ()
-  it("should copy the menu", function ()
-    local config = {
-      entities = {
-        mainMenu = {
-          menu = {
-            options = {"Start"}
-          }
-        }
-      }
-    }
-
-    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
-
-    local mainMenuId = entityTagger.getId("mainMenu")
-    assert.are.same({"Start"},
-                    loadedGameState.components.menu[mainMenuId].options)
   end)
 end)
 

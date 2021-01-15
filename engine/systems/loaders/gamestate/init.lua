@@ -25,8 +25,8 @@ function M.load(love, entityTagger, hid, config)
     }
   }
   local menuName = getMenuEntities(config.entities)
-  component.load(loaded.components)
-  builder.load(love, entityTagger, menuName, component)
+  component.load(love, loaded.components)
+  builder.load(entityTagger, menuName, component)
   if menuName then
     buildEntity(menuName, config.entities[menuName], entityTagger, hid)
   elseif config.levels then
