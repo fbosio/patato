@@ -87,3 +87,14 @@ describe("loading config with nonempty menu", function ()
     assert.are.same({"Start"}, components.menu[mainMenuId].options)
   end)
 end)
+
+describe("loading a collector entity", function ()
+  it("should copy the component", function ()
+    local flags = {"collector"}
+    local playerId = entityTagger.tag("player")
+
+    builder.flags(flags, playerId, {})
+
+    assert.is.truthy(components.collector[playerId])
+  end)
+end)

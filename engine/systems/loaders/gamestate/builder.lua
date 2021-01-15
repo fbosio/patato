@@ -12,6 +12,9 @@ local flagStateBuilders = {
     end
     if not M.inMenu then M.component.setDefaults(entity) end
   end,
+  collector = function (entity, _)
+    M.component.set("collector", entity, true)
+  end
 }
 
 function M.flags(flags, entity, hid)
