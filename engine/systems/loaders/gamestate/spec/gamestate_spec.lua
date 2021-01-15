@@ -232,3 +232,39 @@ describe("loading collectable entities that are in a level", function ()
     assert.are.same(0, position[3].y)
   end)
 end)
+
+describe("loading an entity that is both collector and collectable", function ()
+  local config
+  before_each(function ()
+    config = {
+      entities = {
+        absurdSpecimen = {
+          flags = {"collector", "collectable"}
+        }
+      }
+    }
+  end)
+
+  describe("without levels defined", function ()
+    it("should throw an error", function ()
+      assert.has_error(function ()
+        gamestate.load(loveMock, entityTagger, {}, config)
+      end)
+    end)
+  end)
+
+  describe("with a level defined", function ()
+    it("should throw an error", function ()
+      config.levels = {
+        absurdSpecimen = {
+          {0, 10},
+          {10, 10},
+          {20, 0}
+        }
+      }
+      assert.has_error(function ()
+        gamestate.load(loveMock, entityTagger, {}, config)
+      end)
+    end)
+  end)
+end)

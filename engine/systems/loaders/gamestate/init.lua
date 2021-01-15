@@ -3,6 +3,23 @@ local component = require "engine.systems.loaders.gamestate.component"
 
 local M = {}
 
+local function checkEntitiesCompatibility(entities)
+  for name, data in pairs(entities or {}) do
+    local foundCollectable = false
+    for _, flag in ipairs(data.flags or {}) do
+      if flag == "collectable" then
+        foundCollectable = true
+      end
+    end
+    for _, flag in ipairs(data.flags or {}) do
+      assert(foundCollectable and flag ~= "collector" or not foundCollectable,
+             "Entities must not be collectables and collectors at the same"
+             .. "time, but entity \"" .. name .. "\" has both "
+             .. "components declared in config.lua")
+    end
+  end
+end
+
 local function getMenuEntities(entities)
   for name, entityData in pairs(entities or {}) do
     if entityData.menu then return name end
@@ -24,6 +41,7 @@ function M.load(love, entityTagger, hid, config)
       garbage = {}
     }
   }
+  checkEntitiesCompatibility(config.entities)
   local menuName = getMenuEntities(config.entities)
   component.load(love, loaded.components)
   builder.load(entityTagger, menuName, component)
