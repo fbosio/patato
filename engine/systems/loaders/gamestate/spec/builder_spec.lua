@@ -48,7 +48,7 @@ describe("loading a controllable entity with a walk speed defined", function ()
 
     builder.flags(flags, playerId, {})
     builder.impulseSpeed(impulseSpeed, playerId)
-    
+
     assert.are.same({walk = 800}, components.impulseSpeed[playerId])
   end)
 end)
@@ -64,7 +64,7 @@ describe("loading an entity with impulse speeds", function ()
     local playerId = entityTagger.tag("player")
 
     builder.impulseSpeed(impulseSpeed, playerId)
-    
+
     local playerSpeed = components.impulseSpeed[playerId]
     assert.are.same(400, playerSpeed.walk)
     assert.are.same(200, playerSpeed.crouchWalk)
@@ -83,17 +83,6 @@ describe("loading config with nonempty menu", function ()
     builder.menu(menu, mainMenuId)
 
     assert.are.same({"Start"}, components.menu[mainMenuId].options)
-  end)
-end)
-
-describe("loading a collector entity", function ()
-  it("should copy the component", function ()
-    local flags = {"collector"}
-    local playerId = entityTagger.tag("player")
-
-    builder.flags(flags, playerId, {})
-
-    assert.is.truthy(components.collector[playerId])
   end)
 end)
 
@@ -151,6 +140,26 @@ describe("loading an entity with animations", function ()
   end)
 end)
 
+describe("loading a collector entity", function ()
+  local playerId
+
+  before_each(function ()
+    local flags = {"collector"}
+
+    playerId = entityTagger.tag("player")
+    builder.flags(flags, playerId)
+  end)
+
+  it("should copy the component", function ()
+    assert.is.truthy(components.collector[playerId])
+  end)
+
+  it("should set default components to the entity", function ()
+    assert.are.same({x = 400, y = 300}, components.position[playerId])
+    assert.are.same({x = 0, y = 0}, components.velocity[playerId])
+  end)
+end)
+
 describe("loading a solid entity", function ()
   local playerId
 
@@ -188,5 +197,25 @@ describe("loading a gravitational entity", function ()
   it("should set default components to the entity", function ()
     assert.are.same({x = 400, y = 300}, components.position[anvilId])
     assert.are.same({x = 0, y = 0}, components.velocity[anvilId])
+  end)
+end)
+
+describe("loading a climber entity", function ()
+  local playerId
+
+  before_each(function ()
+    local flags = {"climber"}
+
+    playerId = entityTagger.tag("player")
+    builder.flags(flags, playerId)
+  end)
+
+  it("should copy the component", function ()
+    assert.is.truthy(components.climber[playerId])
+  end)
+
+  it("should set default components to the entity", function ()
+    assert.are.same({x = 400, y = 300}, components.position[playerId])
+    assert.are.same({x = 0, y = 0}, components.velocity[playerId])
   end)
 end)

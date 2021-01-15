@@ -46,24 +46,18 @@ local flagStateBuilders = {
     end
     if not M.inMenu then component.setDefaults(entity) end
   end,
-  collector = function (entity)
-    component.set("collector", entity, true)
-  end,
-  solid = function (entity)
-    component.set("solid", entity, true)
-    component.setDefaultPosition(entity)
-    component.setDefaultVelocity(entity)
-  end,
-  gravitational = function (entity)
-    component.set("gravitational", entity, true)
-    component.setDefaultPosition(entity)
-    component.setDefaultVelocity(entity)
-  end,
   collectable = function (entity)
     local name = M.entityTagger.getName(entity)
     component.setAttribute("collectable", entity, "name", name)
   end
 }
+for _, k in ipairs{"collector", "solid", "gravitational", "climber"} do
+  flagStateBuilders[k] = function (entity)
+    component.set(k, entity, true)
+    component.setDefaultPosition(entity)
+    component.setDefaultVelocity(entity)
+  end
+end
 
 function M.flags(flags, entity, hid)
   for _, flag in ipairs(flags) do
