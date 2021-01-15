@@ -34,6 +34,38 @@ local function buildEntity(name, data, entityTagger, hid)
   return entity
 end
 
+local function buildEntitiesInLevels(config, entityTagger, hid)
+  for entityName, entityData in pairs(config.entities or {}) do
+    local firstLevel = config.firstLevel or next(config.levels)
+    local levelData = config.levels[firstLevel] or {}
+    local positions = levelData[entityName]
+    if positions then
+      if type(positions[1]) ~= "table" then
+        positions = {positions}
+      end
+      for _, position in ipairs(positions) do
+        local entity = buildEntity(entityName, entityData, entityTagger, hid)
+        component.setAttribute("position", entity, "x", position[1])
+        component.setAttribute("position", entity, "y", position[2])
+      end
+    end
+  end
+end
+
+local function buildDefaults(entities, entityTagger, hid)
+  for name, data in pairs(entities or {}) do
+    local mustBeBuilt = true
+    for _, flag in ipairs(data.flags or {}) do
+      if flag == "collectable" then
+        mustBeBuilt = false
+      end
+    end
+    if mustBeBuilt then
+      buildEntity(name, data, entityTagger, hid)
+    end
+  end
+end
+
 function M.load(love, entityTagger, hid, config)
   M.entityTagger = entityTagger
   local loaded = {
@@ -48,33 +80,9 @@ function M.load(love, entityTagger, hid, config)
   if menuName then
     buildEntity(menuName, config.entities[menuName], entityTagger, hid)
   elseif config.levels then
-    for entityName, entityData in pairs(config.entities or {}) do
-      local firstLevel = config.firstLevel or next(config.levels)
-      local levelData = config.levels[firstLevel] or {}
-      local positions = levelData[entityName]
-      if positions then
-        if type(positions[1]) ~= "table" then
-          positions = {positions}
-        end
-        for i, position in ipairs(positions) do
-          local entity = buildEntity(entityName, entityData, entityTagger, hid)
-          component.setAttribute("position", entity, "x", position[1])
-          component.setAttribute("position", entity, "y", position[2])
-        end
-      end
-    end
+    buildEntitiesInLevels(config, entityTagger, hid)
   else
-    for name, data in pairs(config.entities or {}) do
-      local mustBeBuilt = true
-      for _, flag in ipairs(data.flags or {}) do
-        if flag == "collectable" then
-          mustBeBuilt = false
-        end
-      end
-      if mustBeBuilt then
-        buildEntity(name, data, entityTagger, hid)
-      end
-    end
+    buildDefaults(config.entities, entityTagger, hid)
   end
   return loaded
 end
