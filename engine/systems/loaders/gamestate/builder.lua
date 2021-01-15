@@ -12,7 +12,7 @@ local flagStateBuilders = {
         end
       end
     end
-    component.setDefaults(M.love, entity)
+    if not M.inMenu then component.setDefaults(M.love, entity) end
   end,
 }
 
@@ -22,15 +22,22 @@ function M.flags(flags, entity, hid)
   end
 end
 
-function M.impulseSpeed(speeds, entity, hid)
+function M.impulseSpeed(speeds, entity, _)
   for attribute, speed in pairs(speeds) do
     component.setAttribute("impulseSpeed", entity, attribute, speed)
   end
 end
 
-function M.load(love, entityTagger, components)
+function M.menu(data, entity, _)
+  for attribute, value in pairs(data) do
+    component.setAttribute("menu", entity, attribute, value)
+  end
+end
+
+function M.load(love, entityTagger, inMenu, components)
   M.love = love
   M.entityTagger = entityTagger
+  M.inMenu = inMenu
   component.load(components)
 end
 

@@ -51,7 +51,7 @@ describe("loading an entity without components", function ()
   end)
 end)
 
-describe("loading a controllable entity", function ()
+describe("loading a nonmenu controllable entity", function ()
   local config, loadedGameState, playerId
 
   before_each(function ()
@@ -139,3 +139,63 @@ describe("loading an entity with impulse speeds", function ()
     assert.are.same(400, playerSpeed.climb)
   end)
 end)
+
+describe("loading config with nonempty menu", function ()
+  it("should copy the menu", function ()
+    local config = {
+      entities = {
+        mainMenu = {
+          menu = {
+            options = {"Start"}
+          }
+        }
+      }
+    }
+
+    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+
+    local mainMenuId = entityTagger.getId("mainMenu")
+    assert.are.same({"Start"},
+                    loadedGameState.components.menu[mainMenuId].options)
+  end)
+end)
+
+describe("bulding world with nonempty menu and other entities", function ()
+  local config, loadedGameState, mainMenuId, playerOneId, playerTwoId
+
+  before_each(function ()
+    config = {
+      entities = {
+        playerOne = {
+          flags = {"controllable"}
+        },
+        playerTwo = {
+          flags = {"controllable"}
+        },
+        mainMenu = {
+          flags = {"controllable"},
+          menu = {
+            options = {"Start"}
+          }
+        }
+      }
+    }
+    loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+    mainMenuId = entityTagger.getId("mainMenu")
+    playerOneId = entityTagger.getId("playerOne")
+    playerTwoId = entityTagger.getId("playerTwo")
+  end)
+
+  it("should load components with menu entity", function ()
+    assert.are.same({"Start"},
+                    loadedGameState.components.menu[mainMenuId].options)
+    assert.are.truthy(loadedGameState.components.controllable[mainMenuId])
+  end)
+
+  it("should not copy entities that have not the menu component", function ()
+    assert.is.falsy(loadedGameState.components.controllable[playerOneId])
+    assert.is.falsy(loadedGameState.components.controllable[playerTwoId])
+    assert.is.falsy(loadedGameState.components.position)
+  end)
+end)
+
