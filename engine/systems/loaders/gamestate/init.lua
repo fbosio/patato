@@ -1,5 +1,4 @@
 local builder = require "engine.systems.loaders.gamestate.builder"
-local component = require "engine.systems.loaders.gamestate.component"
 
 local M = {}
 
@@ -29,7 +28,9 @@ end
 local function buildEntity(name, data, entityTagger, hid)
   local entity = entityTagger.tag(name)
   for k, v in pairs(data) do
-    builder[k](v, entity, hid)
+    if k ~= "load" and k ~= "buildFromVertices" then
+      builder[k](v, entity, hid)
+    end
   end
   return entity
 end
@@ -45,29 +46,7 @@ local function buildEntitiesInLevels(config, entityTagger, hid)
       end
       for _, vertices in ipairs(levelEntityData) do
         local entity = buildEntity(entityName, entityData, entityTagger, hid)
-        component.setAttribute("position", entity, "x", vertices[1])
-        component.setAttribute("position", entity, "y", vertices[2])
-        if #vertices > 2 then
-          local x1 = math.min(vertices[1], vertices[3])
-          local y1 = math.min(vertices[2], vertices[4] or vertices[2])
-          local x2 = math.max(vertices[1], vertices[3])
-          local y2 = math.max(vertices[2], vertices[4] or vertices[2])
-          component.setAttribute("position", entity, "x", x1)
-          component.setAttribute("position", entity, "y", y1)
-          component.setAttribute("collisionBox", entity, "origin",
-                                 {x = 0, y = 0})
-          component.setAttribute("collisionBox", entity, "width", x2 - x1)
-          component.setAttribute("collisionBox", entity, "height", y2 - y1)
-          if entityData.collideable == "triangle"
-              and vertices[2] ~= vertices [4] then
-            component.setAttribute("collideable", entity, "normalPointingUp",
-                                  vertices[2] > vertices[4])
-            local rising = (vertices[1]-vertices[3])
-                           * (vertices[2]-vertices[4]) < 0
-            component.setAttribute("collideable", entity, "rising",
-                                  rising)
-          end
-        end
+        builder.buildFromVertices(vertices, entity, entityData)
       end
     end
   end
@@ -98,8 +77,7 @@ function M.load(love, entityTagger, hid, config)
   }
   checkEntitiesCompatibility(config.entities)
   local menuName = getMenuEntities(config.entities)
-  component.load(love, loaded.components)
-  builder.load(entityTagger, menuName, component)
+  builder.load(love, entityTagger, menuName, loaded.components)
   if menuName then
     buildEntity(menuName, config.entities[menuName], entityTagger, hid)
   elseif config.levels then

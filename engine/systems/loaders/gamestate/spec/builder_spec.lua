@@ -2,7 +2,6 @@ local builder, component, entityTagger, components
 
 before_each(function ()
   builder = require "engine.systems.loaders.gamestate.builder"
-  component = require "engine.systems.loaders.gamestate.component"
   entityTagger = require "engine.tagger"
   local love = {graphics = {}}
   function love.graphics.getDimensions()
@@ -10,8 +9,7 @@ before_each(function ()
   end
   local loveMock = mock(love)
   components = {}
-  builder.load(entityTagger, false, component)
-  component.load(loveMock, components)
+  builder.load(loveMock, entityTagger, false, components)
 end
 )
 

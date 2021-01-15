@@ -1,27 +1,34 @@
 local component = require "engine.systems.loaders.gamestate.component"
+
 local M = {}
+
+function M.load(love, entityTagger, inMenu, components)
+  component.load(love, components)
+  M.entityTagger = entityTagger
+  M.inMenu = inMenu
+end
 
 local flagStateBuilders = {
   controllable = function (entity, hid)
-    M.component.set("controllable", entity, {})
+    component.set("controllable", entity, {})
     for _, commandActions in pairs(hid.commands or {}) do
       for k, action in pairs(commandActions) do
         if k == M.entityTagger.getName(entity) then
-          M.component.setAttribute("controllable", entity, action, false)
+          component.setAttribute("controllable", entity, action, false)
         end
       end
     end
-    if not M.inMenu then M.component.setDefaults(entity) end
+    if not M.inMenu then component.setDefaults(entity) end
   end,
   collector = function (entity)
-    M.component.set("collector", entity, true)
+    component.set("collector", entity, true)
   end,
   solid = function (entity)
-    M.component.set("solid", entity, true)
+    component.set("solid", entity, true)
   end,
   collectable = function (entity)
     local name = M.entityTagger.getName(entity)
-    M.component.setAttribute("collectable", entity, "name", name)
+    component.setAttribute("collectable", entity, "name", name)
   end
 }
 
@@ -42,13 +49,13 @@ end
 
 function M.impulseSpeed(speeds, entity)
   for attribute, speed in pairs(speeds) do
-    M.component.setAttribute("impulseSpeed", entity, attribute, speed)
+    component.setAttribute("impulseSpeed", entity, attribute, speed)
   end
 end
 
 function M.menu(data, entity)
   for attribute, value in pairs(data) do
-    M.component.setAttribute("menu", entity, attribute, value)
+    component.setAttribute("menu", entity, attribute, value)
   end
 end
 
@@ -69,13 +76,33 @@ function M.collideable(kind, entity)
   assert(kind == "rectangle" or kind == "triangle",
          "Unexpected collideable type \"" .. kind .. "\" for entity \""
          .. name .. "\"")
-  M.component.setAttribute("collideable", entity, "name", name)
+  component.setAttribute("collideable", entity, "name", name)
 end
 
-function M.load(entityTagger, inMenu, component)
-  M.entityTagger = entityTagger
-  M.inMenu = inMenu
-  M.component = component
+function M.buildFromVertices(vertices, entity, entityData)
+  component.setAttribute("position", entity, "x", vertices[1])
+  component.setAttribute("position", entity, "y", vertices[2])
+  if #vertices > 2 then
+    local x1 = math.min(vertices[1], vertices[3])
+    local y1 = math.min(vertices[2], vertices[4] or vertices[2])
+    local x2 = math.max(vertices[1], vertices[3])
+    local y2 = math.max(vertices[2], vertices[4] or vertices[2])
+    component.setAttribute("position", entity, "x", x1)
+    component.setAttribute("position", entity, "y", y1)
+    component.setAttribute("collisionBox", entity, "origin",
+                            {x = 0, y = 0})
+    component.setAttribute("collisionBox", entity, "width", x2 - x1)
+    component.setAttribute("collisionBox", entity, "height", y2 - y1)
+    if entityData.collideable == "triangle"
+        and vertices[2] ~= vertices [4] then
+      component.setAttribute("collideable", entity, "normalPointingUp",
+                            vertices[2] > vertices[4])
+      local rising = (vertices[1]-vertices[3])
+                      * (vertices[2]-vertices[4]) < 0
+      component.setAttribute("collideable", entity, "rising",
+                            rising)
+    end
+  end
 end
 
 return M
