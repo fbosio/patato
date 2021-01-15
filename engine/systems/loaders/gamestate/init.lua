@@ -1,4 +1,5 @@
 local builder = require "engine.systems.loaders.gamestate.builder"
+local component = require "engine.systems.loaders.gamestate.component"
 
 local M = {}
 
@@ -13,6 +14,7 @@ local function buildEntity(name, data, entityTagger, hid)
   for k, v in pairs(data) do
     builder[k](v, entity, hid)
   end
+  return entity
 end
 
 function M.load(love, entityTagger, hid, config)
@@ -23,9 +25,22 @@ function M.load(love, entityTagger, hid, config)
     }
   }
   local menuName = getMenuEntities(config.entities)
-  builder.load(love, entityTagger, menuName, loaded.components)
+  component.load(loaded.components)
+  builder.load(love, entityTagger, menuName, component)
   if menuName then
     buildEntity(menuName, config.entities[menuName], entityTagger, hid)
+  elseif config.levels then
+    for entityName, entityData in pairs(config.entities or {}) do
+      local firstLevel = config.firstLevel or next(config.levels)
+      local levelData = config.levels[firstLevel] or {}
+      local position = levelData[entityName]
+      if position then
+        local entity = buildEntity(entityName, entityData, entityTagger,
+                                    hid)
+        component.setAttribute("position", entity, "x", position[1])
+        component.setAttribute("position", entity, "y", position[2])
+      end
+    end
   else
     for name, data in pairs(config.entities or {}) do
       buildEntity(name, data, entityTagger, hid)

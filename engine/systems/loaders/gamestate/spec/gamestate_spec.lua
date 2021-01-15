@@ -199,3 +199,71 @@ describe("bulding world with nonempty menu and other entities", function ()
   end)
 end)
 
+describe("loading entities and an empty levels table", function ()
+  it("should not copy the entities", function ()
+    local config = {
+      entities = {
+        player = {
+          flags = {"controllable"}
+        }
+      },
+      levels = {}
+    }
+
+    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+
+    assert.is.falsy(loadedGameState.components.controllable)
+  end)
+end)
+
+describe("loading a level with defined entity and position", function ()
+  it("should copy that entity with that position", function ()
+    local config = {
+      entities = {
+        sonic = {
+          flags = {"controllable"}
+        }
+      },
+      levels = {
+        ["green hill zone"] = {
+          sonic = {200, 300}
+        }
+      }
+    }
+
+    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+
+    local playerId = entityTagger.getId("sonic")
+    assert.is.truthy(loadedGameState.components.controllable[playerId])
+    assert.are.same(200, loadedGameState.components.position[playerId].x)
+    assert.are.same(300, loadedGameState.components.position[playerId].y)
+  end)
+end)
+
+describe("load two levels and the name of the first one", function ()
+  it("should start the game in the first level", function ()
+    local config = {
+      entities = {
+        sonic = {
+          flags = {"controllable"}
+        }
+      },
+      levels = {
+        ["metropolis zone"] = {
+          sonic = {735, 97}
+        },
+        ["green hill zone"] = {
+          sonic = {200, 300}
+        }
+      },
+      firstLevel = "green hill zone"
+    }
+
+    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+
+    local playerId = entityTagger.getId("sonic")
+    assert.is.truthy(loadedGameState.components.controllable[playerId])
+    assert.are.same(200, loadedGameState.components.position[playerId].x)
+    assert.are.same(300, loadedGameState.components.position[playerId].y)
+  end)
+end)
