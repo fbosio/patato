@@ -13,10 +13,10 @@ local flagStateBuilders = {
     end
     if not M.inMenu then M.component.setDefaults(entity) end
   end,
-  collector = function (entity, _)
+  collector = function (entity)
     M.component.set("collector", entity, true)
   end,
-  collectable = function (entity, _)
+  collectable = function (entity)
     local name = M.entityTagger.getName(entity)
     M.component.setAttribute("collectable", entity, "name", name)
   end,
@@ -28,19 +28,28 @@ function M.flags(flags, entity, hid)
   end
 end
 
-function M.impulseSpeed(speeds, entity, _)
+function M.resources(resources, entity)
+  if not resources.animations then return end
+  local name = next(resources.animations)
+  component.setAttribute("animation", entity, "name", name)
+  component.setAttribute("animation", entity, "frame", 1)
+  component.setAttribute("animation", entity, "time", 0)
+  component.setAttribute("animation", entity, "ended", false)
+end
+
+function M.impulseSpeed(speeds, entity)
   for attribute, speed in pairs(speeds) do
     M.component.setAttribute("impulseSpeed", entity, attribute, speed)
   end
 end
 
-function M.menu(data, entity, _)
+function M.menu(data, entity)
   for attribute, value in pairs(data) do
     M.component.setAttribute("menu", entity, attribute, value)
   end
 end
 
-function M.collisionBox(box, entity, _)
+function M.collisionBox(box, entity)
   local t = {
     origin = {x = box[1], y = box[2]},
     width = box[3],

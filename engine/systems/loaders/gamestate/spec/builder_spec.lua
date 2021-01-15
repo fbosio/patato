@@ -123,3 +123,21 @@ describe("loading a collision box", function ()
     assert.are.same(300, playerPosition.y)
   end)
 end)
+
+describe("loading an entity with animations", function ()
+  it("should create an animation component", function ()
+    local resources = {
+      animations = {
+        standing = {1, 1},
+        walking = {2, 0.5, 3, 0.5, 4, 0.5, 3, 0.5, true}
+      }
+    }
+
+    local playerId = entityTagger.tag("player")
+    builder.resources(resources, playerId)
+    local playerAnimation = components.animation[playerId]
+    assert.are.same(1, playerAnimation.frame)
+    assert.are.same(0, playerAnimation.time)
+    assert.are.falsy(playerAnimation.ended)
+  end)
+end)
