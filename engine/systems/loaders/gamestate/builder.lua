@@ -1,3 +1,4 @@
+local component = require "engine.systems.loaders.gamestate.component"
 local M = {}
 
 local flagStateBuilders = {
@@ -37,6 +38,18 @@ function M.menu(data, entity, _)
   for attribute, value in pairs(data) do
     M.component.setAttribute("menu", entity, attribute, value)
   end
+end
+
+function M.collisionBox(box, entity, _)
+  local t = {
+    origin = {x = box[1], y = box[2]},
+    width = box[3],
+    height = box[4],
+  }
+  for k, v in pairs(t) do
+    component.setAttribute("collisionBox", entity, k, v)
+  end
+  component.setDefaultPosition(entity)
 end
 
 function M.load(entityTagger, inMenu, component)

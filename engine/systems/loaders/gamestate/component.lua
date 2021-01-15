@@ -16,8 +16,8 @@ function M.setAttribute(name, entity, attribute, value)
   M.components[name][entity][attribute] = value
 end
 
-local function setDefaultPosition(love, entity)
-  local width, height = love.graphics.getDimensions()
+function M.setDefaultPosition(entity)
+  local width, height = M.love.graphics.getDimensions()
   M.setAttribute("position", entity, "x", width/2)
   M.setAttribute("position", entity, "y", height/2)
 end
@@ -33,7 +33,7 @@ function M.setDefaults(entity)
   if not M.components.impulseSpeed[entity].walk then
     M.setAttribute("impulseSpeed", entity, "walk", 400)
   end
-  setDefaultPosition(M.love, entity)
+  M.setDefaultPosition(entity)
   setDefaultVelocity(entity)
 end
 

@@ -98,3 +98,28 @@ describe("loading a collector entity", function ()
     assert.is.truthy(components.collector[playerId])
   end)
 end)
+
+describe("loading a collision box", function ()
+  local collisionBox, playerId
+
+  before_each(function ()
+    collisionBox = {15, 35, 30, 70}
+
+    playerId = entityTagger.tag("player")
+    builder.collisionBox(collisionBox, playerId)
+  end)
+
+  it("should copy the component", function ()
+    local box = components.collisionBox[playerId]
+    assert.are.same(15, box.origin.x)
+    assert.are.same(35, box.origin.y)
+    assert.are.same(30, box.width)
+    assert.are.same(70, box.height)
+  end)
+
+  it("should create game state with default position", function ()
+    local playerPosition = components.position[playerId]
+    assert.are.same(400, playerPosition.x)
+    assert.are.same(300, playerPosition.y)
+  end)
+end)
