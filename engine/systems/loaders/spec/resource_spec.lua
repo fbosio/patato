@@ -12,9 +12,6 @@ before_each(function ()
   function love.graphics.getHeight()
     return 600
   end
-  function love.graphics.getDimensions()
-    return love.graphics.getWidth(), love.graphics.getHeight()
-  end
   function love.graphics.newImage()
     return {
       getDimensions = function () return nil end,
