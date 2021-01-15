@@ -14,7 +14,11 @@ local flagStateBuilders = {
   end,
   collector = function (entity, _)
     M.component.set("collector", entity, true)
-  end
+  end,
+  collectable = function (entity, _)
+    local name = M.entityTagger.getName(entity)
+    M.component.setAttribute("collectable", entity, "name", name)
+  end,
 }
 
 function M.flags(flags, entity, hid)

@@ -174,3 +174,61 @@ describe("load two levels and the name of the first one", function ()
     assert.are.same(300, loadedGameState.components.position[playerId].y)
   end)
 end)
+
+describe("loading a collectable entity that is not in any level", function ()
+  it("should not copy the component", function ()
+    local config = {
+      entities = {
+        item = {
+          flags = {"collectable"}
+        }
+      }
+    }
+
+    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+
+    assert.is.falsy(loadedGameState.components.collectable)
+  end)
+end)
+
+describe("loading collectable entities that are in a level", function ()
+  local config, loadedGameState
+
+  before_each(function ()
+    config = {
+      entities = {
+        bottle = {
+          flags = {"collectable"}
+        }
+      },
+      levels = {
+        garden = {
+          bottle = {
+            {0, 10},
+            {10, 10},
+            {20, 0}
+          }
+        }
+      }
+    }
+  
+    loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+  end)
+
+  it("sould copy the collectable components with its name", function ()
+    local collectable = loadedGameState.components.collectable
+    assert.are.same("bottle", collectable[1].name)
+    assert.are.same("bottle", collectable[2].name)
+    assert.are.same("bottle", collectable[3].name)
+  end)
+
+  it("should copy the positions of the collectable components", function ()
+    local position = loadedGameState.components.position
+    assert.are.same(0, position[1].x)
+    assert.are.same(10, position[1].y)
+    assert.are.same(10, position[2].x)
+    assert.are.same(10, position[2].y)
+    assert.are.same(20, position[3].x)
+    assert.are.same(0, position[3].y)
+  end)
+end)

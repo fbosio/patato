@@ -33,17 +33,29 @@ function M.load(love, entityTagger, hid, config)
     for entityName, entityData in pairs(config.entities or {}) do
       local firstLevel = config.firstLevel or next(config.levels)
       local levelData = config.levels[firstLevel] or {}
-      local position = levelData[entityName]
-      if position then
-        local entity = buildEntity(entityName, entityData, entityTagger,
-                                    hid)
-        component.setAttribute("position", entity, "x", position[1])
-        component.setAttribute("position", entity, "y", position[2])
+      local positions = levelData[entityName]
+      if positions then
+        if type(positions[1]) ~= "table" then
+          positions = {positions}
+        end
+        for i, position in ipairs(positions) do
+          local entity = buildEntity(entityName, entityData, entityTagger, hid)
+          component.setAttribute("position", entity, "x", position[1])
+          component.setAttribute("position", entity, "y", position[2])
+        end
       end
     end
   else
     for name, data in pairs(config.entities or {}) do
-      buildEntity(name, data, entityTagger, hid)
+      local mustBeBuilt = true
+      for _, flag in ipairs(data.flags or {}) do
+        if flag == "collectable" then
+          mustBeBuilt = false
+        end
+      end
+      if mustBeBuilt then
+        buildEntity(name, data, entityTagger, hid)
+      end
     end
   end
   return loaded
