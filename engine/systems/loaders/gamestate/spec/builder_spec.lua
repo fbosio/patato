@@ -122,6 +122,17 @@ describe("loading a collision box", function ()
   end)
 end)
 
+describe("loading an entity that has a wrong collideable type", function ()
+  it("should throw an error", function ()
+    local collideableWithTypo = "rectanlgbe"
+    local surfaceId = entityTagger.tag("surface")
+
+    assert.has_error(function ()
+      builder.collideable(collideableWithTypo, surfaceId)
+    end)
+  end)
+end)
+
 describe("loading an entity with animations", function ()
   it("should create an animation component", function ()
     local resources = {
@@ -141,22 +152,41 @@ describe("loading an entity with animations", function ()
 end)
 
 describe("loading a solid entity", function ()
-  it("should copy the component", function ()
+  local playerId
+
+  before_each(function ()
     local flags = {"solid"}
 
-    local playerId = entityTagger.tag("player")
+    playerId = entityTagger.tag("player")
     builder.flags(flags, playerId)
+  end)
+
+  it("should copy the component", function ()
     assert.is.truthy(components.solid[playerId])
+  end)
+
+  it("should set default components to the entity", function ()
+    assert.are.same({x = 400, y = 300}, components.position[playerId])
+    assert.are.same({x = 0, y = 0}, components.velocity[playerId])
   end)
 end)
 
-describe("loading an entity that has a wrong collideable type", function ()
-  it("should throw an error", function ()
-    local collideableWithTypo = "rectanlgbe"
-    local surfaceId = entityTagger.tag("surface")
+describe("loading a gravitational entity", function ()
+  local anvilId
 
-    assert.has_error(function ()
-      builder.collideable(collideableWithTypo, surfaceId)
-    end)
+  before_each(function ()
+    local flags = {"gravitational"}
+
+    anvilId = entityTagger.tag("anvil")
+    builder.flags(flags, anvilId)
+  end)
+
+  it("should copy the component", function ()
+    assert.is.truthy(components.gravitational[anvilId])
+  end)
+
+  it("should set default components to the entity", function ()
+    assert.are.same({x = 400, y = 300}, components.position[anvilId])
+    assert.are.same({x = 0, y = 0}, components.velocity[anvilId])
   end)
 end)

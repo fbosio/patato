@@ -51,6 +51,13 @@ local flagStateBuilders = {
   end,
   solid = function (entity)
     component.set("solid", entity, true)
+    component.setDefaultPosition(entity)
+    component.setDefaultVelocity(entity)
+  end,
+  gravitational = function (entity)
+    component.set("gravitational", entity, true)
+    component.setDefaultPosition(entity)
+    component.setDefaultVelocity(entity)
   end,
   collectable = function (entity)
     local name = M.entityTagger.getName(entity)

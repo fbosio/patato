@@ -22,7 +22,7 @@ function M.setDefaultPosition(entity)
   M.setAttribute("position", entity, "y", height/2)
 end
 
-local function setDefaultVelocity(entity)
+function M.setDefaultVelocity(entity)
   M.setAttribute("velocity", entity, "x", 0)
   M.setAttribute("velocity", entity, "y", 0)
 end
@@ -34,7 +34,7 @@ function M.setDefaults(entity)
     M.setAttribute("impulseSpeed", entity, "walk", 400)
   end
   M.setDefaultPosition(entity)
-  setDefaultVelocity(entity)
+  M.setDefaultVelocity(entity)
 end
 
 return M
