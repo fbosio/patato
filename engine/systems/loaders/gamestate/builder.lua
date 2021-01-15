@@ -49,6 +49,9 @@ local flagStateBuilders = {
   collectable = function (entity)
     local name = M.entityTagger.getName(entity)
     component.setAttribute("collectable", entity, "name", name)
+  end,
+  trellis = function (entity)
+    component.set("trellis", entity, true)
   end
 }
 for _, k in ipairs{"collector", "solid", "gravitational", "climber"} do

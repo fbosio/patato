@@ -19,16 +19,19 @@ end
 local function checkEntitiesCompatibility(entities)
   local incompatiblePairs = {
     {"collectable", "collector"},
-    {"collideable", "solid"}
+    {"collideable", "solid"},
+    {"climber", "trellis"}
   }
   for name, data in pairs(entities or {}) do
     local flattened = getFlattenedData(data)
     for _, pair in ipairs(incompatiblePairs) do
       assert(not (flattened[pair[1]] and flattened[pair[2]]),
-             "Entities must not be " .. pair[1] .. "s and " .. pair[2]
-             .. "s at the same time, but entity \"" .. name .. "\" has both "
-             .. "components declared in config.lua")
+             "Found entity \"" .. name .. "\" declared as both " .. pair[1]
+             .. " and " .. pair[2] .. "in config.lua")
     end
+    assert(not (data.collideable == "triangle" and flattened.trellis),
+           "Found entity \"" .. name .. "\" declared as both slope and trellis"
+           .. "in config.lua")
   end
 end
 
@@ -70,7 +73,7 @@ local function buildDefaults(entities, entityTagger, hid)
     local mustBeBuilt = not data.collideable
     if not mustBeBuilt then break end
     for _, flag in ipairs(data.flags or {}) do
-      if flag == "collectable" then
+      if flag == "collectable" or flag == "trellis" then
         mustBeBuilt = false
         break
       end

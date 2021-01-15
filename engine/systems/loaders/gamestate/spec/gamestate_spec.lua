@@ -431,3 +431,127 @@ describe("loading an entity that is both collideable and solid", function ()
     end)
   end)
 end)
+
+describe("loading a trellis entity that is not in any level", function ()
+  it("should not copy the component", function ()
+    local config = {
+      entities = {
+        trellis = {
+          flags = {"trellis"}
+        }
+      }
+    }
+
+    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+
+    assert.is.falsy(loadedGameState.components.trellis)
+  end)
+end)
+
+describe("loading trellis entities that are in a level", function ()
+  local loadedGameState
+
+  before_each(function ()
+    local config = {
+      entities = {
+        trellises = {
+          flags = {"trellis"}
+        }
+      },
+      levels = {
+        garden = {
+          trellises = {
+            {400, 50, 700, 200},
+            {400, 400, 700, 550},
+          }
+        }
+      }
+    }
+
+    loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+  end)
+
+  it("should copy the trellis components", function ()
+    local trellis = loadedGameState.components.trellis
+    assert.is.truthy(trellis[1])
+    assert.is.truthy(trellis[2])
+  end)
+
+  it("should create collision boxes for each entity", function ()
+    assert.are.same({
+      {origin = {x = 0, y = 0}, width = 300, height = 150},
+      {origin = {x = 0, y = 0}, width = 300, height = 150},
+    }, loadedGameState.components.collisionBox)
+  end)
+end)
+
+describe("loading an entity that is both climber and trellis", function ()
+  local config
+  before_each(function ()
+    config = {
+      entities = {
+        absurdSpecimen = {
+          flags = {"climber", "trellis"}
+        }
+      }
+    }
+  end)
+
+  describe("without levels defined", function ()
+    it("should throw an error", function ()
+      assert.has_error(function ()
+        gamestate.load(loveMock, entityTagger, {}, config)
+      end)
+    end)
+  end)
+
+  describe("with a level defined", function ()
+    it("should throw an error", function ()
+      config.levels = {
+        absurdSpecimen = {
+          {400, 50, 700, 200},
+          {400, 400, 700, 550},
+        }
+      }
+      assert.has_error(function ()
+        gamestate.load(loveMock, entityTagger, {}, config)
+      end)
+    end)
+  end)
+end)
+
+describe("loading an entity that is both slope and trellis", function ()
+  local config
+  before_each(function ()
+    config = {
+      entities = {
+        absurdSpecimen = {
+          flags = {"trellis"},
+          collideable = "triangle"
+        }
+      }
+    }
+  end)
+
+  describe("without levels defined", function ()
+    it("should throw an error", function ()
+      assert.has_error(function ()
+        gamestate.load(loveMock, entityTagger, {}, config)
+      end)
+    end)
+  end)
+
+  describe("with a level defined", function ()
+    it("should throw an error", function ()
+      config.levels = {
+        absurdSpecimen = {
+          {400, 50, 700, 200},
+          {400, 400, 700, 550},
+        }
+      }
+      assert.has_error(function ()
+        gamestate.load(loveMock, entityTagger, {}, config)
+      end)
+    end)
+  end)
+end)
