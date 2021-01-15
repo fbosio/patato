@@ -348,3 +348,50 @@ describe("loading cloud entities that are in a level", function ()
     }, collisionBox)
   end)
 end)
+
+describe("loading slope entities that are in a level", function ()
+  local config, loadedGameState
+
+  before_each(function ()
+    config = {
+      entities = {
+        slopes = {
+          collideable = "triangle"
+        }
+      },
+      levels = {
+        garden = {
+          slopes = {
+            {10, 10, 0, 0},
+            {20, 10, 30, 0},
+            {10, 20, 0, 30},
+            {20, 20, 30, 30},
+          }
+        }
+      }
+    }
+
+    loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+  end)
+
+  it("should create collision boxes for each entity", function ()
+    assert.are.same({
+      {origin = {x = 0, y = 0}, width = 10, height = 10},
+      {origin = {x = 0, y = 0}, width = 10, height = 10},
+      {origin = {x = 0, y = 0}, width = 10, height = 10},
+      {origin = {x = 0, y = 0}, width = 10, height = 10},
+    }, loadedGameState.components.collisionBox)
+  end)
+
+  it("should create a collideable with slope attributes", function ()
+    local collideable = loadedGameState.components.collideable
+    assert.is.truthy(collideable[1].normalPointingUp)
+    assert.is.falsy(collideable[1].rising)
+    assert.is.truthy(collideable[2].normalPointingUp)
+    assert.is.truthy(collideable[2].rising)
+    assert.is.falsy(collideable[3].normalPointingUp)
+    assert.is.truthy(collideable[3].rising)
+    assert.is.falsy(collideable[4].normalPointingUp)
+    assert.is.falsy(collideable[4].rising)
+  end)
+end)

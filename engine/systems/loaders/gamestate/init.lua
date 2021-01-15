@@ -58,6 +58,15 @@ local function buildEntitiesInLevels(config, entityTagger, hid)
                                  {x = 0, y = 0})
           component.setAttribute("collisionBox", entity, "width", x2 - x1)
           component.setAttribute("collisionBox", entity, "height", y2 - y1)
+          if entityData.collideable == "triangle"
+              and vertices[2] ~= vertices [4] then
+            component.setAttribute("collideable", entity, "normalPointingUp",
+                                  vertices[2] > vertices[4])
+            local rising = (vertices[1]-vertices[3])
+                           * (vertices[2]-vertices[4]) < 0
+            component.setAttribute("collideable", entity, "rising",
+                                  rising)
+          end
         end
       end
     end
