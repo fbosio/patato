@@ -16,10 +16,13 @@ local flagStateBuilders = {
   collector = function (entity)
     M.component.set("collector", entity, true)
   end,
+  solid = function (entity)
+    M.component.set("solid", entity, true)
+  end,
   collectable = function (entity)
     local name = M.entityTagger.getName(entity)
     M.component.setAttribute("collectable", entity, "name", name)
-  end,
+  end
 }
 
 function M.flags(flags, entity, hid)
@@ -59,6 +62,11 @@ function M.collisionBox(box, entity)
     component.setAttribute("collisionBox", entity, k, v)
   end
   component.setDefaultPosition(entity)
+end
+
+function M.collideable(_, entity)
+  local name = M.entityTagger.getName(entity)
+  M.component.setAttribute("collideable", entity, "name", name)
 end
 
 function M.load(entityTagger, inMenu, component)

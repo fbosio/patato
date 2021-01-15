@@ -141,3 +141,13 @@ describe("loading an entity with animations", function ()
     assert.are.falsy(playerAnimation.ended)
   end)
 end)
+
+describe("loading a solid entity", function ()
+  it("should copy the component", function ()
+    local flags = {"solid"}
+
+    local playerId = entityTagger.tag("player")
+    builder.flags(flags, playerId)
+    assert.is.truthy(components.solid[playerId])
+  end)
+end)

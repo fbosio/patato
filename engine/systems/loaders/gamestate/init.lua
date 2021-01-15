@@ -38,15 +38,27 @@ local function buildEntitiesInLevels(config, entityTagger, hid)
   for entityName, entityData in pairs(config.entities or {}) do
     local firstLevel = config.firstLevel or next(config.levels)
     local levelData = config.levels[firstLevel] or {}
-    local positions = levelData[entityName]
-    if positions then
-      if type(positions[1]) ~= "table" then
-        positions = {positions}
+    local levelEntityData = levelData[entityName]
+    if levelEntityData then
+      if type(levelEntityData[1]) ~= "table" then
+        levelEntityData = {levelEntityData}
       end
-      for _, position in ipairs(positions) do
+      for _, vertices in ipairs(levelEntityData) do
         local entity = buildEntity(entityName, entityData, entityTagger, hid)
-        component.setAttribute("position", entity, "x", position[1])
-        component.setAttribute("position", entity, "y", position[2])
+        component.setAttribute("position", entity, "x", vertices[1])
+        component.setAttribute("position", entity, "y", vertices[2])
+        if #vertices == 4 then
+          local x1 = math.min(vertices[1], vertices[3])
+          local y1 = math.min(vertices[2], vertices[4])
+          local x2 = math.max(vertices[1], vertices[3])
+          local y2 = math.max(vertices[2], vertices[4])
+          component.setAttribute("position", entity, "x", x1)
+          component.setAttribute("position", entity, "y", y1)
+          component.setAttribute("collisionBox", entity, "origin",
+                                 {x = 0, y = 0})
+          component.setAttribute("collisionBox", entity, "width", x2 - x1)
+          component.setAttribute("collisionBox", entity, "height", y2 - y1)
+        end
       end
     end
   end
@@ -54,10 +66,12 @@ end
 
 local function buildDefaults(entities, entityTagger, hid)
   for name, data in pairs(entities or {}) do
-    local mustBeBuilt = true
+    local mustBeBuilt = not data.collideable
+    if not mustBeBuilt then break end
     for _, flag in ipairs(data.flags or {}) do
       if flag == "collectable" then
         mustBeBuilt = false
+        break
       end
     end
     if mustBeBuilt then

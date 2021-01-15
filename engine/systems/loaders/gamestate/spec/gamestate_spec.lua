@@ -268,3 +268,56 @@ describe("loading an entity that is both collector and collectable", function ()
     end)
   end)
 end)
+
+describe("loading a collideable entity that is not in any level", function ()
+  it("should not copy the component", function ()
+    local config = {
+      entities = {
+        surface = {
+          collideable = "rectangle"
+        }
+      }
+    }
+
+    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+
+    assert.is.falsy(loadedGameState.components.collideable)
+  end)
+end)
+
+describe("loading surface entities that are in a level", function ()
+  local loadedGameState
+
+  before_each(function ()
+    local config = {
+      entities = {
+        surfaces = {
+          collideable = "rectangle"
+        }
+      },
+      levels = {
+        garden = {
+          surfaces = {
+            {400, 50, 700, 200},
+            {400, 400, 700, 550},
+          }
+        }
+      }
+    }
+
+    loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+  end)
+
+  it("should copy the collideable components with its name", function ()
+    local collideable = loadedGameState.components.collideable
+    assert.are.same("surfaces", collideable[1].name)
+    assert.are.same("surfaces", collideable[2].name)
+  end)
+
+  it("should create collision boxes for each entity", function ()
+    assert.are.same({
+      {origin = {x = 0, y = 0}, width = 300, height = 150},
+      {origin = {x = 0, y = 0}, width = 300, height = 150},
+    }, loadedGameState.components.collisionBox)
+  end)
+end)
