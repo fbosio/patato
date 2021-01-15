@@ -47,11 +47,11 @@ local function buildEntitiesInLevels(config, entityTagger, hid)
         local entity = buildEntity(entityName, entityData, entityTagger, hid)
         component.setAttribute("position", entity, "x", vertices[1])
         component.setAttribute("position", entity, "y", vertices[2])
-        if #vertices == 4 then
+        if #vertices > 2 then
           local x1 = math.min(vertices[1], vertices[3])
-          local y1 = math.min(vertices[2], vertices[4])
+          local y1 = math.min(vertices[2], vertices[4] or vertices[2])
           local x2 = math.max(vertices[1], vertices[3])
-          local y2 = math.max(vertices[2], vertices[4])
+          local y2 = math.max(vertices[2], vertices[4] or vertices[2])
           component.setAttribute("position", entity, "x", x1)
           component.setAttribute("position", entity, "y", y1)
           component.setAttribute("collisionBox", entity, "origin",

@@ -211,7 +211,7 @@ describe("loading collectable entities that are in a level", function ()
         }
       }
     }
-  
+
     loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
   end)
 
@@ -319,5 +319,32 @@ describe("loading surface entities that are in a level", function ()
       {origin = {x = 0, y = 0}, width = 300, height = 150},
       {origin = {x = 0, y = 0}, width = 300, height = 150},
     }, loadedGameState.components.collisionBox)
+  end)
+end)
+
+describe("loading cloud entities that are in a level", function ()
+  it("should create collision lines for each entity", function ()
+    local config = {
+      entities = {
+        clouds = {
+          collideable = "rectangle"
+        }
+      },
+      levels = {
+        garden = {
+          clouds = {
+            {400, 50, 700},
+            {400, 400, 700},
+          }
+        }
+      }
+    }
+    local loadedGameState = gamestate.load(loveMock, entityTagger, {}, config)
+
+    local collisionBox = loadedGameState.components.collisionBox
+    assert.are.same({
+      {origin = {x = 0, y = 0}, width = 300, height = 0},
+      {origin = {x = 0, y = 0}, width = 300, height = 0},
+    }, collisionBox)
   end)
 end)
