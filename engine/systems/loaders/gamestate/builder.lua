@@ -22,6 +22,12 @@ function M.flags(flags, entity, hid)
   end
 end
 
+function M.impulseSpeed(speeds, entity, hid)
+  for attribute, speed in pairs(speeds) do
+    component.setAttribute("impulseSpeed", entity, attribute, speed)
+  end
+end
+
 function M.load(love, entityTagger, components)
   M.love = love
   M.entityTagger = entityTagger
