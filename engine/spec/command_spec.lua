@@ -1,20 +1,27 @@
-local command, entityTagger, hid, components
+local command, entityTagger, hid, marioId, luigiId, components
 
 before_each(function ()
   command = require "engine.command"
   entityTagger = require "engine.tagger"
-
+  marioId = entityTagger.tag("mario")
+  luigiId = entityTagger.tag("luigi")
   hid = {}
-  components = {}
+  components = {
+    controllable = {
+      [marioId] = {},
+      [luigiId] = {}
+    }
+  }
   command.load(entityTagger, hid, components)
 end)
 
 after_each(function ()
   package.loaded["engine.command"] = nil
+  package.loaded["engine.tagger"] = nil
 end)
 
 describe("setting repeated commands for different entities", function ()
-  local leftCallback, rightCallback, marioId, luigiId
+  local leftCallback, rightCallback
 
   before_each(function ()
     leftCallback = function (t)
@@ -23,8 +30,6 @@ describe("setting repeated commands for different entities", function ()
     rightCallback = function (t)
       t.velocity.x = t.impulseSpeed.walk
     end
-    marioId = entityTagger.tag("mario")
-    luigiId = entityTagger.tag("luigi")
     
     command.set("mario", "left", leftCallback, "hold")
     command.set("mario", "right", rightCallback, "hold")
@@ -59,6 +64,15 @@ describe("setting a command with a wrong kind", function ()
   it("should throw an error", function ()
     assert.has_error(function ()
       command.set("mario", "jump", function () end, "hofl")
+    end)
+  end)
+end)
+
+describe("setting a command for a noncontrollable entity", function ()
+  it("should throw an error", function ()
+    entityTagger.tag("anvil")
+    assert.has_error(function ()
+      command.set("anvil", "left", function () end, "hold")
     end)
   end)
 end)

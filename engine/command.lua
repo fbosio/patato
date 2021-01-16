@@ -6,10 +6,10 @@ function M.load(entityTagger, hid, components)
   M.components = components
 end
 
-local kinds = {"hold", "press", "release"}
 
 function M.set(entityName, input, callback, kind)
   local existentKind = false
+  local kinds = {"hold", "press", "release"}
   for _, v in ipairs(kinds) do
     if v == kind then
       existentKind = true
@@ -27,7 +27,8 @@ function M.set(entityName, input, callback, kind)
   local controllable = M.components.controllable
   local entities = M.entityTagger.getIds(entityName)
   for _, entity in ipairs(entities) do
-    controllable[entity] = controllable[entity] or {}
+    assert(controllable[entity], "Entity \"" .. entityName .. "\" is not "
+           .. "controllable but a command is being set for it")
     controllable[entity][kind] = controllable[entity][kind] or {}
     controllable[entity][kind][input] = false
   end
