@@ -84,7 +84,7 @@ local function buildDefaults(entities, entityTagger)
   end
 end
 
-function M.load(love, entityTagger, config)
+function M.load(love, entityTagger, command, config)
   M.entityTagger = entityTagger
   local loaded = {
     components = {
@@ -93,7 +93,7 @@ function M.load(love, entityTagger, config)
   }
   checkEntitiesCompatibility(config.entities)
   local menuName = getMenuEntities(config.entities)
-  builder.load(love, entityTagger, menuName, loaded.components)
+  builder.load(love, entityTagger, command, menuName, loaded.components)
   if menuName then
     buildEntity(menuName, config.entities[menuName], entityTagger)
   elseif config.levels then

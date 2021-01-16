@@ -3,15 +3,17 @@ local builder, entityTagger, components
 before_each(function ()
   builder = require "engine.systems.loaders.gamestate.builder"
   entityTagger = require "engine.tagger"
+  local command = require "engine.command"
   local love = {graphics = {}}
   function love.graphics.getDimensions()
     return 800, 600
   end
   local loveMock = mock(love)
   components = {}
-  builder.load(loveMock, entityTagger, false, components)
-end
-)
+  local hid = {commands = {}}
+  command.load(hid, components)
+  builder.load(loveMock, entityTagger, command, false, components)
+end)
 
 after_each(function ()
   package.loaded["engine.systems.loaders.gamestate.builder"] = nil

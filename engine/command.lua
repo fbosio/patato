@@ -1,11 +1,9 @@
 local M = {}
 
-function M.load(entityTagger, hid, components)
-  M.entityTagger = entityTagger
+function M.load(hid, components)
   M.hid = hid
   M.components = components
 end
-
 
 function M.set(entityName, input, callback, kind)
   local existentKind = false
@@ -22,51 +20,21 @@ function M.set(entityName, input, callback, kind)
   commands[kind] = commands[kind] or {}
   commands[kind][entityName] = commands[kind][entityName] or {}
   commands[kind][entityName][input] = callback
+end
 
-  M.components.controllable = M.components.controllable or {}
+function M.update(entity, name)
+  if not M.components then return end
   local controllable = M.components.controllable
-  local entities = M.entityTagger.getIds(entityName)
-  for _, entity in ipairs(entities) do
-    assert(controllable[entity], "Entity \"" .. entityName .. "\" is not "
-           .. "controllable but a command is being set for it")
-    controllable[entity][kind] = controllable[entity][kind] or {}
-    controllable[entity][kind][input] = false
+  for kind, t in pairs(M.hid.commands) do
+    if t[name] then
+      for input, _ in pairs(t[name]) do
+        assert(controllable[entity], "Entity \"" .. name .. "\" is not "
+                .. "controllable but a command is being set for it")
+        controllable[entity][kind] = controllable[entity][kind] or {}
+        controllable[entity][kind][input] = false
+      end
+    end
   end
-end
-
--- Old code
--- Check that all values of table t1 are in table t2.
-local function isIncluded(t1, t2)                                                                   
-  for _, v1 in ipairs(t1) do                                                                        
-    local hasValue = false                                                                          
-    for _, v2 in ipairs(t2) do                                                                      
-      if v1 == v2 then                                                                              
-        hasValue = true                                                                             
-        break                                                                                       
-      end                                                                                           
-    end                                                                                             
-    if not hasValue then                                                                            
-      return false                                                                                  
-    end                                                                                             
-  end                                                                                               
-  return true                                                                                       
-end
-
-local mt = {
-  __eq = function (a, b)
-    return not a.release == not b.release and not a.oneShot == not b.oneShot
-      and isIncluded(a.input, b.input) and isIncluded(b.input, a.input)
-  end
-}
-
-function M.new(args)
-  local newCommand = {
-    release = args.release,
-    oneShot = args.oneShot,
-    input = type(args.input) == "table" and args.input or {args.input}
-  }
-  setmetatable(newCommand, mt)
-  return newCommand
 end
 
 return M

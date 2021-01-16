@@ -12,7 +12,7 @@ before_each(function ()
       [luigiId] = {}
     }
   }
-  command.load(entityTagger, hid, components)
+  command.load(hid, components)
 end)
 
 after_each(function ()
@@ -49,6 +49,8 @@ describe("setting repeated commands for different entities", function ()
   end)
 
   it("should create an input set for each entity", function ()
+    command.update(marioId, "mario")
+    command.update(luigiId, "luigi")
     assert.are.same({
       left = false,
       right = false
@@ -70,9 +72,10 @@ end)
 
 describe("setting a command for a noncontrollable entity", function ()
   it("should throw an error", function ()
-    entityTagger.tag("anvil")
+    local anvilId = entityTagger.tag("anvil")
     assert.has_error(function ()
       command.set("anvil", "left", function () end, "hold")
+      command.update(anvilId, "anvil")
     end)
   end)
 end)
