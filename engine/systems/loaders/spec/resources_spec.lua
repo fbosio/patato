@@ -172,6 +172,22 @@ describe("loading an entity with an image and depth", function ()
   end)
 end)
 
+describe("loading an entity with sprites table and no image", function ()
+  it("should throw an error", function ()
+    local config = {
+      entities = {
+        player = {
+          resources = {
+            sprites = {}
+          }
+        }
+      }
+    }
+    
+    assert.has_error(function () resources.load(loveMock, config) end)
+  end)
+end)
+
 describe("loading sprites and an entity with animations", function ()
   local loadedResources
 

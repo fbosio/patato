@@ -65,6 +65,9 @@ function M.load(love, config)
   for entityName, entityData in pairs(config.entities or {}) do
     local entityResources = entityData.resources or {}
     if entityResources.sprites then
+      assert(entityResources.sprites.image,
+             "Entity " .. entityName .. " has resources but no image declared"
+             .. " in config.lua")
       loaded[entityName] = loaded[entityName] or {}
       loaded[entityName].sprites = buildSprites(entityResources.sprites)
     end
