@@ -60,12 +60,12 @@ function M.update(hid, components)
   end
 end
 
-function M.keypressed(key, hid, components)
-  for entityName, entityCommands in pairs(hid.commands.press or {}) do
+local function checkEvent(k, kind, t, commands, components)
+  for entityName, entityCommands in pairs(commands[kind] or {}) do
     for input, callback in pairs(entityCommands) do
-      local physicalKey = hid.keys[input]
+      local physicalInput = t[input]
       local entities = M.entityTagger.getIds(entityName)
-      if physicalKey == key then
+      if physicalInput == k then
         for _, entity in ipairs(entities or {}) do
           local entityComponents = buildArguments(entity, components)
           callback(entityComponents)
@@ -75,19 +75,12 @@ function M.keypressed(key, hid, components)
   end
 end
 
+function M.keypressed(key, hid, components)
+  checkEvent(key, "press", hid.keys, hid.commands, components)
+end
+
 function M.keyreleased(key, hid, components)
-  for entityName, entityCommands in pairs(hid.commands.release or {}) do
-    for input, callback in pairs(entityCommands) do
-      local physicalKey = hid.keys[input]
-      local entities = M.entityTagger.getIds(entityName)
-      if physicalKey == key then
-        for _, entity in ipairs(entities or {}) do
-          local entityComponents = buildArguments(entity, components)
-          callback(entityComponents)
-        end
-      end
-    end
-  end
+  checkEvent(key, "release", hid.keys, hid.commands, components)
 end
 
 function M.joystickadded(joystick, hid)
@@ -132,35 +125,15 @@ end
 
 function M.joystickpressed(joystick, button, hid, components)
   if joystick == hid.joystick.current then
-    for entityName, entityCommands in pairs(hid.commands.press or {}) do
-      for input, callback in pairs(entityCommands) do
-        local physicalButton = hid.joystick.buttons[input]
-        local entities = M.entityTagger.getIds(entityName)
-        if physicalButton == button then
-          for _, entity in ipairs(entities or {}) do
-            local entityComponents = buildArguments(entity, components)
-            callback(entityComponents)
-          end
-        end
-      end
-    end
+    checkEvent(button, "press", hid.joystick.buttons, hid.commands,
+               components)
   end
 end
 
 function M.joystickreleased(joystick, button, hid, components)
   if joystick == hid.joystick.current then
-    for entityName, entityCommands in pairs(hid.commands.release or {}) do
-      for input, callback in pairs(entityCommands) do
-        local physicalButton = hid.joystick.buttons[input]
-        local entities = M.entityTagger.getIds(entityName)
-        if physicalButton == button then
-          for _, entity in ipairs(entities or {}) do
-            local entityComponents = buildArguments(entity, components)
-            callback(entityComponents)
-          end
-        end
-      end
-    end
+    checkEvent(button, "release", hid.joystick.buttons, hid.commands,
+               components)
   end
 end
 

@@ -7,16 +7,12 @@ before_each(function ()
   hid = {
     keys = {
       left = "a",
-      right = "d",
-      jump = "space",
-      run = "shift"
+      jump = "space"
     },
     joystick = {
       hats = {
         left = "l",
-        right = "r",
-        up = "u",
-        down = "d"
+        up = "u"
       },
       buttons = {
         jump = 1,
@@ -81,6 +77,7 @@ describe("with a player with movement, jump and run commands", function ()
       function loveMock.keyboard.isDown(key)
         return key == "a"
       end
+
       controller.keypressed("a", hid, components)
       controller.update(hid, components)
     end)
@@ -103,6 +100,7 @@ describe("with a player with movement, jump and run commands", function ()
         function loveMock.keyboard.isDown()
           return false
         end
+
         controller.keyreleased("a", hid, components)
         controller.update(hid, components)
   
@@ -117,6 +115,7 @@ describe("with a player with movement, jump and run commands", function ()
       function loveMock.keyboard.isDown(key)
         return key == "space"
       end
+      
       controller.keypressed("space", hid, components)
       controller.update(hid, components)
     end)
