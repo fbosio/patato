@@ -13,9 +13,8 @@ after_each(function ()
   package.loaded["engine.command"] = nil
 end)
 
-describe("setting some hold commands for an entity", function ()
-  local leftCallback, rightCallback, playerId
-  
+describe("loading two entities that share the same input", function ()
+  local leftCallback, rightCallback, marioId, luigiId
   before_each(function ()
     leftCallback = function (t)
       t.velocity.x = -t.impulseSpeed.walk
@@ -23,23 +22,34 @@ describe("setting some hold commands for an entity", function ()
     rightCallback = function (t)
       t.velocity.x = t.impulseSpeed.walk
     end
-    playerId = entityTagger.tag("player")
-
-    command.set("player", "left", leftCallback, "hold")
-    command.set("player", "right", rightCallback, "hold")
+    marioId = entityTagger.tag("mario")
+    luigiId = entityTagger.tag("luigi")
+    
+    command.set("mario", "left", leftCallback, "hold")
+    command.set("mario", "right", rightCallback, "hold")
+    command.set("luigi", "left", leftCallback, "hold")
+    command.set("luigi", "right", rightCallback, "hold")
   end)
 
-  it("should map the entity to the commands", function ()
+  it("should map the defined commands with the entities", function ()
     assert.are.same({
       left = leftCallback,
       right = rightCallback
-    }, hid.commands.hold.player)
+    }, hid.commands.hold.mario)
+    assert.are.same({
+      left = leftCallback,
+      right = rightCallback
+    }, hid.commands.hold.luigi)
   end)
 
-  it("should create an input set", function ()
+  it("should create an input set for each entity", function ()
     assert.are.same({
       left = false,
       right = false
-    }, components.controllable[playerId].hold)
+    }, components.controllable[marioId].hold)
+    assert.are.same({
+      left = false,
+      right = false
+    }, components.controllable[luigiId].hold)
   end)
 end)
