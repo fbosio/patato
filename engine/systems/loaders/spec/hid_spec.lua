@@ -43,7 +43,9 @@ end)
 
 describe("loading an empty keys structure", function ()
   it("should load default movement and start keys", function ()
-    local config = {keys = {}}
+    local config = {
+      inputs = {keyboard = {}}
+    }
 
     local loadedHid = hid.load(config)
 
@@ -60,11 +62,13 @@ end)
 describe("loading all movement keys", function ()
   it("should copy the defined keys", function ()
     local config = {
-      keys = {
-        left = "j",
-        right = "l",
-        up = "i",
-        down = "k"
+      inputs = {
+        keyboard = {
+          left = "j",
+          right = "l",
+          up = "i",
+          down = "k"
+        }
       }
     }
 
@@ -80,9 +84,11 @@ end)
 describe("loading some movement keys", function ()
   it("should fill lacking keys with default values", function ()
     local config = {
-      keys = {
-        left = "j",
-        down = "k"
+      inputs = {
+        keyboard = {
+          left = "j",
+          down = "k"
+        }
       }
     }
 
@@ -101,9 +107,11 @@ end)
 describe("loading some keys that are not for movement", function ()
   it("should copy the defined keys", function ()
     local config = {
-      keys = {
-        ["super cool action 1"] = "j",
-        ["super cool action 2"] = "k"
+      inputs = {
+        keyboard = {
+          ["super cool action 1"] = "j",
+          ["super cool action 2"] = "k"
+        }
       }
     }
 
@@ -116,7 +124,9 @@ end)
 
 describe("loading an empty joystick structure", function ()
   it("should load default hats and a start button", function ()
-    local config = {joystick = {}}
+    local config = {
+      inputs = {joystick = {}}
+    }
 
     local loadedHid = hid.load(config)
 
@@ -135,10 +145,12 @@ end)
 describe("loading some buttons", function ()
   it("should fill lacking button with default value", function ()
     local config = {
-      joystick = {
-        buttons = {
-          jump = 1,
-          run = 2
+      inputs = {
+        joystick = {
+          buttons = {
+            jump = 1,
+            run = 2
+          }
         }
       }
     }

@@ -6,27 +6,28 @@ M.physics = {
   gravity = 5000
 }
 
-M.keys = {
-  left2 = "j",
-  right2 = "l",
-  up2 = "i",
-  down2 = "k",
-  start = "return",
-  message = "m",
-  jump = "space"
-}
-
-M.joystick = {
-  hats = {
-    left = "l",
-    right = "r",
-    up = "u",
-    down = "d"
+M.inputs = {
+  keyboard = {
+    left2 = "j",
+    right2 = "l",
+    up2 = "i",
+    down2 = "k",
+    start = "return",
+    message = "m",
+    jump = "space"
   },
-  buttons = {
-    jump = 3,
-    message = 2,
-    start = 10
+  joystick = {
+    hats = {
+      left = "l",
+      right = "r",
+      up = "u",
+      down = "d"
+    },
+    buttons = {
+      jump = 3,
+      message = 2,
+      start = 10
+    }
   }
 }
 

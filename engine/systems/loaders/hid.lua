@@ -23,11 +23,11 @@ function M.load(config)
       }
     }
   }
-  loaded.keys = config.keys or {}
+  loaded.keys = (config.inputs or {}).keyboard or {}
   for input, key in pairs(defaults.keys) do
     loaded.keys[input] = loaded.keys[input] or key
   end
-  loaded.joystick = config.joystick or {}
+  loaded.joystick = (config.inputs or {}).joystick or {}
   for k, inputs in pairs(defaults.joystick) do
     loaded.joystick[k] = loaded.joystick[k] or {}
     for input, v in pairs(inputs) do
