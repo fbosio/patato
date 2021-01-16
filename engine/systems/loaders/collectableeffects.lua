@@ -1,13 +1,12 @@
 local M = {}
 
 function M.load()
-  local t = {}
-  setmetatable(t, {
-    __index = function ()
-      return function () end
+  return setmetatable({}, {
+    __index = function (_, k)
+      error('Entity "' .. k .. '" has no collectable effect assigned to it',
+            0)
     end
   })
-  return t
 end
 
 return M
