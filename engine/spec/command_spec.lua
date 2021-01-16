@@ -13,8 +13,9 @@ after_each(function ()
   package.loaded["engine.command"] = nil
 end)
 
-describe("loading two entities that share the same input", function ()
+describe("setting repeated commands for different entities", function ()
   local leftCallback, rightCallback, marioId, luigiId
+
   before_each(function ()
     leftCallback = function (t)
       t.velocity.x = -t.impulseSpeed.walk
@@ -51,5 +52,13 @@ describe("loading two entities that share the same input", function ()
       left = false,
       right = false
     }, components.controllable[luigiId].hold)
+  end)
+end)
+
+describe("setting a command with a wrong kind", function ()
+  it("should throw an error", function ()
+    assert.has_error(function ()
+      command.set("mario", "jump", function () end, "hofl")
+    end)
   end)
 end)

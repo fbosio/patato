@@ -6,7 +6,17 @@ function M.load(entityTagger, hid, components)
   M.components = components
 end
 
+local kinds = {"hold", "press", "release"}
+
 function M.set(entityName, input, callback, kind)
+  local existentKind = false
+  for _, v in ipairs(kinds) do
+    if v == kind then
+      existentKind = true
+      break
+    end
+  end
+  assert(existentKind, "Unexpected command type \"" .. kind .. "\"")
   M.hid.commands = M.hid.commands or {}
   local commands = M.hid.commands
   commands[kind] = commands[kind] or {}
