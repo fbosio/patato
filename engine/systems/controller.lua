@@ -60,12 +60,12 @@ function M.update(hid, components)
   end
 end
 
-local function checkEvent(k, kind, t, commands, components)
+local function checkEvent(input, kind, hidInputs, commands, components)
   for entityName, entityCommands in pairs(commands[kind] or {}) do
-    for input, callback in pairs(entityCommands) do
-      local physicalInput = t[input]
+    for commandInput, callback in pairs(entityCommands) do
+      local physicalInput = hidInputs[commandInput]
       local entities = M.entityTagger.getIds(entityName)
-      if physicalInput == k then
+      if physicalInput == input then
         for _, entity in ipairs(entities or {}) do
           local entityComponents = buildArguments(entity, components)
           callback(entityComponents)
@@ -110,15 +110,7 @@ function M.joystickhat(joystick, hat, direction, hid, components)
         end
       end
     else
-      for entityName, entityCommands in pairs(hid.commands.press or {}) do
-        for _, callback in pairs(entityCommands) do
-          local entities = M.entityTagger.getIds(entityName)
-          for _, entity in ipairs(entities or {}) do
-            local entityComponents = buildArguments(entity, components)
-            callback(entityComponents)
-          end
-        end
-      end
+      checkEvent(nil, "press", {}, hid.commands, components)
     end
   end
 end
