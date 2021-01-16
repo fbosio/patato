@@ -1,8 +1,26 @@
 local M = {}
 
-function M.load(hid, components)
+function M.load(entityTagger, hid, components)
+  M.entityTagger = entityTagger
   M.hid = hid
   M.components = components
+end
+
+function M.set(entityName, input, callback, kind)
+  M.hid.commands = M.hid.commands or {}
+  local commands = M.hid.commands
+  commands[kind] = commands[kind] or {}
+  commands[kind][entityName] = commands[kind][entityName] or {}
+  commands[kind][entityName][input] = callback
+
+  M.components.controllable = M.components.controllable or {}
+  local controllable = M.components.controllable
+  local entities = M.entityTagger.getIds(entityName)
+  for _, entity in ipairs(entities) do
+    controllable[entity] = controllable[entity] or {}
+    controllable[entity][kind] = controllable[entity][kind] or {}
+    controllable[entity][kind][input] = false
+  end
 end
 
 -- Old code

@@ -41,17 +41,17 @@ local function getMenuEntities(entities)
   end
 end
 
-local function buildEntity(name, data, entityTagger, hid)
+local function buildEntity(name, data, entityTagger)
   local entity = entityTagger.tag(name)
   for k, v in pairs(data) do
     if k ~= "load" and k ~= "buildFromVertices" then
-      builder[k](v, entity, hid)
+      builder[k](v, entity)
     end
   end
   return entity
 end
 
-local function buildEntitiesInLevels(config, entityTagger, hid)
+local function buildEntitiesInLevels(config, entityTagger)
   for entityName, entityData in pairs(config.entities or {}) do
     local firstLevel = config.firstLevel or next(config.levels)
     local levelData = config.levels[firstLevel] or {}
@@ -61,14 +61,14 @@ local function buildEntitiesInLevels(config, entityTagger, hid)
         levelEntityData = {levelEntityData}
       end
       for _, vertices in ipairs(levelEntityData) do
-        local entity = buildEntity(entityName, entityData, entityTagger, hid)
+        local entity = buildEntity(entityName, entityData, entityTagger)
         builder.buildFromVertices(vertices, entity, entityData)
       end
     end
   end
 end
 
-local function buildDefaults(entities, entityTagger, hid)
+local function buildDefaults(entities, entityTagger)
   for name, data in pairs(entities or {}) do
     local mustBeBuilt = not data.collideable
     if not mustBeBuilt then break end
@@ -79,12 +79,12 @@ local function buildDefaults(entities, entityTagger, hid)
       end
     end
     if mustBeBuilt then
-      buildEntity(name, data, entityTagger, hid)
+      buildEntity(name, data, entityTagger)
     end
   end
 end
 
-function M.load(love, entityTagger, hid, config)
+function M.load(love, entityTagger, config)
   M.entityTagger = entityTagger
   local loaded = {
     components = {
@@ -93,13 +93,13 @@ function M.load(love, entityTagger, hid, config)
   }
   checkEntitiesCompatibility(config.entities)
   local menuName = getMenuEntities(config.entities)
-  builder.load(love, entityTagger, menuName, hid, loaded.components)
+  builder.load(love, entityTagger, menuName, loaded.components)
   if menuName then
-    buildEntity(menuName, config.entities[menuName], entityTagger, hid)
+    buildEntity(menuName, config.entities[menuName], entityTagger)
   elseif config.levels then
-    buildEntitiesInLevels(config, entityTagger, hid)
+    buildEntitiesInLevels(config, entityTagger)
   else
-    buildDefaults(config.entities, entityTagger, hid)
+    buildDefaults(config.entities, entityTagger)
   end
   return loaded
 end

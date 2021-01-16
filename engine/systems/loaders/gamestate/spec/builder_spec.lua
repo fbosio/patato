@@ -9,7 +9,7 @@ before_each(function ()
   end
   local loveMock = mock(love)
   components = {}
-  builder.load(loveMock, entityTagger, false, {}, components)
+  builder.load(loveMock, entityTagger, false, components)
 end
 )
 
