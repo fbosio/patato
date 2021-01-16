@@ -64,7 +64,7 @@ function M.load(love, config)
 
   for entityName, entityData in pairs(config.entities or {}) do
     local entityResources = entityData.resources or {}
-    if entityResources.sprites and entityResources.sprites.image then
+    if entityResources.sprites then
       loaded[entityName] = loaded[entityName] or {}
       loaded[entityName].sprites = buildSprites(entityResources.sprites)
     end

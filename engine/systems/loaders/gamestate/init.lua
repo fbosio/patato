@@ -93,7 +93,7 @@ function M.load(love, entityTagger, hid, config)
   }
   checkEntitiesCompatibility(config.entities)
   local menuName = getMenuEntities(config.entities)
-  builder.load(love, entityTagger, menuName, loaded.components)
+  builder.load(love, entityTagger, menuName, hid, loaded.components)
   if menuName then
     buildEntity(menuName, config.entities[menuName], entityTagger, hid)
   elseif config.levels then

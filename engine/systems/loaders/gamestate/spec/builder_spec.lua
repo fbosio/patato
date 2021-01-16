@@ -9,7 +9,7 @@ before_each(function ()
   end
   local loveMock = mock(love)
   components = {}
-  builder.load(loveMock, entityTagger, false, components)
+  builder.load(loveMock, entityTagger, false, {}, components)
 end
 )
 
@@ -26,7 +26,7 @@ describe("loading a nonmenu controllable entity", function ()
     local flags = {"controllable"}
     playerId = entityTagger.tag("player")
 
-    builder.flags(flags, playerId, {})
+    builder.flags(flags, playerId)
   end)
 
   it("should create a component for the entity", function ()
@@ -46,7 +46,7 @@ describe("loading a controllable entity with a walk speed defined", function ()
     local impulseSpeed = {walk = 800}
     local playerId = entityTagger.tag("player")
 
-    builder.flags(flags, playerId, {})
+    builder.flags(flags, playerId)
     builder.impulseSpeed(impulseSpeed, playerId)
 
     assert.are.same({walk = 800}, components.impulseSpeed[playerId])

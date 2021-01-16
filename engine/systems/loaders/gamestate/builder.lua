@@ -2,10 +2,11 @@ local component = require "engine.systems.loaders.gamestate.component"
 
 local M = {}
 
-function M.load(love, entityTagger, inMenu, components)
+function M.load(love, entityTagger, inMenu, hid, components)
   component.load(love, components)
   M.entityTagger = entityTagger
   M.inMenu = inMenu
+  M.hid = hid
 end
 
 function M.buildFromVertices(vertices, entity, entityData)
@@ -35,9 +36,9 @@ function M.buildFromVertices(vertices, entity, entityData)
 end
 
 local flagStateBuilders = {
-  controllable = function (entity, hid)
+  controllable = function (entity)
     component.set("controllable", entity, {})
-    for _, commandActions in pairs(hid.commands or {}) do
+    for _, commandActions in pairs(M.hid.commands or {}) do
       for k, action in pairs(commandActions) do
         if k == M.entityTagger.getName(entity) then
           component.setAttribute("controllable", entity, action, false)
@@ -62,9 +63,9 @@ for _, k in ipairs{"collector", "solid", "gravitational", "climber"} do
   end
 end
 
-function M.flags(flags, entity, hid)
+function M.flags(flags, entity)
   for _, flag in ipairs(flags) do
-    flagStateBuilders[flag](entity, hid)
+    flagStateBuilders[flag](entity)
   end
 end
 

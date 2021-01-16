@@ -69,7 +69,7 @@ describe("loading all movement keys", function ()
     }
 
     local loadedHid = hid.load(config)
-    
+
     assert.are.same("j", loadedHid.keys.left)
     assert.are.same("l", loadedHid.keys.right)
     assert.are.same("i", loadedHid.keys.up)
@@ -117,9 +117,9 @@ end)
 describe("loading an empty joystick structure", function ()
   it("should load default hats and a start button", function ()
     local config = {joystick = {}}
-    
+
     local loadedHid = hid.load(config)
-  
+
     assert.are.same({
       hats = {
         left = "l",
