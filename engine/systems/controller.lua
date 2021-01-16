@@ -26,7 +26,11 @@ local function buildArguments(entity, components)
   if components.animation then
     entityComponents.animation = entityComponents.animation or {}
   end
-  return entityComponents
+  return setmetatable(entityComponents, {
+    __index = function (_, attr)
+      error("Unexpected component \"" .. attr .. "\".", 2)
+    end
+  })
 end
 
 function M.load(love, entityTagger)
