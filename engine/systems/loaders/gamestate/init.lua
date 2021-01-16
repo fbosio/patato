@@ -45,7 +45,8 @@ local function buildEntity(name)
   local entity = M.entityTagger.tag(name)
   for k, v in pairs(M.config.entities[name]) do
     if k ~= "load" and k ~= "buildFromVertices" then
-      builder[k](v, entity)
+      assert(builder[k], "Unexpected component \"" .. k .. "\" for entity \""
+             .. name .. "\" in config.lua")(v, entity)
     end
   end
   return entity
