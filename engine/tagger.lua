@@ -1,7 +1,11 @@
 local M = {}
 
 local id = 0
-local tags = {}
+local tags
+
+function M.clear()
+  tags = {}
+end
 
 function M.tag(name)
   id = id + 1
@@ -31,5 +35,8 @@ function M.getName(entity)
     end
   end
 end
+
+
+M.clear()
 
 return M

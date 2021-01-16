@@ -6,10 +6,9 @@
 ]]
 
 local config
-config = require "config"
+pcall(function () config = require "config" end)
 
 local entityTagger = require "engine.tagger"
-local resourcemanager = require "engine.resourcemanager"
 local systems = require "engine.systems"
 local command = require "engine.command"
 
@@ -51,57 +50,15 @@ local M = {}
   end
 ]]
 function M.load()
-  systems.load(love, entityTagger)
-  resourcemanager.load(love, entityTagger)
+  local world = systems.load(love, entityTagger, command, config)
 
-  local emptyConfig = not config
-  if emptyConfig then
-    config = {
-      entities = {
-        player = {
-          flags = {"controllable"}
-        }
-      }
-    }
-  end
-
-  if type(config) ~= "table" then
-    local message = "Incorrect config, received " .. type(config) .. "."
-    if type(config) == "boolean" and config then
-      message = message .. "\n"
-                        .. "Probably config.lua is empty or you forgot the "
-                        .. '"return M" statement.'
-    end
-    error(message)
-  end
-
-  for k, v in pairs(resourcemanager.buildWorld(config)) do
+  for k, v in pairs(world) do
     M[k] = v
   end
 
-  if emptyConfig then
-    M.setInputs("player", {
-      walkLeft = M.command{input = "left"},
-      walkRight = M.command{input = "right"},
-      walkUp = M.command{input = "up"},
-      walkDown = M.command{input = "down"},
-      stopWalkingHorizontally = M.command{
-        input = {"left", "right"},
-        release = true
-      },
-      stopWalkingVertically = M.command{
-        input = {"up", "down"},
-        release = true
-      },
-    })
+  if not config then
+    -- TODO: hello world
   end
-
-  M.collectableEffects = {}
-  setmetatable(M.collectableEffects, {
-    __index = function ()
-      return function () end
-    end
-  })
 end
 
 --[[--
@@ -258,8 +215,7 @@ end
   end)
 ]]
 function M.startGame(level)
-  M.gameState.inMenu = false
-  resourcemanager.buildState(config, M, level)
+  M.gameState = systems.reload(level, M.gameState.inMenu)
 end
 
 
@@ -298,61 +254,6 @@ function M.setCollectableEffect(entity, callback)
 end
 
 
---[=[--
- Associate a callback to an action.
-
- An _action_ is triggered by a _command_.
- For an entity, the action is identified by a unique name which is defined when
- calling @{setInputs}.
- @tparam string action
-  The identifier of the input event, as defined in @{setInputs}.
- @tparam function callback What the event triggers.
-  The callback receives a table `c` that has the components associated with
-  the entity that triggered the input event in the first place.
- @usage
- engine.setAction("walkRight", function (c)
-   --[[
-       `c` is the components table of the entity.
-       In this case, `c` has at least three fields:
-       1. `velocity`
-       2. `impulseSpeed`
-       3. `animation`
-       whose values are tables themselves that have respectively the fields
-       1. `x`
-       2. `walk`
-       3. `name`
-   ]]
-   c.velocity.x = c.impulseSpeed.walk
-   c.animation.name = "walking"
- end)
-]=]
-function M.setAction(action, callback)
-  M.hid.actions[action] = callback
-end
-
-
---[[--
-  Associate actions of an entity to commands.
-
-  Callbacks for actions are set using @{setAction}.
-  Commands are created using @{command}.
-  @tparam string entity
-   The identifier of the entity, as defined in `config.lua`
-  @tparam table actionCommands Table that has action names as fields and
-  commands as values.
-  @usage
-  engine.setInputs("hero", {
-    walkLeft = engine.command{input = "left"},
-    walkRight = engine.command{input = "right"},
-    stopWalking = engine.command{input = {"left", "right"}, release = true},
-    jump = engine.command{input = "jump", oneShot = true}
-  })
-]]
-function M.setInputs(entity, actionCommands)
-  resourcemanager.setInputs(M, entity, actionCommands)
-end
-
-
 --[[--
   Create a new command.
 
@@ -384,8 +285,8 @@ end
     Note that this kind of command prevents the player from, for example,
     holding the "jump button" to make the character continuosly hop.
 ]]
-function M.command(args)
-  return command.new(args)
+function M.setCommand(entityName, input, callback, kind)
+  return command.set(entityName, input, callback, kind)
 end
 
 

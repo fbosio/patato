@@ -15,73 +15,85 @@ function love.load()
     engine.startGame("secretLevel")
   end)
 
-  engine.setAction("walkLeft", function (c)
-    c.velocity.x = -c.impulseSpeed.walk
-    c.animation.name = "walking"
-  end)
-  engine.setAction("walkRight", function (c)
-    c.velocity.x = c.impulseSpeed.walk
-    c.animation.name = "walking"
-  end)
-  engine.setAction("stopWalkingHorizontally", function (c)
-    c.velocity.x = 0
-    c.animation.name = "standing"
-  end)
-  engine.setAction("jump", function (c)
-    if c.climber.climbing then
-      c.climber.climbing = false
-      c.velocity.y = -c.impulseSpeed.jump
-      c.gravitational.enabled = true
-      c.animation.name = "jumping"
-    elseif c.velocity.y == 0 then
-      c.animation.name = "jumping"
-      c.velocity.y = -c.impulseSpeed.jump
+  engine.setCommand("patato", "left", function (t)
+    t.velocity.x = -t.impulseSpeed.walk
+    t.animation.name = "walking"
+  end, "hold")
+  engine.setCommand("patato", "right", function (t)
+    t.velocity.x = t.impulseSpeed.walk
+    t.animation.name = "walking"
+  end, "hold")
+  engine.setCommand("patato", "left", function (t)
+    t.velocity.x = 0
+    t.animation.name = "standing"
+  end, "release")
+  engine.setCommand("patato", "right", function (t)
+    t.velocity.x = 0
+    t.animation.name = "standing"
+  end, "release")
+  engine.setCommand("patato", "jump", function (t)
+    if t.climber.climbing then
+      t.climber.climbing = false
+      t.velocity.y = -t.impulseSpeed.jump
+      t.gravitational.enabled = true
+      t.animation.name = "jumping"
+    elseif t.velocity.y == 0 then
+      t.animation.name = "jumping"
+      t.velocity.y = -t.impulseSpeed.jump
     end
-  end)
-  engine.setAction("startClimb", function (c)
-    c.climber.climbing = true
-    c.animation.name = "climbingIdle"
-  end)
-  engine.setAction("climbUp", function (c)
-    if c.climber.climbing and c.climber.trellis then
-      c.velocity.y = -c.impulseSpeed.climb
-      c.animation.name = "climbingMove"
+  end, "press")
+  engine.setCommand("patato", "up", function (t)
+    t.climber.climbing = true
+    t.animation.name = "climbingIdle"
+  end, "press")
+  engine.setCommand("patato", "down", function (t)
+    t.climber.climbing = true
+    t.animation.name = "climbingIdle"
+  end, "press")
+  engine.setCommand("patato", "up", function (t)
+    if t.climber.climbing and t.climber.trellis then
+      t.velocity.y = -t.impulseSpeed.climb
+      t.animation.name = "climbingMove"
     end
-  end)
-  engine.setAction("climbDown", function (c)
-    if c.climber.climbing and c.climber.trellis then
-      c.velocity.y = c.impulseSpeed.climb
-      c.animation.name = "climbingMove"
+  end, "hold")
+  engine.setCommand("patato", "down", function (t)
+    if t.climber.climbing and t.climber.trellis then
+      t.velocity.y = t.impulseSpeed.climb
+      t.animation.name = "climbingMove"
     end
-  end)
-  engine.setAction("stopClimbingVertically", function (c)
-    if c.climber.climbing then
-      c.velocity.y = 0
-      c.animation.name = "climbingIdle"
+  end, "hold")
+  engine.setCommand("patato", "up", function (t)
+    if t.climber.climbing then
+      t.velocity.y = 0
+      t.animation.name = "climbingIdle"
     end
-  end)
-  
-  engine.setInputs("patato", {
-    walkLeft = engine.command{input = "left"},
-    walkRight = engine.command{input = "right"},
-    startClimb = engine.command{input = {"up", "down"}, oneShot = true},
-    climbUp = engine.command{input = "up"},
-    climbDown = engine.command{input = "down"},
-    stopWalkingHorizontally = engine.command{
-      input = {"left", "right"},
-      release = true
-    },
-    stopClimbingVertically = engine.command{
-      input = {"up", "down"},
-      release = true
-    },
-    jump = engine.command{input = "jump", oneShot = true}
-  })
-  engine.setInputs("mainMenu", {
-    menuPrevious = engine.command{input = "up", oneShot = true},
-    menuNext = engine.command{input = "down", oneShot = true},
-    menuSelect = engine.command{input = "start", oneShot = true}
-  })
+  end, "release")
+  engine.setCommand("patato", "down", function (t)
+    if t.climber.climbing then
+      t.velocity.y = 0
+      t.animation.name = "climbingIdle"
+    end
+  end, "release")
+
+  engine.setCommand("mainMenu", "up", function (t)
+    t.menu.selected = t.menu.selected - 1
+    if t.menu.selected == 0 then
+      t.menu.selected = #t.menu.options
+    end
+  end, "press")
+  engine.setCommand("mainMenu", "down", function (t)
+    t.menu.selected = t.menu.selected + 1
+    if t.menu.selected == #t.menu.options + 1 then
+      t.menu.selected = 1
+    end
+  end, "press")
+  engine.setCommand("mainMenu", "start", function (t)
+    local menu = t.menu
+    local callbacks = menu.callbacks
+    local selected = menu.selected
+    local callback = callbacks[selected];
+    (callback or function () end)()
+  end, "press")
 
   score = 0
   engine.setCollectableEffect("bottle", function ()

@@ -21,7 +21,7 @@ describe("loading an empty config", function ()
   it("should create a garbage component table", function ()
     local emptyConfig = {}
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           emptyConfig)
+                                           hid, emptyConfig)
     command.load(hid, loadedGameState.components)
 
     assert.are.truthy(loadedGameState.components.garbage)
@@ -35,7 +35,7 @@ describe("loading an empty entities list", function ()
     }
 
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           config)
+                                           hid, config)
     command.load(hid, loadedGameState.components)
 
     assert.are.truthy(loadedGameState.components.garbage)
@@ -51,7 +51,7 @@ describe("loading an entity without components", function ()
     }
 
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           config)
+                                           hid, config)
     command.load(hid, loadedGameState.components)
 
     assert.are.truthy(loadedGameState.components.garbage)
@@ -69,7 +69,7 @@ describe("loading an entity with only an empty speed list", function ()
     }
 
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           config)
+                                           hid, config)
     command.load(hid, loadedGameState.components)
 
     assert.are.same({garbage = {}}, loadedGameState.components)
@@ -82,7 +82,7 @@ describe("bulding world with nonempty menu and other entities", function ()
   before_each(function ()
     config = {
       entities = {
-        playerOne = {
+        playerhid, One = {
           flags = {"controllable"}
         },
         playerTwo = {
@@ -96,7 +96,8 @@ describe("bulding world with nonempty menu and other entities", function ()
         }
       }
     }
-    loadedGameState = gamestate.load(loveMock, entityTagger, command, config)
+    loadedGameState = gamestate.load(loveMock, entityTagger, command, hid,
+                                     config)
     command.load(hid, loadedGameState.components)
     mainMenuId = entityTagger.getId("mainMenu")
     playerOneId = entityTagger.getId("playerOne")
@@ -128,7 +129,7 @@ describe("loading entities and an empty levels table", function ()
     }
 
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           config)
+                                           hid, config)
     command.load(hid, loadedGameState.components)
 
     assert.is.falsy(loadedGameState.components.controllable)
@@ -151,7 +152,7 @@ describe("loading a level with defined entity and position", function ()
     }
 
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           config)
+                                           hid, config)
     command.load(hid, loadedGameState.components)
 
     local playerId = entityTagger.getId("sonic")
@@ -181,7 +182,7 @@ describe("load two levels and the name of the first one", function ()
     }
 
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           config)
+                                           hid, config)
     command.load(hid, loadedGameState.components)
 
     local playerId = entityTagger.getId("sonic")
@@ -202,7 +203,7 @@ describe("loading a collectable entity that is not in any level", function ()
     }
 
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           config)
+                                           hid, config)
     command.load(hid, loadedGameState.components)
 
     assert.is.falsy(loadedGameState.components.collectable)
@@ -230,7 +231,8 @@ describe("loading collectable entities that are in a level", function ()
       }
     }
 
-    loadedGameState = gamestate.load(loveMock, entityTagger, command, config)
+    loadedGameState = gamestate.load(loveMock, entityTagger, command, hid,
+                                     config)
     command.load(hid, loadedGameState.components)
   end)
   
@@ -253,7 +255,7 @@ describe("loading collectable entities that are in a level", function ()
 end)
 
 describe("loading an entity that is both collector and collectable", function ()
-  local config
+  local hid, config
   before_each(function ()
     config = {
       entities = {
@@ -267,7 +269,7 @@ describe("loading an entity that is both collector and collectable", function ()
   describe("without levels defined", function ()
     it("should throw an error", function ()
       assert.has_error(function ()
-        gamestate.load(loveMock, entityTagger, command, config)
+        gamestate.load(loveMock, entityTagger, command, hid, config)
       end)
     end)
   end)
@@ -282,7 +284,7 @@ describe("loading an entity that is both collector and collectable", function ()
         }
       }
       assert.has_error(function ()
-        gamestate.load(loveMock, entityTagger, command, config)
+        gamestate.load(loveMock, entityTagger, command, hid, config)
       end)
     end)
   end)
@@ -299,7 +301,7 @@ describe("loading a collideable entity that is not in any level", function ()
     }
 
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           config)
+                                           hid, config)
     command.load(hid, loadedGameState.components)
 
     assert.is.falsy(loadedGameState.components.collideable)
@@ -326,7 +328,8 @@ describe("loading surface entities that are in a level", function ()
       }
     }
 
-    loadedGameState = gamestate.load(loveMock, entityTagger, command, config)
+    loadedGameState = gamestate.load(loveMock, entityTagger, command, hid,
+                                     config)
     command.load(hid, loadedGameState.components)
   end)
 
@@ -362,7 +365,7 @@ describe("loading cloud entities that are in a level", function ()
       }
     }
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           config)
+                                           hid, config)
     command.load(hid, loadedGameState.components)
 
     local collisionBox = loadedGameState.components.collisionBox
@@ -395,7 +398,8 @@ describe("loading slope entities that are in a level", function ()
       }
     }
 
-    loadedGameState = gamestate.load(loveMock, entityTagger, command, config)
+    loadedGameState = gamestate.load(loveMock, entityTagger, command, hid,
+                                     config)
     command.load(hid, loadedGameState.components)
   end)
 
@@ -437,7 +441,7 @@ describe("loading an entity that is both collideable and solid", function ()
   describe("without levels defined", function ()
     it("should throw an error", function ()
       assert.has_error(function ()
-        gamestate.load(loveMock, entityTagger, command, config)
+        gamestate.load(loveMock, entityTagger, command, hid, config)
       end)
     end)
   end)
@@ -451,7 +455,7 @@ describe("loading an entity that is both collideable and solid", function ()
         }
       }
       assert.has_error(function ()
-        gamestate.load(loveMock, entityTagger, command, config)
+        gamestate.load(loveMock, entityTagger, command, hid, config)
       end)
     end)
   end)
@@ -468,7 +472,7 @@ describe("loading a trellis entity that is not in any level", function ()
     }
 
     local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           config)
+                                           hid, config)
     command.load(hid, loadedGameState.components)
 
     assert.is.falsy(loadedGameState.components.trellis)
@@ -495,7 +499,8 @@ describe("loading trellis entities that are in a level", function ()
       }
     }
 
-    loadedGameState = gamestate.load(loveMock, entityTagger, command, config)
+    loadedGameState = gamestate.load(loveMock, entityTagger, command, hid,
+                                     config)
     command.load(hid, loadedGameState.components)
   end)
 
@@ -528,7 +533,7 @@ describe("loading an entity that is both climber and trellis", function ()
   describe("without levels defined", function ()
     it("should throw an error", function ()
       assert.has_error(function ()
-        gamestate.load(loveMock, entityTagger, command, config)
+        gamestate.load(loveMock, entityTagger, command, hid, config)
       end)
     end)
   end)
@@ -542,7 +547,7 @@ describe("loading an entity that is both climber and trellis", function ()
         }
       }
       assert.has_error(function ()
-        gamestate.load(loveMock, entityTagger, command, config)
+        gamestate.load(loveMock, entityTagger, command, hid, config)
       end)
     end)
   end)
@@ -564,7 +569,7 @@ describe("loading an entity that is both slope and trellis", function ()
   describe("without levels defined", function ()
     it("should throw an error", function ()
       assert.has_error(function ()
-        gamestate.load(loveMock, entityTagger, command, config)
+        gamestate.load(loveMock, entityTagger, command, hid, config)
       end)
     end)
   end)
@@ -578,7 +583,7 @@ describe("loading an entity that is both slope and trellis", function ()
         }
       }
       assert.has_error(function ()
-        gamestate.load(loveMock, entityTagger, command, config)
+        gamestate.load(loveMock, entityTagger, command, hid, config)
       end)
     end)
   end)

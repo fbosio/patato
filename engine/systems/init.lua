@@ -4,13 +4,21 @@ local messengers = require "engine.systems.messengers"
 local animator = require "engine.systems.animator"
 local garbagecollector = require "engine.systems.garbagecollector"
 local renderer = require "engine.systems.renderer"
+local loaders = require "engine.systems.loaders"
 
 local M = {}
 
-function M.load(love, entityTagger)
+function M.load(love, entityTagger, command, config)
+  local world = loaders.load(love, entityTagger, command, config)
   controller.load(love, entityTagger)
   animator.load(entityTagger)
   renderer.load(love, entityTagger)
+
+  return world
+end
+
+function M.reload(level, inMenu)
+  return loaders.reload(level, inMenu)
 end
 
 function M.update(dt, hid, components, collectableEffects, resources,

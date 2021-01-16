@@ -2,11 +2,11 @@ local component = require "engine.systems.loaders.gamestate.component"
 
 local M = {}
 
-function M.load(love, entityTagger, command, inMenu, components)
+function M.load(love, entityTagger, command, menuName, components)
   component.load(love, components)
   M.entityTagger = entityTagger
   M.command = command
-  M.inMenu = inMenu
+  M.menuName = menuName
 end
 
 function M.buildFromVertices(vertices, entity, entityData)
@@ -38,7 +38,9 @@ end
 local flagStateBuilders = {
   controllable = function (entity)
     component.set("controllable", entity, {})
-    if not M.inMenu then component.setDefaults(entity) end
+    if not M.menuName then
+      component.setDefaults(entity)
+    end
     M.command.update(entity, M.entityTagger.getName(entity))
   end,
   collectable = function (entity)
@@ -79,6 +81,8 @@ function M.impulseSpeed(speeds, entity)
 end
 
 function M.menu(data, entity)
+  component.setAttribute("menu", entity, "callbacks", {})
+  component.setAttribute("menu", entity, "selected", 1)
   for attribute, value in pairs(data) do
     component.setAttribute("menu", entity, attribute, value)
   end

@@ -45,7 +45,7 @@ local function drawSprites(components, resources)
         local entitySprites = entityResources.sprites
         local entityAnimations = entityResources.animations
         local entities = M.tagger.getIds(entityName)
-        for _, entity in ipairs(entities) do
+        for _, entity in ipairs(entities or {}) do
           local animation = (components.animation or {})[entity]
           local position = (components.position or {})[entity]
             local t = entityAnimations[animation.name]

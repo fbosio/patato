@@ -41,9 +41,9 @@ local function getMenuEntities(entities)
   end
 end
 
-local function buildEntity(name, data, entityTagger)
-  local entity = entityTagger.tag(name)
-  for k, v in pairs(data) do
+local function buildEntity(name)
+  local entity = M.entityTagger.tag(name)
+  for k, v in pairs(M.config.entities[name]) do
     if k ~= "load" and k ~= "buildFromVertices" then
       builder[k](v, entity)
     end
@@ -51,24 +51,24 @@ local function buildEntity(name, data, entityTagger)
   return entity
 end
 
-local function buildEntitiesInLevels(config, entityTagger)
-  for entityName, entityData in pairs(config.entities or {}) do
-    local firstLevel = config.firstLevel or next(config.levels)
-    local levelData = config.levels[firstLevel] or {}
+local function buildEntitiesInLevels(level)
+  for entityName, entityData in pairs(M.config.entities or {}) do
+    local firstLevel = M.config.firstLevel or next(M.config.levels)
+    local levelData = M.config.levels[level or firstLevel] or {}
     local levelEntityData = levelData[entityName]
     if levelEntityData then
       if type(levelEntityData[1]) ~= "table" then
         levelEntityData = {levelEntityData}
       end
       for _, vertices in ipairs(levelEntityData) do
-        local entity = buildEntity(entityName, entityData, entityTagger)
+        local entity = buildEntity(entityName)
         builder.buildFromVertices(vertices, entity, entityData)
       end
     end
   end
 end
 
-local function buildDefaults(entities, entityTagger)
+local function buildDefaults(entities)
   for name, data in pairs(entities or {}) do
     local mustBeBuilt = not data.collideable
     if not mustBeBuilt then break end
@@ -79,29 +79,43 @@ local function buildDefaults(entities, entityTagger)
       end
     end
     if mustBeBuilt then
-      buildEntity(name, data, entityTagger)
+      buildEntity(name)
     end
   end
 end
 
-function M.load(love, entityTagger, command, config)
-  M.entityTagger = entityTagger
+function M.reload(level, inMenu)
   local loaded = {
+    inMenu = inMenu,
     components = {
       garbage = {}
     }
   }
-  checkEntitiesCompatibility(config.entities)
-  local menuName = getMenuEntities(config.entities)
-  builder.load(love, entityTagger, command, menuName, loaded.components)
-  if menuName then
-    buildEntity(menuName, config.entities[menuName], entityTagger)
-  elseif config.levels then
-    buildEntitiesInLevels(config, entityTagger)
+  M.entityTagger.clear()
+  M.command.load(M.hid, loaded.components)
+  checkEntitiesCompatibility(M.config.entities)
+  local menuName = getMenuEntities(M.config.entities)
+  builder.load(M.love, M.entityTagger, M.command, menuName, loaded.components)
+  if menuName and not loaded.inMenu then
+    buildEntity(menuName)
+    loaded.inMenu = true
+  elseif M.config.levels then
+    loaded.inMenu = false
+    buildEntitiesInLevels(level)
   else
-    buildDefaults(config.entities, entityTagger)
+    loaded.inMenu = false
+    buildDefaults(M.config.entities)
   end
   return loaded
+end
+
+function M.load(love, entityTagger, command, hid, config)
+  M.love = love
+  M.entityTagger = entityTagger
+  M.hid = hid
+  M.command = command
+  M.config = config
+  return M.reload()
 end
 
 return M

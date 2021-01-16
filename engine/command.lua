@@ -25,7 +25,7 @@ end
 function M.update(entity, name)
   if not M.components then return end
   local controllable = M.components.controllable
-  for kind, t in pairs(M.hid.commands) do
+  for kind, t in pairs(M.hid.commands or {}) do
     if t[name] then
       for input, _ in pairs(t[name]) do
         assert(controllable[entity], "Entity \"" .. name .. "\" is not "
