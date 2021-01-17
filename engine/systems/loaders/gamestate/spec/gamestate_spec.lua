@@ -82,7 +82,7 @@ describe("bulding world with nonempty menu and other entities", function ()
   before_each(function ()
     config = {
       entities = {
-        playerhid, One = {
+        playerOne = {
           flags = {"controllable"}
         },
         playerTwo = {
