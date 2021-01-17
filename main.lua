@@ -96,7 +96,7 @@ function love.load()
   end, "press")
 
   score = 0
-  engine.setCollectableEffect("bottle", function ()
+  engine.setCollectableEffect("bottles", function ()
     score = score + 1
   end)
 end

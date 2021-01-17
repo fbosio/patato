@@ -2,7 +2,7 @@ local dt = 1 / 70
 local collider, solids, collisionBoxes, gravitationals, climbers
 
 before_each(function ()
-  collider = require "engine.systems.messengers.collision"
+  collider = require "engine.systems.messengers.collision.init"
   solids = {
     player = {},
   }
