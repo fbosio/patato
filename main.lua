@@ -1,9 +1,11 @@
 local engine = require "engine"
 local elapsed, message, score
 
-function love.load()
-  engine.load()
+function love.run()
+  return engine.run()
+end
 
+function love.load()
   engine.setMenuOptionEffect("mainMenu", 1, function ()
     engine.startGame()  -- changeScene (call automatically if there is no menu)
   end)
@@ -102,8 +104,6 @@ function love.load()
 end
 
 function love.update(dt)
-  engine.update(dt)
-
   if elapsed then
     elapsed = elapsed + dt
     if elapsed > 1 then
@@ -114,8 +114,6 @@ function love.update(dt)
 end
 
 function love.draw()
-  engine.draw()
-
   if message then
     love.graphics.print(message, 0, 0)
   end
@@ -127,8 +125,4 @@ function love.draw()
   local mouseX, mouseY = love.mouse.getPosition()
   love.graphics.print(tostring(mouseX) .. ", " .. tostring(mouseY),
                       mouseX + 10, mouseY - 10)
-end
-
-function love.run()
-  return engine.run()
 end

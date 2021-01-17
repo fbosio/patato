@@ -17,40 +17,7 @@ local handlers = require "engine.handlers"
 local M = {}
 
 
---[[--
- Callbacks.
-
- Similar to those in [Löve2D](https://love2d.org/wiki/love).
-
- Call them inside the [Löve2D](https://love2d.org/wiki/love) callbacks of
- the same name.
-
- A typical project starts just with the @{load}, @{update} and @{draw}
- callbacks. As the game is developed the need for new functionality arises and,
- with it, more specific callbacks are needed as well.
-
- `oneShot` and `release` keyboard commands require the @{keypressed} and @{keyreleased}
- callbacks, respectively.
- Joystick handling requires @{joystickadded} and @{joystickremoved}.
- `oneShot` and `release` _joystick_ commands require the additional @{joystickhat} and
- @{joystickpressed} callbacks.
-
- See @{command} for an explanation of the `oneShot` and `release` parameters.
-
- @section callbacks
- ]]
-
---[[--
- Call it inside [love.load](https://love2d.org/wiki/love.load).
-
- Required if you call @{engine.update}.
-
- @usage
-  function love.load()
-    engine.load()
-  end
-]]
-function M.load()
+local function load()
   local world = systems.load(love, entityTagger, command, config)
   
   for k, v in pairs(world) do
@@ -64,39 +31,16 @@ function M.load()
   end
 end
 
---[[--
- Call it inside [love.update](https://love2d.org/wiki/love.update).
-
- A previous call to @{engine.load} is required by this callback in order to
- work.
-
- @tparam number dt Time since the last update in seconds.
- @usage
-  function love.load()
-    engine.load()
-  end
-
-  function love.update(dt)
-    engine.update(dt)
-  end
-]]
-function M.update(dt)
+local function update(dt)
   systems.update(dt, M.hid, M.gameState.components, M.collectableEffects,
                  M.resources, M.physics)
 end
 
---[[--
- Call it inside [love.draw](https://love2d.org/wiki/love.draw).
-
- @usage
-  function love.draw()
-    engine.draw()
-  end
-]]
-function M.draw()
+local function draw()
   systems.draw(M.gameState.components, M.gameState.inMenu, M.resources,
                M.release)
 end
+
 
 --[[--
  API
@@ -197,16 +141,13 @@ function M.setCommand(entityName, input, callback, kind)
 end
 
 function M.run()
+  load()
   if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
-  
-  -- We don't want the first frame's dt to include time taken by love.load.
   if love.timer then love.timer.step() end
   
   local dt = 0
   
-  -- Main loop time.
   return function()
-    -- Process events.
     if love.event then
       love.event.pump()
       for name, a, b, c, d, e, f in love.event.poll() do
@@ -220,16 +161,16 @@ function M.run()
       end
     end
   
-    -- Update dt, as we'll be passing it to update
     if love.timer then dt = love.timer.step() end
   
-    -- Call update and draw
-    if love.update then love.update(dt) end -- will pass 0 if love.timer is disabled
+    update(dt)
+    if love.update then love.update(dt) end
   
     if love.graphics and love.graphics.isActive() then
       love.graphics.origin()
       love.graphics.clear(love.graphics.getBackgroundColor())
   
+      draw()
       if love.draw then love.draw() end
   
       love.graphics.present()
