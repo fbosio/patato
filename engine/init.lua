@@ -1,5 +1,5 @@
 --[[--
- Contains callbacks for general use and specific functions that constitute its
+ Contains a callback for general use and specific functions that constitute its
  API.
 
  @module engine
@@ -16,6 +16,14 @@ local handlers = require "engine.handlers"
 
 local M = {}
 
+--[[--
+ Callback
+
+ The engine Swiss Army knife for communicating with
+ [Löve2D](https://love2d.org/).
+
+ @section callback
+]]
 
 local function load()
   local world = systems.load(love, entityTagger, command, config)
@@ -39,6 +47,57 @@ end
 local function draw()
   systems.draw(M.gameState.components, M.gameState.inMenu, M.resources,
                M.release)
+end
+
+--[[--
+ All-in-one callback.
+ 
+ Load, update, draw and handle [Löve2D events](https://love2d.org/wiki/Event)
+ from the same place.
+
+ @usage
+  function love.run()
+    return engine.run()
+  end
+]]
+function M.run()
+  load()
+  if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
+  if love.timer then love.timer.step() end
+  
+  local dt = 0
+  
+  return function()
+    if love.event then
+      love.event.pump()
+      for name, a, b, c, d, e, f in love.event.poll() do
+        if name == "quit" then
+          if not love.quit or not love.quit() then
+            return a or 0
+          end
+        end
+        handlers[name](a, b, c, d, e, f)
+        love.handlers[name](a, b, c, d, e, f)
+      end
+    end
+  
+    if love.timer then dt = love.timer.step() end
+  
+    update(dt)
+    if love.update then love.update(dt) end
+  
+    if love.graphics and love.graphics.isActive() then
+      love.graphics.origin()
+      love.graphics.clear(love.graphics.getBackgroundColor())
+  
+      draw()
+      if love.draw then love.draw() end
+  
+      love.graphics.present()
+    end
+  
+    if love.timer then love.timer.sleep(0.001) end
+  end
 end
 
 
@@ -105,79 +164,58 @@ function M.setCollectableEffect(entity, callback)
 end
 
 
---[[--
-  Create a new command.
+--[=[--
+  Set a command for an entity.
 
-  A command is a table that represents a keyboard or joystick gesture.
+  @tparam string entityName Name of the entity.
+  
+  @tparam string input Input that will trigger the command. Specified in the
+    `inputs` table in `config.lua`.
 
-  See @{setInputs} for examples of use.
+  @tparam function callback What to do when the command is triggered.
+    It receives a table that has the entity components.
+  
+  @tparam string kind Must be one of the following.
 
-  @tparam table args Arguments for building the command. Valid arguments are:
+  - `"press"`
+  - `"hold"`
+  - `"release"`
+ 
+  @usage
+    --[[ Example config.lua
+      local M = {}
 
-  - **key:** String that represents a key, defined in the `keys` table in
-    `config.lua`. If this argument is set, do not set the `keys` argument.
-  - **keys:** Table of strings that represent keys, defined in the `keys`
-    table in `config.lua`. If this argument is set, do not set the `key`
-    argument.
-  - **release:** `true` if the command represents an "up" gesture. `false`
-    otherwise.
+      M.inputs = {
+        keyboard = {
+          right = "d",
+          jump = "space"
+        }
+      }
 
-    `release` commands are used often to stop moving characters.
-  - **oneShot:** `true` if the command must be detected in one frame only.
-    `false` otherwise.
+      M.entities = {
+        player = {
+          flags = {"controllable"},
+          impulseSpeed = {
+            walk = 500,
+            jump = 1000
+          }
+        }
+      }
 
-    Declaring a command as `oneShot` will _only_ trigger an event when its
-    associated input (e.g.: key, pad or button) is _pressed_, and _not_ while
-    it is _held down_.
-
-    `oneShot` commands are used often for selecting options in a menu and for
-    making a character jump or grab something in a level that needs subsequent
-    control, like a ladder or a trellis.
-    Note that this kind of command prevents the player from, for example,
-    holding the "jump button" to make the character continuosly hop.
-]]
+      return M
+    ]]
+    engine.setCommand("player", "right", function (t)
+      t.velocity.x = t.impulseSpeed.walk
+    end, "hold")
+    engine.setCommand("player", "jump", function (t)
+      t.velocity.y = -t.impulseSpeed.jump
+    end, "press")
+    engine.setCommand("player", "right", function (t)
+      t.velocity.x = 0
+    end, "release")
+]=]
 function M.setCommand(entityName, input, callback, kind)
   return command.set(entityName, input, callback, kind)
-end
-
-function M.run()
-  load()
-  if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
-  if love.timer then love.timer.step() end
-  
-  local dt = 0
-  
-  return function()
-    if love.event then
-      love.event.pump()
-      for name, a, b, c, d, e, f in love.event.poll() do
-        if name == "quit" then
-          if not love.quit or not love.quit() then
-            return a or 0
-          end
-        end
-        handlers[name](a, b, c, d, e, f)
-        love.handlers[name](a, b, c, d, e, f)
-      end
-    end
-  
-    if love.timer then dt = love.timer.step() end
-  
-    update(dt)
-    if love.update then love.update(dt) end
-  
-    if love.graphics and love.graphics.isActive() then
-      love.graphics.origin()
-      love.graphics.clear(love.graphics.getBackgroundColor())
-  
-      draw()
-      if love.draw then love.draw() end
-  
-      love.graphics.present()
-    end
-  
-    if love.timer then love.timer.sleep(0.001) end
-  end
 end
 
 
