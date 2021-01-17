@@ -11,6 +11,7 @@ pcall(function () config = require "config" end)
 local entityTagger = require "engine.tagger"
 local systems = require "engine.systems"
 local command = require "engine.command"
+local handlers = require "engine.handlers"
 
 
 local M = {}
@@ -51,10 +52,12 @@ local M = {}
 ]]
 function M.load()
   local world = systems.load(love, entityTagger, command, config)
-
+  
   for k, v in pairs(world) do
     M[k] = v
   end
+
+  handlers.load(M)
 
   if not config then
     -- TODO: hello world
@@ -193,31 +196,6 @@ function M.setCommand(entityName, input, callback, kind)
   return command.set(entityName, input, callback, kind)
 end
 
-local handlers = setmetatable({
-  keypressed = function (key)
-    systems.keypressed(key, M.hid, M.gameState.components)
-  end,
-  keyreleased = function (key)
-    systems.keyreleased(key, M.hid, M.gameState.components)
-  end,
-  joystickadded = function (joystick)
-    systems.joystickadded(joystick, M.hid)
-  end,
-  joystickremoved = function (joystick)
-    systems.joystickremoved(joystick, M.hid)
-  end,
-  joystickpressed = function (joystick, button)
-    systems.joystickpressed(joystick, button, M.hid, M.gameState.components)
-  end,
-  joystickreleased = function (joystick, button)
-    systems.joystickreleased(joystick, button, M.hid, M.gameState.components)
-  end,
-  joystickhat = function (joystick, hat, direction)
-    systems.joystickhat(joystick, hat, direction, M.hid,
-                        M.gameState.components)
-  end
-}, {__index = function () return function () end end})
-
 function M.run()
   if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
   
@@ -231,7 +209,7 @@ function M.run()
     -- Process events.
     if love.event then
       love.event.pump()
-      for name, a,b,c,d,e,f in love.event.poll() do
+      for name, a, b, c, d, e, f in love.event.poll() do
         if name == "quit" then
           if not love.quit or not love.quit() then
             return a or 0
