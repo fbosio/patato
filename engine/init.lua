@@ -96,102 +96,6 @@ function M.draw()
 end
 
 --[[--
- Call it inside [love.keypressed](https://love2d.org/wiki/love.keypressed).
-
- Capture an event only when a key is pressed and not while it is held down.
-
- Required for _one shot keyboard commands_.
- @tparam string key Character of the pressed key.
- @usage
-  function love.keypressed(key)
-    engine.keypressed(key)
-  end
- @see setInputs
- @see command
-]]
-function M.keypressed(key)
-  systems.keypressed(key, M.hid, M.gameState.components)
-end
-
---[[--
- Call it inside [love.keyreleased](https://love2d.org/wiki/love.keyreleased).
-
- Needed for _release keyboard commands_.
- @tparam string key Character of the pressed key.
- @usage
-  function love.keyreleased(key)
-    engine.keyreleased(key)
-  end
- @see setInputs
- @see command
-]]
-function M.keyreleased(key)
-  systems.keyreleased(key, M.hid, M.gameState.components)
-end
-
---[[--
- Call it inside
- [love.joystickadded](https://love2d.org/wiki/love.joystickadded).
-
- @tparam Joystick joystick The newly connected
-  [Joystick object](https://love2d.org/wiki/Joystick).
- @usage
-  function love.joystickadded(joystick)
-    engine.joystickadded(joystick)
-  end
-]]
-function M.joystickadded(joystick)
-  systems.joystickadded(joystick, M.hid)
-end
-
---[[--
- Call it inside
- [love.joystickpressed](https://love2d.org/wiki/love.joystickpressed).
-
- @tparam Joystick joystick The
-  [joystick object](https://love2d.org/wiki/Joystick).
- @tparam number button The button number.
- @usage
-  function love.joystickpressed(joystick, button)
-    engine.joystickpressed(joystick, button)
-  end
-]]
-function M.joystickpressed(joystick, button)
-  systems.joystickpressed(joystick, button, M.hid, M.gameState.components)
-end
-
---[[--
- Call it inside [love.joystickhat](https://love2d.org/wiki/love.joystickhat).
-
- @tparam Joystick joystick The
-  [joystick object](https://love2d.org/wiki/Joystick).
- @tparam number hat The hat number.
- @tparam JoystickHat direction The new [hat direction](https://love2d.org/wiki/JoystickHat).
- @usage
-  function love.joystickhat(joystick, hat, direction)
-    engine.joystickhat(joystick, hat, direction)
-  end
-]]
-function M.joystickhat(joystick, hat, direction)
-  systems.joystickhat(joystick, hat, direction, M.hid, M.gameState.components)
-end
-
---[[--
- Call it inside
- [love.joystickremoved](https://love2d.org/wiki/love.joystickremoved).
-
- @tparam Joystick joystick Called when a
-  [Joystick](https://love2d.org/wiki/Joystick) is disconnected.
- @usage
-  function love.joystickremoved(joystick)
-    engine.joystickremoved(joystick)
-  end
-]]
-function M.joystickremoved(joystick)
-  systems.joystickremoved(joystick, M.hid)
-end
-
---[[--
  API
 
  Engine-specific functions
@@ -287,6 +191,74 @@ end
 ]]
 function M.setCommand(entityName, input, callback, kind)
   return command.set(entityName, input, callback, kind)
+end
+
+local handlers = setmetatable({
+  keypressed = function (key)
+    systems.keypressed(key, M.hid, M.gameState.components)
+  end,
+  keyreleased = function (key)
+    systems.keyreleased(key, M.hid, M.gameState.components)
+  end,
+  joystickadded = function (joystick)
+    systems.joystickadded(joystick, M.hid)
+  end,
+  joystickremoved = function (joystick)
+    systems.joystickremoved(joystick, M.hid)
+  end,
+  joystickpressed = function (joystick, button)
+    systems.joystickpressed(joystick, button, M.hid, M.gameState.components)
+  end,
+  joystickreleased = function (joystick, button)
+    systems.joystickreleased(joystick, button, M.hid, M.gameState.components)
+  end,
+  joystickhat = function (joystick, hat, direction)
+    systems.joystickhat(joystick, hat, direction, M.hid,
+                        M.gameState.components)
+  end
+}, {__index = function () return function () end end})
+
+function M.run()
+  if love.load then love.load(love.arg.parseGameArguments(arg), arg) end
+  
+  -- We don't want the first frame's dt to include time taken by love.load.
+  if love.timer then love.timer.step() end
+  
+  local dt = 0
+  
+  -- Main loop time.
+  return function()
+    -- Process events.
+    if love.event then
+      love.event.pump()
+      for name, a,b,c,d,e,f in love.event.poll() do
+        if name == "quit" then
+          if not love.quit or not love.quit() then
+            return a or 0
+          end
+        end
+        handlers[name](a, b, c, d, e, f)
+        love.handlers[name](a, b, c, d, e, f)
+      end
+    end
+  
+    -- Update dt, as we'll be passing it to update
+    if love.timer then dt = love.timer.step() end
+  
+    -- Call update and draw
+    if love.update then love.update(dt) end -- will pass 0 if love.timer is disabled
+  
+    if love.graphics and love.graphics.isActive() then
+      love.graphics.origin()
+      love.graphics.clear(love.graphics.getBackgroundColor())
+  
+      if love.draw then love.draw() end
+  
+      love.graphics.present()
+    end
+  
+    if love.timer then love.timer.sleep(0.001) end
+  end
 end
 
 

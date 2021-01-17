@@ -48,6 +48,10 @@ function M.joystickpressed(joystick, button, hid, components)
   controller.joystickpressed(joystick, button, hid, components)
 end
 
+function M.joystickreleased(joystick, button, hid, components)
+  controller.joystickreleased(joystick, button, hid, components)
+end
+
 function M.joystickhat(joystick, hat, direction, hid, components)
   controller.joystickhat(joystick, hat, direction, hid, components)
 end
