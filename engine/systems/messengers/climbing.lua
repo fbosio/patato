@@ -1,4 +1,4 @@
-local iterators = require "engine.iterators"
+local iter = require "engine.iterators"
 local helpers = require "engine.systems.messengers.helpers"
 local getTranslatedBox = helpers.getTranslatedBox
 local areOverlapped = helpers.areOverlapped
@@ -40,36 +40,36 @@ local function stopClimber(dt, cb, tb, cv)
 end
 
 function M.update(dt, components)
-  for _, c, cb, g, v, p in iterators.climber(components) do
-    local translatedCB = getTranslatedBox(p, cb)
+  for _, climber, cBox, grav, vel, pos in iter.climber(components) do
+    local translatedCB = getTranslatedBox(pos, cBox)
 
     local isClimberCollidingWithNoTrellises = true
-    for trellisEntity, t, tCb, tP in iterators.trellis(components) do
-      if t then
-        local translatedTB = getTranslatedBox(tP, tCb)
+    for trellisEntity, isTrellis, tBox, tPos in iter.trellis(components) do
+      if isTrellis then
+        local translatedTB = getTranslatedBox(tPos, tBox)
 
         if areOverlapped(translatedCB, translatedTB) then
           isClimberCollidingWithNoTrellises = false
-          if c.climbing then
+          if climber.climbing then
             snapClimberToTrellis(translatedCB, translatedTB)
-            stopClimber(dt, translatedCB, translatedTB, v)
-            g.enabled = false
-            if not c.trellis then
-              v.y = 0
+            stopClimber(dt, translatedCB, translatedTB, vel)
+            grav.enabled = false
+            if not climber.trellis then
+              vel.y = 0
             end
-            c.trellis = trellisEntity
+            climber.trellis = trellisEntity
           else
-            c.trellis = nil
+            climber.trellis = nil
           end
         else
-          c.trellis = nil
+          climber.trellis = nil
         end
       end
     end
 
     if isClimberCollidingWithNoTrellises then
-      c.climbing = false
-      g.enabled = true
+      climber.climbing = false
+      grav.enabled = true
     end
   end
 end
