@@ -46,10 +46,11 @@ local function getIterator(componentName)
   local componentDependencies = expandDependencies(componentName)
   return function (components, entity)
     local component
-    entity, component = next(components[componentName], entity)
+    entity, component = next(components[componentName] or {}, entity)
+    if not entity then return end
     local nextDependencies = {}
     for i, dependency in ipairs(componentDependencies) do
-      nextDependencies[i] = components[dependency][entity]
+      nextDependencies[i] = (components[dependency] or {})[entity] or {}
     end
     if entity then return entity, component, unpack(nextDependencies) end
   end

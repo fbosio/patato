@@ -7,9 +7,6 @@ before_each(function ()
     climber = {
       player = {}
     },
-    gravitational = {
-      player = {enabled = false}
-    },
     collisionBox = {
       player = {
         origin = {x = 16, y = 64},
@@ -162,7 +159,9 @@ describe("with a trellis", function ()
 
   describe("and a gravitational climber climbing", function ()
     it("should disable the gravitational component", function ()
-      components.gravitational.player.enabled = true
+      components.gravitational = {
+        player = {enabled = true}
+      }
       components.position.player = {x = 0, y = -16}
       components.climber.player.climbing = true
       climbing.update(dt, components)
@@ -173,6 +172,9 @@ describe("with a trellis", function ()
 
   describe("and a gravitational climber not climbing", function ()
     it("should enable the gravitational component", function ()
+      components.gravitational = {
+        player = {enabled = false}
+      }
       components.position.player = {x = 96, y = 0}
       components.climber.player.climbing = false
       climbing.update(dt, components)
@@ -183,6 +185,9 @@ describe("with a trellis", function ()
 
   describe("and a gravitational entity jumping off the trellis", function ()
     it("should unset trellis reference of the climber", function ()
+      components.gravitational = {
+        player = {enabled = false}
+      }
       components.position.player = {x = 0, y = 0}
       components.climber.player.climbing = false
       components.climber.player.trellis = "trellis"
