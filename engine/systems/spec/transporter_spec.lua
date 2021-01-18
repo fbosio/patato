@@ -1,8 +1,12 @@
 local dt = 1 / 70
-local transporter
+local transporter, components
 
 before_each(function ()
   transporter = require "engine.systems.transporter"
+  components = {
+    velocity = {},
+    position = {}
+  }
 end)
 
 after_each(function ()
@@ -11,73 +15,68 @@ end)
 
 describe("with empty velocity and position tables", function ()
   it("should keep those tables empty", function ()
-    local velocities = {}
-    local positions = {}
+    transporter.move(dt, components)
 
-    transporter.move(dt, velocities, positions)
-
-    assert.are.same(velocities, {})
-    assert.are.same(positions, {})
+    assert.are.same(components.velocity, {})
+    assert.are.same(components.position, {})
   end)
 end)
 
 describe("receiving an entity with nonzero velocity", function ()
-  local velocities, positions
-
-  before_each(function ()
-    velocities = {
+  it("should update its position", function ()
+    components.velocity = {
       player = {
         x = 140,
         y = -70
       }
     }
-    positions = {
+    components.position = {
       player = {
         x = -397,
         y = 254
       }
     }
-    transporter.move(dt, velocities, positions)
-  end)
+    
+    transporter.move(dt, components)
 
-  it("should update its position", function ()
-    assert.are.same({x = -395, y = 253}, positions.player)
+    assert.are.same({x = -395, y = 253}, components.position.player)
   end)
-
 end)
 
 describe("receiving gravity and a enabled gravitational entity", function ()
   it("should upate the velocity of the entity", function ()
-    local velocities = {
+    components.velocity = {
       anvil = {
         x = 0,
         y = 0
       }
     }
     local gravity = 7000
-    local gravitationals = {
+    components.gravitational = {
       anvil = {enabled = true}
     }
-    transporter.drag(dt, velocities, gravitationals, gravity)
+    
+    transporter.drag(dt, components, gravity)
 
-    assert.are.same(100, velocities.anvil.y)
+    assert.are.same(100, components.velocity.anvil.y)
   end)
 end)
 
 describe("receiving gravity and a disabled gravitational entity", function ()
-  it("should upate the velocity of the entity", function ()
-    local velocities = {
+  it("should update the velocity of the entity", function ()
+    local gravity = 7000
+    components.velocity = {
       anvil = {
         x = 0,
         y = 0
       }
     }
-    local gravity = 7000
-    local gravitationals = {
+    components.gravitational = {
       anvil = {enabled = false}
     }
-    transporter.drag(dt, velocities, gravitationals, gravity)
+    
+    transporter.drag(dt, components, gravity)
 
-    assert.are.same(0, velocities.anvil.y)
+    assert.are.same(0, components.velocity.anvil.y)
   end)
 end)
