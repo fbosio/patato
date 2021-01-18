@@ -1,3 +1,4 @@
+local iterators = require "engine.iterators"
 local helpers = require "engine.systems.messengers.helpers"
 local getTranslatedBox = helpers.getTranslatedBox
 local areOverlapped = helpers.areOverlapped
@@ -38,45 +39,37 @@ local function stopClimber(dt, cb, tb, cv)
   end
 end
 
-function M.update(dt, climbers, trellises, collisionBoxes, positions,
-                  velocities, gravitationals)
-  for climberEntity, climber in pairs(climbers or {}) do
-    local climberBox = collisionBoxes[climberEntity]
-    local climberPosition = positions[climberEntity]
-    local climberVelocity = velocities[climberEntity]
-    local translatedCB = getTranslatedBox(climberPosition, climberBox)
-    gravitationals = gravitationals or {}
-    local gravitationalEntity = gravitationals[climberEntity] or {}
+function M.update(dt, components)
+  for _, c, cb, g, v, p in iterators.climber(components) do
+    local translatedCB = getTranslatedBox(p, cb)
 
     local isClimberCollidingWithNoTrellises = true
-    for trellisEntity, isTrellis in pairs(trellises or {}) do
-      if isTrellis then
-        local trellisBox = collisionBoxes[trellisEntity]
-        local trellisPosition = positions[trellisEntity]
-        local translatedTB = getTranslatedBox(trellisPosition, trellisBox)
+    for trellisEntity, t, tCb, tP in iterators.trellis(components) do
+      if t then
+        local translatedTB = getTranslatedBox(tP, tCb)
 
         if areOverlapped(translatedCB, translatedTB) then
           isClimberCollidingWithNoTrellises = false
-          if climber.climbing then
+          if c.climbing then
             snapClimberToTrellis(translatedCB, translatedTB)
-            stopClimber(dt, translatedCB, translatedTB, climberVelocity)
-            gravitationalEntity.enabled = false
-            if not climber.trellis then
-              climberVelocity.y = 0
+            stopClimber(dt, translatedCB, translatedTB, v)
+            g.enabled = false
+            if not c.trellis then
+              v.y = 0
             end
-            climber.trellis = trellisEntity
+            c.trellis = trellisEntity
           else
-            climber.trellis = nil
+            c.trellis = nil
           end
         else
-          climber.trellis = nil
+          c.trellis = nil
         end
       end
     end
 
     if isClimberCollidingWithNoTrellises then
-      climber.climbing = false
-      gravitationalEntity.enabled = true
+      c.climbing = false
+      g.enabled = true
     end
   end
 end

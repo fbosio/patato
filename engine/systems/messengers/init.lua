@@ -5,9 +5,7 @@ local collision = require "engine.systems.messengers.collision"
 local M = {}
 
 function M.update(dt, components, collectableEffects)
-  climbing.update(dt, components.climber, components.trellis,
-                  components.collisionBox, components.position,
-                  components.velocity, components.gravitational)
+  climbing.update(dt, components)
   collection.update(components.collector, components.collectable,
                     collectableEffects, components.collisionBox,
                     components.position, components.garbage)
