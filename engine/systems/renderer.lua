@@ -1,3 +1,5 @@
+local iter = require "engine.iterators"
+
 local M = {}
 
 function M.load(love, tagger)
@@ -53,8 +55,8 @@ local function drawSprites(components, resources)
             local origin = entitySprites.origins[t.frames[animation.frame]]
             local x, y = position.x, position.y
             local scale = entitySprites.scale
-            love.graphics.draw(entitySprites.image, quad, x, y, 0, scale,
-                               scale, origin.x, origin.y)
+            M.love.graphics.draw(entitySprites.image, quad, x, y, 0, scale,
+                                 scale, origin.x, origin.y)
         end
       end
     end
@@ -69,36 +71,46 @@ local function drawPositions(positions)
   end
 end
 
+local function drawRectangle(position, box, r, g, b, a)
+  local x, y = position.x - box.origin.x, position.y - box.origin.y
+  M.love.graphics.setColor(r, g, b, a)
+  M.love.graphics.rectangle("fill", x, y, box.width, box.height)
+end
+
 local function drawDebugElements(components)
-  local rgba = {love.graphics.getColor()}
-  for entity, box in pairs(components.collisionBox or {}) do
-    love.graphics.setColor(0, 0, 1, 0.3)
-    local position = components.position[entity]
+  local rgba = {M.love.graphics.getColor()}
+
+  for _, collideable, box, position in iter.collideable(components) do
+    M.love.graphics.setColor(0, 0, 1, 0.3)
     local x, y = position.x - box.origin.x, position.y - box.origin.y
     if box.height == 0 then
       M.love.graphics.line(x, y, x + box.width, y)
+    elseif collideable.normalPointingUp ~= nil
+        and collideable.rising ~= nil then
+      local y1 = collideable.normalPointingUp and y+box.height or y
+      local x3 = ((collideable.normalPointingUp and not collideable.rising)
+                  or (not collideable.normalPointingUp and collideable.rising))
+                  and x or x+box.width
+      local y3 = collideable.normalPointingUp and y or y+box.height
+      M.love.graphics.polygon("fill", {x, y1, x + box.width, y1, x3, y3})
     else
-      local collideable = (components.collideable or {})[entity] or {}
-      if collideable.normalPointingUp ~= nil
-          and collideable.rising ~= nil then
-        local y1 = collideable.normalPointingUp and y+box.height or y
-        local x3 = ((collideable.normalPointingUp and not collideable.rising)
-                    or (not collideable.normalPointingUp and collideable.rising))
-                   and x or x+box.width
-        local y3 = collideable.normalPointingUp and y or y+box.height
-        M.love.graphics.polygon("fill", {x, y1, x + box.width, y1, x3, y3})
-      else
-        if (components.trellis or {})[entity] then
-          love.graphics.setColor(0.4, 0.4, 1, 0.3)
-        elseif (components.collectable or {})[entity] then
-          love.graphics.setColor(0.4, 1, 0.4, 0.3)
-        end
-        M.love.graphics.rectangle("fill", x, y, box.width, box.height)
-      end
+      M.love.graphics.rectangle("fill", x, y, box.width, box.height)
     end
   end
 
-  love.graphics.setColor(rgba)
+  for _, isTrellis, box, position in iter.trellis(components) do
+    if isTrellis then
+      drawRectangle(position, box, 0.4, 0.4, 1, 0.3)
+    end
+  end
+
+  for _, isCollectable, box, position in iter.collectable(components) do
+    if isCollectable then
+      drawRectangle(position, box, 0.4, 1, 0.4, 0.3)
+    end
+  end
+  
+  M.love.graphics.setColor(rgba)
   drawPositions(components.position)
 end
 
