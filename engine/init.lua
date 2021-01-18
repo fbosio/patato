@@ -167,7 +167,7 @@ end
 --[=[--
   Set a command for an entity.
 
-  @tparam string entityName Name of the entity.
+  @tparam string entity Name of the entity.
   
   @tparam string input Input that will trigger the command. Specified in the
     `inputs` table in `config.lua`.
@@ -214,8 +214,8 @@ end
       t.velocity.x = 0
     end, "release")
 ]=]
-function M.setCommand(entityName, input, callback, kind)
-  return command.set(entityName, input, callback, kind)
+function M.setCommand(entity, input, callback, kind)
+  return command.set(entity, input, callback, kind)
 end
 
 
