@@ -8,8 +8,8 @@ after_each(function ()
   package.loaded["engine.iterators"] = nil
 end)
 
-describe("", function ()
-  it("", function ()
+describe("with velocity and position components", function ()
+  it("should yield entity, velocity and position", function ()
     local components = {
       velocity = {
         ball = {x = 50, y = -100},
