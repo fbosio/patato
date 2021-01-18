@@ -1,45 +1,39 @@
-local rectangle = require "engine.systems.messengers.collision.rectangle"
+local iter = require "engine.iterators"
 local helpers = require "engine.systems.messengers.helpers"
+local rectangle = require "engine.systems.messengers.collision.rectangle"
 local triangle = require "engine.systems.messengers.collision.triangle"
 local cloud = require "engine.systems.messengers.collision.cloud"
 local getTranslatedBox = helpers.getTranslatedBox
-local translate = helpers.translate
-
 
 local M = {}
 
-function M.update(dt, solids, collideables, collisionBoxes, positions,
-                  velocities, gravitationals, climbers)
-  for solidEntity, solid in pairs(solids or {}) do
-    local solidBox = collisionBoxes[solidEntity]
-    local solidPosition = positions[solidEntity]
-    local solidVelocity = velocities[solidEntity]
-    gravitationals = gravitationals or {}
-    local gravitational = gravitationals[solidEntity] or {}
-    local climber = (climbers or {})[solidEntity]
-    local translatedSB = getTranslatedBox(solidPosition, solidBox)
+--[[
+  s = solid,
+  c = collideable,
+]]
 
-    for collideableEntity, collideable in pairs(collideables or {}) do
-      local collideableBox = collisionBoxes[collideableEntity]
-      local collideablePosition = positions[collideableEntity]
-      local translatedCB = getTranslatedBox(collideablePosition,
-                                            collideableBox)
+function M.update(dt, components)
+  for _, s, climber, sb, grav, sv, sp in iter.solid(components) do
+    local translatedSB = getTranslatedBox(sp, sb)
 
-      if collideableBox.height > 0 then
-        if collideable.normalPointingUp == nil
-            or collideable.rising == nil then
-          rectangle.update(dt, collideables, collisionBoxes, positions,
-                           solidVelocity, climber, gravitational,
-                           translatedSB, translatedCB, solid.slope)
+    for cEntity, c, cb, cp in iter.collideable(components) do
+      local translatedCB = getTranslatedBox(cp, cb)
+
+      if cb.height > 0 then
+        if c.normalPointingUp == nil
+            or c.rising == nil then
+          rectangle.update(dt, components.collideable,
+                           components.collisionBox, components.position,
+                           sv, climber, grav, translatedSB, translatedCB,
+                           s.slope)
         else
-          triangle.update(dt, collideables, collisionBoxes, positions,
-                          solidVelocity, collideable, solid, climber,
-                          gravitational, translatedSB, translatedCB, 
-                          collideableEntity)
+          triangle.update(dt, components.collideable,
+                          components.collisionBox, components.position,
+                          sv, c, s, climber, grav, translatedSB, translatedCB,
+                          cEntity)
         end
       else
-        cloud.update(dt, solidVelocity, climber, gravitational, translatedSB,
-                     translatedCB)
+        cloud.update(dt, sv, climber, grav, translatedSB, translatedCB)
       end
     end
   end
