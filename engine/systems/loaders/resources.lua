@@ -19,7 +19,7 @@ local function buildSprites(entitySprites)
     local quads = {}
     local origins = {}
     local spritesImage = sprites.image
-    for _, quadData in ipairs(entitySprites.quads or {}) do
+    for _, quadData in ipairs(entitySprites.quads) do
       local x, y, w, h, originX, originY = unpack(quadData)
       quads[#quads+1] = M.love.graphics.newQuad(x, y, w, h,
                                                 spritesImage:getDimensions())
@@ -62,7 +62,7 @@ function M.load(love, config)
 
   local loaded = {}
 
-  for entityName, entityData in pairs(config.entities or {}) do
+  for entityName, entityData in pairs(config.entities) do
     local entityResources = entityData.resources or {}
     if entityResources.sprites then
       assert(entityResources.sprites.image,

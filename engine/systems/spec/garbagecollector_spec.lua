@@ -14,7 +14,8 @@ describe("Loading an entity that is marked as garbage", function ()
   before_each(function ()
     components = {
       garbage = {
-        markedEntity = true
+        markedEntity = true,
+        nonMarkedEntity = false
       },
       position = {
         markedEntity = {

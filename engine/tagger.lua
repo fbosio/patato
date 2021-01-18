@@ -23,7 +23,7 @@ function M.getId(name)
 end
 
 function M.getIds(name)
-  return tags[name]
+  return tags[name] or {}
 end
 
 function M.getName(entity)

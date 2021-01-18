@@ -16,13 +16,13 @@ local function getFlattenedData(data)
   return flattened
 end
 
-local function checkEntitiesCompatibility(entities)
+local function checkEntitiesCompatibility()
   local incompatiblePairs = {
     {"collectable", "collector"},
     {"collideable", "solid"},
     {"climber", "trellis"}
   }
-  for name, data in pairs(entities or {}) do
+  for name, data in pairs(M.config.entities or {}) do
     local flattened = getFlattenedData(data)
     for _, pair in ipairs(incompatiblePairs) do
       assert(not (flattened[pair[1]] and flattened[pair[2]]),
@@ -35,8 +35,8 @@ local function checkEntitiesCompatibility(entities)
   end
 end
 
-local function getMenuEntities(entities)
-  for name, entityData in pairs(entities or {}) do
+local function getMenuEntities()
+  for name, entityData in pairs(M.config.entities or {}) do
     if entityData.menu then return name end
   end
 end
@@ -69,8 +69,8 @@ local function buildEntitiesInLevels(level)
   end
 end
 
-local function buildDefaults(entities)
-  for name, data in pairs(entities or {}) do
+local function buildDefaults()
+  for name, data in pairs(M.config.entities or {}) do
     local mustBeBuilt = not data.collideable
     if not mustBeBuilt then break end
     for _, flag in ipairs(data.flags or {}) do
@@ -94,8 +94,8 @@ function M.reload(level, inMenu)
   }
   M.entityTagger.clear()
   M.command.load(M.hid, loaded.components)
-  checkEntitiesCompatibility(M.config.entities)
-  local menuName = getMenuEntities(M.config.entities)
+  checkEntitiesCompatibility()
+  local menuName = getMenuEntities()
   builder.load(M.love, M.entityTagger, M.command, menuName, loaded.components)
   if menuName and not loaded.inMenu then
     buildEntity(menuName)
@@ -105,7 +105,7 @@ function M.reload(level, inMenu)
     buildEntitiesInLevels(level)
   else
     loaded.inMenu = false
-    buildDefaults(M.config.entities)
+    buildDefaults()
   end
   return loaded
 end

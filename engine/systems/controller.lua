@@ -52,7 +52,7 @@ function M.update(hid, components)
       end
       if M.love.keyboard.isDown(physicalKey) or isHatDown or isButtonDown then
         local entities = M.entityTagger.getIds(entityName)
-        for _, entity in ipairs(entities or {}) do
+        for _, entity in ipairs(entities) do
           local controllables = components.controllable or {}
           local controllableEntity = (controllables[entity] or {}).hold or {}
           controllableEntity[input] = true
@@ -70,7 +70,7 @@ local function checkEvent(input, kind, hidInputs, commands, components)
       local physicalInput = hidInputs[commandInput]
       local entities = M.entityTagger.getIds(entityName)
       if physicalInput == input then
-        for _, entity in ipairs(entities or {}) do
+        for _, entity in ipairs(entities) do
           local entityComponents = buildArguments(entity, components)
           callback(entityComponents)
         end
@@ -102,7 +102,7 @@ function M.joystickhat(joystick, hat, direction, hid, components)
       for entityName, entityCommands in pairs(hid.commands.release or {}) do
         for input, callback in pairs(entityCommands) do
           local entities = M.entityTagger.getIds(entityName)
-          for _, entity in ipairs(entities or {}) do
+          for _, entity in ipairs(entities) do
             local controllables = components.controllable or {}
             local controllableEntity = (controllables[entity] or {}).hold or {}
             if controllableEntity[input] then

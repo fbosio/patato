@@ -1,9 +1,11 @@
 local M = {}
 
-function M.update(st)
-  for entity, isGarbage in pairs(st.garbage or {}) do
-    for _, component in pairs(st) do
-      component[entity] = nil
+function M.update(components)
+  for entity, isGarbage in pairs(components.garbage or {}) do
+    if isGarbage then
+      for _, component in pairs(components) do
+        component[entity] = nil
+      end
     end
   end
 end
