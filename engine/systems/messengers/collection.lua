@@ -1,3 +1,4 @@
+local iter = require "engine.iterators"
 local helpers = require "engine.systems.messengers.helpers"
 local getTranslatedBox = helpers.getTranslatedBox
 local areOverlapped = helpers.areOverlapped
@@ -5,20 +6,23 @@ local areOverlapped = helpers.areOverlapped
 
 local M = {}
 
-function M.update(collectors, collectables, collectableEffects,
-                  collisionBoxes, positions, garbage)
-  for collectorEntity, _ in pairs(collectors or {}) do
-    local position1 = positions[collectorEntity]
-    local box1 = getTranslatedBox(position1, collisionBoxes[collectorEntity])
+--[[
+  cr = collector,
+  ce = collectable,
+]]
 
-    for collectableEntity, collectable in pairs(collectables or {}) do
-      local position2 = positions[collectableEntity]
-      local box2 = getTranslatedBox(position2,
-                                    collisionBoxes[collectableEntity])
-
-      if areOverlapped(box1, box2) then
-        collectableEffects[collectable.name]()
-        garbage[collectableEntity] = true
+function M.update(components, collectableEffects)
+  for _, isCr, crBox, crPos in iter.collector(components) do
+    if isCr then
+      local crTBox = getTranslatedBox(crPos, crBox)
+      
+      for ceEntity, ce, ceBox, cePos in iter.collectable(components) do
+        local ceTBox = getTranslatedBox(cePos, ceBox)
+        
+        if areOverlapped(crTBox, ceTBox) then
+          collectableEffects[ce.name]()
+          components.garbage[ceEntity] = true
+        end
       end
     end
   end

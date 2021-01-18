@@ -5,6 +5,7 @@ local dependencies = {
   velocity = "position",
   gravitational = "velocity",
   collector = "collisionBox",
+  collectable = "collisionBox",
   solid = "climber",
   collideable = "collisionBox",
   climber = {"collisionBox", "gravitational"},
