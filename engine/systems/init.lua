@@ -27,7 +27,7 @@ function M.update(dt, hid, components, collectableEffects, resources,
   transporter.drag(dt, components, physics.gravity)
   messengers.update(dt, components, collectableEffects)
   transporter.move(dt, components)
-  animator.update(dt, components.animation, resources)
+  animator.update(dt, components, resources)
   garbagecollector.update(components)
 end
 

@@ -10,7 +10,7 @@ end
 
 local function drawMenu(components)
   local width, height = M.love.graphics.getDimensions()
-  for _, menu in pairs(components.menu) do
+  for _, menu in iter.menu(components) do
     for i, option in ipairs(menu.options) do
       local font = M.love.graphics.getFont()
       M.love.graphics.print({{1, 1, menu.selected == i and 0 or 1}, option},
@@ -63,8 +63,8 @@ local function drawSprites(components, resources)
   end
 end
 
-local function drawPositions(positions)
-  for entity, position in pairs(positions or {}) do
+local function drawPositions(components)
+  for entity, position in iter.position(components) do
     local x, y = position.x, position.y
     M.love.graphics.points{{x, y, 1, 0, 0, 1}}
     M.love.graphics.print({{1, 0, 0}, tostring(entity)}, x, y - 20)
@@ -111,7 +111,7 @@ local function drawDebugElements(components)
   end
   
   M.love.graphics.setColor(rgba)
-  drawPositions(components.position)
+  drawPositions(components)
 end
 
 function M.draw(components, inMenu, resources, release)

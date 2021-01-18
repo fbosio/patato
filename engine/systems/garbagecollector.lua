@@ -1,7 +1,8 @@
+local iter = require "engine.iterators"
 local M = {}
 
 function M.update(components)
-  for entity, isGarbage in pairs(components.garbage or {}) do
+  for entity, isGarbage in iter.garbage(components) do
     if isGarbage then
       for _, component in pairs(components) do
         component[entity] = nil

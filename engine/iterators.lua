@@ -1,25 +1,29 @@
 local M = {}
 
-local dependencies = {
-  collisionBox = "position",
-  velocity = "position",
-  gravitational = "velocity",
-  collector = "collisionBox",
-  collectable = "collisionBox",
+local dependencyTree = {
   solid = "climber",
   collideable = "collisionBox",
-  climber = {"collisionBox", "gravitational"},
+  collector = "collisionBox",
+  collectable = "collisionBox",
   trellis = "collisionBox",
+  climber = {"collisionBox", "gravitational"},
+  gravitational = "velocity",
+  velocity = "position",
+  collisionBox = "position",
+  animation = "position",
+  -- Atoms
+  position = {},
+  garbage = {},
+  menu = {}
 }
 
 local function getDependencies(componentName, dependenciesSeq, i)
-  local componentDependencies = dependencies[componentName]
-  if not componentDependencies then return i end
-  if type(componentDependencies) ~= "table" then
-    componentDependencies = {componentDependencies}
+  local dependencies = dependencyTree[componentName]
+  if not dependencies then return i end
+  if type(dependencies) ~= "table" then
+    dependencies = {dependencies}
   end
-
-  for _, dependency in ipairs(componentDependencies) do
+  for _, dependency in ipairs(dependencies) do
     dependenciesSeq[dependency] = i
     i = getDependencies(dependency, dependenciesSeq, i + 1)
   end
@@ -27,11 +31,11 @@ local function getDependencies(componentName, dependenciesSeq, i)
 end
 
 local function expandDependencies(componentName)
-  local dependenciesSet = {}
-  local iMax = getDependencies(componentName, dependenciesSet, 1)
+  local dependenciesSeq = {}
+  local iMax = getDependencies(componentName, dependenciesSeq, 1)
 
   local transposed = {}
-  for dependency, i in pairs(dependenciesSet) do
+  for dependency, i in pairs(dependenciesSeq) do
     transposed[i] = dependency
   end
 
@@ -57,7 +61,7 @@ local function getIterator(componentName)
   end
 end
 
-for componentName, _ in pairs(dependencies) do
+for componentName, _ in pairs(dependencyTree) do
   M[componentName] = function (components)
     return getIterator(componentName), components, nil
   end

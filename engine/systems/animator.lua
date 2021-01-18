@@ -1,11 +1,12 @@
+local iter = require "engine.iterators"
 local M = {}
 
 function M.load(entityTagger)
   M.entityTagger = entityTagger
 end
 
-function M.update(dt, animationComponents, resources)
-  for entity, animation in pairs(animationComponents or {}) do
+function M.update(dt, components, resources)
+  for entity, animation in iter.animation(components) do
     local entityName = M.entityTagger.getName(entity)
     local resource = resources[entityName].animations[animation.name]
     animation.time = animation.time + dt
