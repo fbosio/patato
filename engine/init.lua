@@ -56,9 +56,7 @@ end
  from the same place.
 
  @usage
-  function love.run()
-    return engine.run()
-  end
+  love.run = engine.run
 ]]
 function M.run()
   load()

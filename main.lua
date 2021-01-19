@@ -1,9 +1,7 @@
 local engine = require "engine"
 local elapsed, message, score
 
-function love.run()
-  return engine.run()
-end
+love.run = engine.run
 
 function love.load()
   engine.setMenuOptionEffect("mainMenu", 1, function ()
