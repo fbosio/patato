@@ -123,13 +123,13 @@ local function drawDebugElements(components)
   drawMousePosition()
 end
 
-function M.draw(components, inMenu, resources, release)
-  if inMenu then
-    drawMenu(components)
+function M.draw(gameState, resources, release)
+  if gameState.inMenu then
+    drawMenu(gameState.components)
   else
-    drawSprites(components, resources)
+    drawSprites(gameState.components, resources)
     if not release then
-      drawDebugElements(components)
+      drawDebugElements(gameState.components)
     end
   end
 end

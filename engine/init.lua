@@ -40,12 +40,11 @@ local function load()
 end
 
 local function update(dt)
-  systems.update(dt, M.hid, M.gameState, M.resources, M.physics, M.camera)
+  systems.update(dt, M.hid, M.gameState, M.resources, M.physics)
 end
 
 local function draw()
-  systems.draw(M.gameState.components, M.gameState.inMenu, M.resources,
-               M.release, M.camera)
+  systems.draw(M.gameState, M.resources, M.release)
 end
 
 --[[--
@@ -219,10 +218,10 @@ function M.setCommand(entity, input, callback, kind)
 end
 
 function M.setCameraTarget(cameraEntity, targetEntity, focusCallback)
-  M.camera = M.camera or {}
-  M.camera.name = cameraEntity
-  M.camera.target = targetEntity
-  M.camera.focusCallback = focusCallback
+  M.gameState.camera = M.gameState.camera or {}
+  M.gameState.camera.name = cameraEntity
+  M.gameState.camera.target = targetEntity
+  M.gameState.camera.focusCallback = focusCallback
 end
 
 return M

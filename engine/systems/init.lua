@@ -22,19 +22,18 @@ function M.reload(level, inMenu)
   return loaders.reload(level, inMenu)
 end
 
-function M.update(dt, hid, gameState, resources, physics, cameraData)
+function M.update(dt, hid, gameState, resources, physics)
   controller.update(hid, gameState.components)
   transporter.drag(dt, gameState.components, physics.gravity)
-  messengers.update(dt, gameState.components, gameState.collectableEffects,
-                    cameraData)
+  messengers.update(dt, gameState)
   transporter.move(dt, gameState.components)
   animator.update(dt, gameState.components, resources)
   garbagecollector.update(gameState.components)
 end
 
-function M.draw(components, inMenu, resources, release, cameraData)
-  messengers.draw(components, cameraData)
-  renderer.draw(components, inMenu, resources, release)
+function M.draw(gameState, resources, release)
+  messengers.draw(gameState)
+  renderer.draw(gameState, resources, release)
 end
 
 function M.keypressed(key, hid, components)

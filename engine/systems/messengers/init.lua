@@ -9,15 +9,15 @@ function M.load(love, entityTagger)
   camera.load(love, entityTagger)
 end
 
-function M.update(dt, components, collectableEffects, cameraData)
-  camera.update(components, cameraData)
-  climbing.update(dt, components)
-  collection.update(components, collectableEffects)
-  collision.update(dt, components)
+function M.update(dt, gameState)
+  camera.update(gameState.components, gameState.camera)
+  climbing.update(dt, gameState.components)
+  collection.update(gameState.components, gameState.collectableEffects)
+  collision.update(dt, gameState.components)
 end
 
-function M.draw(components, cameraData)
-  camera.draw(components, cameraData)
+function M.draw(gameState)
+  camera.draw(gameState.components, gameState.camera)
 end
 
 return M
