@@ -77,6 +77,14 @@ local function drawRectangle(position, box, r, g, b, a)
   M.love.graphics.rectangle("fill", x, y, box.width, box.height)
 end
 
+local function drawMousePosition()
+  local mouseX, mouseY = love.mouse.getPosition()
+  mouseX, mouseY = love.graphics.inverseTransformPoint(mouseX, mouseY)
+  love.graphics.print(tostring(math.floor(mouseX)) .. ", "
+                      .. tostring(math.floor(mouseY)),
+                      mouseX + 10, mouseY - 10)
+end
+
 local function drawDebugElements(components)
   local rgba = {M.love.graphics.getColor()}
 
@@ -112,6 +120,7 @@ local function drawDebugElements(components)
   
   M.love.graphics.setColor(rgba)
   drawPositions(components)
+  drawMousePosition()
 end
 
 function M.draw(components, inMenu, resources, release)

@@ -5,6 +5,7 @@ local animator = require "engine.systems.animator"
 local garbagecollector = require "engine.systems.garbagecollector"
 local renderer = require "engine.systems.renderer"
 local loaders = require "engine.systems.loaders"
+local camera = require "engine.systems.camera"
 
 local M = {}
 
@@ -13,6 +14,7 @@ function M.load(love, entityTagger, command, config)
   controller.load(love, entityTagger)
   animator.load(entityTagger)
   renderer.load(love, entityTagger)
+  camera.load(love, entityTagger)
 
   return world
 end
@@ -27,11 +29,13 @@ function M.update(dt, hid, components, collectableEffects, resources,
   transporter.drag(dt, components, physics.gravity)
   messengers.update(dt, components, collectableEffects)
   transporter.move(dt, components)
+  camera.update(components)
   animator.update(dt, components, resources)
   garbagecollector.update(components)
 end
 
 function M.draw(components, inMenu, resources, release)
+  camera.draw()
   renderer.draw(components, inMenu, resources, release)
 end
 
@@ -61,6 +65,10 @@ end
 
 function M.joystickremoved(joystick, hid)
   controller.joystickremoved(joystick, hid)
+end
+
+function M.setCameraTarget(entity, focusCallback)
+  camera.setTarget(entity, focusCallback)
 end
 
 return M

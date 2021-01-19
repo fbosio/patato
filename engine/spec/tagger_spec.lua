@@ -35,8 +35,8 @@ describe("tagging an entity twice", function ()
   end)
 
   describe("and getting an unique id", function ()
-    it("should return nothing", function ()
-      assert.is.falsy(entityTagger.getId("player"))
+    it("should return the first id", function ()
+      assert.are.same(id1, entityTagger.getId("player"))
     end)
   end)
 

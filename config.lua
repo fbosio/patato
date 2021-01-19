@@ -42,7 +42,7 @@ M.entities = {
     },
     collisionBox = {20, 120, 40, 120},
     impulseSpeed = {
-      walk = 1000,
+      walk = 500,
       jump = 1500,
       climb = 200,
       climbJump = 700

@@ -94,10 +94,14 @@ function love.load()
     local callback = callbacks[selected];
     (callback or function () end)()
   end, "press")
-
+  
   score = 0
   engine.setCollectableEffect("bottles", function ()
     score = score + 1
+  end)
+  
+  engine.setCameraTarget("patato", function (t)
+    return t.position.x, t.position.y - t.collisionBox.height / 2
   end)
 end
 
@@ -119,8 +123,4 @@ function love.draw()
   if not engine.gameState.inMenu then
     love.graphics.print(score, 0, 0)
   end
-
-  local mouseX, mouseY = love.mouse.getPosition()
-  love.graphics.print(tostring(mouseX) .. ", " .. tostring(mouseY),
-                      mouseX + 10, mouseY - 10)
 end

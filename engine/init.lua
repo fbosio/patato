@@ -213,8 +213,11 @@ end
     end, "release")
 ]=]
 function M.setCommand(entity, input, callback, kind)
-  return command.set(entity, input, callback, kind)
+  command.set(entity, input, callback, kind)
 end
 
+function M.setCameraTarget(entity, focusCallback)
+  systems.setCameraTarget(entity, focusCallback)
+end
 
 return M

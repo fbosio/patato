@@ -16,10 +16,7 @@ function M.tag(name)
 end
 
 function M.getId(name)
-  local ids = tags[name] or {}
-  if #ids == 1 then
-    return ids[1]
-  end
+  return M.getIds(name)[1]
 end
 
 function M.getIds(name)
