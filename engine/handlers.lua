@@ -13,34 +13,31 @@ function M.load(engine)
 end
 
 function M.keypressed(key)
-  systems.keypressed(key, M.engine.hid, M.engine.gameState.components)
+  systems.keypressed(key, M.engine.gameState)
 end
 
 function M.keyreleased(key)
-  systems.keyreleased(key, M.engine.hid, M.engine.gameState.components)
+  systems.keyreleased(key, M.engine.gameState)
 end
 
 function M.joystickadded(joystick)
-  systems.joystickadded(joystick, M.engine.hid)
+  systems.joystickadded(joystick, M.engine.gameState)
 end
 
 function M.joystickremoved(joystick)
-  systems.joystickremoved(joystick, M.engine.hid)
+  systems.joystickremoved(joystick, M.engine.gameState)
 end
 
 function M.joystickpressed(joystick, button)
-  systems.joystickpressed(joystick, button, M.engine.hid,
-                          M.engine.gameState.components)
+  systems.joystickpressed(joystick, button, M.engine.gameState)
 end
 
 function M.joystickreleased(joystick, button)
-  systems.joystickreleased(joystick, button, M.engine.hid,
-                          M.engine.gameState.components)
+  systems.joystickreleased(joystick, button, M.engine.gameState)
 end
 
 function M.joystickhat(joystick, hat, direction)
-  systems.joystickhat(joystick, hat, direction, M.engine.hid,
-                          M.engine.gameState.components)
+  systems.joystickhat(joystick, hat, direction, M.engine.gameState)
 end
 
 return M

@@ -1,6 +1,7 @@
 local builder = require "engine.systems.loaders.gamestate.builder"
 local collectableeffects =
   require "engine.systems.loaders.gamestate.collectableeffects"
+local hid = require "engine.systems.loaders.gamestate.hid"
 
 local M = {}
 
@@ -102,9 +103,9 @@ function M.reload(level, inMenu)
       garbage = {}
   }
   M.entityTagger.clear()
-  M.command.load(M.hid, components)
   checkEntitiesCompatibility()
   local menuName = getMenuEntity()
+  M.command.load(M.hid, components)
   builder.load(M.love, M.entityTagger, M.command, menuName, components)
   if menuName and not inMenu then
     buildEntity(menuName)
@@ -121,13 +122,14 @@ function M.reload(level, inMenu)
   return components, inMenu
 end
 
-function M.load(love, entityTagger, command, hid, config)
+function M.load(love, entityTagger, command, config)
   M.love = love
   M.entityTagger = entityTagger
-  M.hid = hid
   M.command = command
   M.config = config
   local loaded = {}
+  loaded.hid = hid.load(config)
+  M.hid = loaded.hid
   loaded.components, loaded.inMenu = M.reload()
   loaded.collectableEffects = collectableeffects.load()
   return loaded

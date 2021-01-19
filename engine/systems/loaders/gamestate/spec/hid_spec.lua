@@ -1,11 +1,11 @@
 local hid
 
 before_each(function ()
-  hid = require "engine.systems.loaders.hid"
+  hid = require "engine.systems.loaders.gamestate.hid"
 end)
 
 after_each(function ()
-  package.loaded["engine.systems.loaders.hid"] = nil
+  package.loaded["engine.systems.loaders.gamestate.hid"] = nil
 end)
 
 describe("loading an empty config", function ()

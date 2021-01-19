@@ -40,7 +40,7 @@ local function load()
 end
 
 local function update(dt)
-  systems.update(dt, M.hid, M.gameState, M.resources, M.physics)
+  systems.update(dt, M.gameState, M.resources, M.physics)
 end
 
 local function draw()

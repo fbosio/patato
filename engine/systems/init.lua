@@ -22,8 +22,8 @@ function M.reload(level, inMenu)
   return loaders.reload(level, inMenu)
 end
 
-function M.update(dt, hid, gameState, resources, physics)
-  controller.update(hid, gameState.components)
+function M.update(dt, gameState, resources, physics)
+  controller.update(gameState.hid, gameState.components)
   transporter.drag(dt, gameState.components, physics.gravity)
   messengers.update(dt, gameState)
   transporter.move(dt, gameState.components)
@@ -36,32 +36,35 @@ function M.draw(gameState, resources, release)
   renderer.draw(gameState, resources, release)
 end
 
-function M.keypressed(key, hid, components)
-  controller.keypressed(key, hid, components)
+function M.keypressed(key, gameState)
+  controller.keypressed(key, gameState.hid, gameState.components)
 end
 
-function M.keyreleased(key, hid, components)
-  controller.keyreleased(key, hid, components)
+function M.keyreleased(key, gameState)
+  controller.keyreleased(key, gameState.hid, gameState.components)
 end
 
-function M.joystickpressed(joystick, button, hid, components)
-  controller.joystickpressed(joystick, button, hid, components)
+function M.joystickpressed(joystick, button, gameState)
+  controller.joystickpressed(joystick, button, gameState.hid, 
+                             gameState.components)
 end
 
-function M.joystickreleased(joystick, button, hid, components)
-  controller.joystickreleased(joystick, button, hid, components)
+function M.joystickreleased(joystick, button, gameState)
+  controller.joystickreleased(joystick, button, gameState.hid, 
+                              gameState.components)
 end
 
-function M.joystickhat(joystick, hat, direction, hid, components)
-  controller.joystickhat(joystick, hat, direction, hid, components)
+function M.joystickhat(joystick, hat, direction, gameState)
+  controller.joystickhat(joystick, hat, direction, gameState.hid, 
+                         gameState.components)
 end
 
-function M.joystickadded(joystick, hid)
-  controller.joystickadded(joystick, hid)
+function M.joystickadded(joystick, gameState)
+  controller.joystickadded(joystick, gameState.hid)
 end
 
-function M.joystickremoved(joystick, hid)
-  controller.joystickremoved(joystick, hid)
+function M.joystickremoved(joystick, gameState)
+  controller.joystickremoved(joystick, gameState.hid)
 end
 
 return M
