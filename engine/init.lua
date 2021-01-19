@@ -140,12 +140,14 @@ end
   end)
 ]]
 function M.setMenuOptionEffect(entity, index, callback)
-  local menu = M.gameState.components.menu
-  if menu then
-    menu[entityTagger.getId(entity)].callbacks[index] = callback
-  end
+  M.gameState.menu = M.gameState.menu or {}
+  M.gameState.menu[entity] = M.gameState.menu[entity] or {}
+  M.gameState.menu[entity][index] = callback
 end
 
+function M.getMenuOptionEffect(entity, index)
+  return M.gameState.menu[entity][index] or function () end
+end
 
 --[[--
  Associate a callback to a collectable.

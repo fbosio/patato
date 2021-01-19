@@ -88,11 +88,7 @@ function love.load()
     end
   end, "press")
   engine.setCommand("mainMenu", "start", function (t)
-    local menu = t.menu
-    local callbacks = menu.callbacks
-    local selected = menu.selected
-    local callback = callbacks[selected];
-    (callback or function () end)()
+    engine.getMenuOptionEffect("mainMenu", t.menu.selected)()
   end, "press")
   
   score = 0
