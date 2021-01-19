@@ -1,6 +1,8 @@
 local iter = require "engine.iterators"
 local helpers = require "engine.systems.helpers"
 local buildArguments = helpers.buildArguments
+local getTranslatedBox = helpers.getTranslatedBox
+local translate = helpers.translate
 
 local M = {}
 
@@ -16,8 +18,9 @@ function M.update(components, cameraData)
     if isCamera and targetEntity then
       local entityComponents = buildArguments(targetEntity, components)
       local x, y = cameraData.focusCallback(entityComponents)
-      position.x = x - collisionBox.width / 2
-      position.y = y - collisionBox.height / 2
+      local box = getTranslatedBox(position, collisionBox)
+      translate.horizontalCenter(box, x)
+      translate.verticalCenter(box, y)
     end
   end
 end
