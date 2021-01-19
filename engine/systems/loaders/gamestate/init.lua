@@ -1,4 +1,6 @@
 local builder = require "engine.systems.loaders.gamestate.builder"
+local collectableeffects =
+  require "engine.systems.loaders.gamestate.collectableeffects"
 
 local M = {}
 
@@ -96,30 +98,27 @@ local function buildDefaults()
 end
 
 function M.reload(level, inMenu)
-  local loaded = {
-    inMenu = inMenu,
-    components = {
+  local components = {
       garbage = {}
-    }
   }
   M.entityTagger.clear()
-  M.command.load(M.hid, loaded.components)
+  M.command.load(M.hid, components)
   checkEntitiesCompatibility()
   local menuName = getMenuEntity()
-  builder.load(M.love, M.entityTagger, M.command, menuName, loaded.components)
-  if menuName and not loaded.inMenu then
+  builder.load(M.love, M.entityTagger, M.command, menuName, components)
+  if menuName and not inMenu then
     buildEntity(menuName)
-    loaded.inMenu = true
+    inMenu = true
   elseif M.config.levels then
-    loaded.inMenu = false
+    inMenu = false
     buildEntitiesInLevels(level)
   else
-    loaded.inMenu = false
+    inMenu = false
     buildDefaults()
   end
   local cameraName = getCameraEntity()
   if cameraName then buildEntity(cameraName) end
-  return loaded
+  return components, inMenu
 end
 
 function M.load(love, entityTagger, command, hid, config)
@@ -128,7 +127,10 @@ function M.load(love, entityTagger, command, hid, config)
   M.hid = hid
   M.command = command
   M.config = config
-  return M.reload()
+  local loaded = {}
+  loaded.components, loaded.inMenu = M.reload()
+  loaded.collectableEffects = collectableeffects.load()
+  return loaded
 end
 
 return M

@@ -1,16 +1,16 @@
-local collectableEffects
+local loader
 
 before_each(function ()
-  collectableEffects = require "engine.systems.loaders.collectableeffects"
+  loader = require "engine.systems.loaders.gamestate.collectableeffects"
 end)
 
 after_each(function ()
-  package.loaded["engine.systems.loaders.collectableeffects"] = nil
+  package.loaded["engine.systems.loaders.gamestate.collectableeffects"] = nil
 end)
 
 describe("loading itself", function ()
   it("should create an empty collectable effects table", function ()
-    local loadedCollectableEffects = collectableEffects.load()
+    local loadedCollectableEffects = loader.load()
 
     assert.are.same({}, loadedCollectableEffects)
   end)

@@ -40,8 +40,7 @@ local function load()
 end
 
 local function update(dt)
-  systems.update(dt, M.hid, M.gameState.components, M.collectableEffects,
-                 M.resources, M.physics, M.camera)
+  systems.update(dt, M.hid, M.gameState, M.resources, M.physics, M.camera)
 end
 
 local function draw()
@@ -123,7 +122,8 @@ end
   end)
 ]]
 function M.startGame(level)
-  M.gameState = systems.reload(level, M.gameState.inMenu)
+  M.gameState.components, M.gameState.inMenu =
+    systems.reload(level, M.gameState.inMenu)
 end
 
 
@@ -158,7 +158,7 @@ end
   end)
 ]]
 function M.setCollectableEffect(entity, callback)
-  M.collectableEffects[entity] = callback
+  M.gameState.collectableEffects[entity] = callback
 end
 
 

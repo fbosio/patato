@@ -3,7 +3,6 @@ local mode = require "engine.systems.loaders.mode"
 local physics = require "engine.systems.loaders.physics"
 local hid = require "engine.systems.loaders.hid"
 local resources = require "engine.systems.loaders.resources"
-local collectableeffects = require "engine.systems.loaders.collectableeffects"
 local gamestate = require "engine.systems.loaders.gamestate"
 
 local M = {}
@@ -18,7 +17,6 @@ function M.load(love, entityTagger, command, config)
     physics = physics.load(loadedConfig),
     hid = loadedHid,
     resources = resources.load(love, loadedConfig),
-    collectableEffects = collectableeffects.load(),
     gameState = gameState
   }
 end
