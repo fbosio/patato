@@ -56,6 +56,12 @@ M.entities = {
     flags = {"collectable"},
     collisionBox = {15, 45, 35, 45}
   },
+  camera = {
+    flags = {"camera"}
+  },
+  cameraBounds = {
+    flags = {"limiter"}
+  },
   soilSurfaces = {
     collideable = "rectangle",
   },
@@ -87,6 +93,7 @@ M.entities.background.resources.sprites.tiled = true
 
 M.levels = {
   garden = {
+    cameraBounds = {0, 0, 1000, 1000},
     background = {0, 0},
     gardenArtwork = {0, 0},
     patato = {250, 100},

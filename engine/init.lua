@@ -41,12 +41,12 @@ end
 
 local function update(dt)
   systems.update(dt, M.hid, M.gameState.components, M.collectableEffects,
-                 M.resources, M.physics)
+                 M.resources, M.physics, M.camera)
 end
 
 local function draw()
   systems.draw(M.gameState.components, M.gameState.inMenu, M.resources,
-               M.release)
+               M.release, M.camera)
 end
 
 --[[--
@@ -216,8 +216,11 @@ function M.setCommand(entity, input, callback, kind)
   command.set(entity, input, callback, kind)
 end
 
-function M.setCameraTarget(entity, focusCallback)
-  systems.setCameraTarget(entity, focusCallback)
+function M.setCameraTarget(cameraEntity, targetEntity, focusCallback)
+  M.camera = M.camera or {}
+  M.camera.name = cameraEntity
+  M.camera.target = targetEntity
+  M.camera.focusCallback = focusCallback
 end
 
 return M

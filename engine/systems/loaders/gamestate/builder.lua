@@ -54,7 +54,7 @@ local flagStateBuilders = {
     component.set("limiter", entity, true)
   end,
   camera = function (entity)
-    component.set("camera", entity, {})
+    component.set("camera", entity, true)
     component.setAttribute("position", entity, "x", 0)
     component.setAttribute("position", entity, "y", 0)
     component.matchCollisionBoxToScreen(entity)

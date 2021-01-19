@@ -1,4 +1,4 @@
-local messengersHelpers = require "engine.systems.messengers.helpers"
+local messengersHelpers = require "engine.systems.helpers"
 local collisionHelpers = require "engine.systems.messengers.collision.helpers"
 local translate = messengersHelpers.translate
 local mustCollideSides = collisionHelpers.mustCollideSides

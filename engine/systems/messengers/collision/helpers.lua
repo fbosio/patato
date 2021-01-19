@@ -1,4 +1,4 @@
-local helpers = require "engine.systems.messengers.helpers"
+local helpers = require "engine.systems.helpers"
 local getTranslatedBox = helpers.getTranslatedBox
 local translate = helpers.translate
 

@@ -7,6 +7,7 @@ local dependencyTree = {
   collectable = "collisionBox",
   trellis = "collisionBox",
   climber = {"collisionBox", "gravitational"},
+  camera = "collisionBox",
   gravitational = "velocity",
   velocity = "position",
   collisionBox = "position",

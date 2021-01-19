@@ -35,9 +35,19 @@ local function checkEntitiesCompatibility()
   end
 end
 
-local function getMenuEntities()
+local function getMenuEntity()
   for name, entityData in pairs(M.config.entities or {}) do
     if entityData.menu then return name end
+  end
+end
+
+local function getCameraEntity()
+  for name, entityData in pairs(M.config.entities or {}) do
+    for _, flag in ipairs(entityData.flags or {}) do
+      if flag == "camera" then
+        return name
+      end
+    end
   end
 end
 
@@ -95,7 +105,7 @@ function M.reload(level, inMenu)
   M.entityTagger.clear()
   M.command.load(M.hid, loaded.components)
   checkEntitiesCompatibility()
-  local menuName = getMenuEntities()
+  local menuName = getMenuEntity()
   builder.load(M.love, M.entityTagger, M.command, menuName, loaded.components)
   if menuName and not loaded.inMenu then
     buildEntity(menuName)
@@ -107,6 +117,8 @@ function M.reload(level, inMenu)
     loaded.inMenu = false
     buildDefaults()
   end
+  local cameraName = getCameraEntity()
+  if cameraName then buildEntity(cameraName) end
   return loaded
 end
 
