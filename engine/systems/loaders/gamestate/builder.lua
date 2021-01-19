@@ -49,6 +49,15 @@ local flagStateBuilders = {
   end,
   trellis = function (entity)
     component.set("trellis", entity, true)
+  end,
+  limiter = function (entity)
+    component.set("limiter", entity, true)
+  end,
+  camera = function (entity)
+    component.set("camera", entity, {})
+    component.setAttribute("position", entity, "x", 0)
+    component.setAttribute("position", entity, "y", 0)
+    component.matchCollisionBoxToScreen(entity)
   end
 }
 for _, k in ipairs{"collector", "solid", "gravitational", "climber"} do
@@ -61,7 +70,9 @@ end
 
 function M.flags(flags, entity)
   for _, flag in ipairs(flags) do
-    flagStateBuilders[flag](entity)
+    assert(flagStateBuilders[flag], 'Unexpected flag "' .. flag .. '" for '
+           .. "entity " .. M.entityTagger.getName(entity)
+           .. " in config.lua")(entity)
   end
 end
 

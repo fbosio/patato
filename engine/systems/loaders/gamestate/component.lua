@@ -37,4 +37,11 @@ function M.setDefaults(entity)
   M.setDefaultVelocity(entity)
 end
 
+function M.matchCollisionBoxToScreen(entity)
+  local width, height = M.love.graphics.getDimensions()
+  M.setAttribute("collisionBox", entity, "origin", {x = 0, y = 0})
+  M.setAttribute("collisionBox", entity, "width", width)
+  M.setAttribute("collisionBox", entity, "height", height)
+end
+
 return M

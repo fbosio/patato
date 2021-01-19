@@ -588,3 +588,42 @@ describe("loading an entity that is both slope and trellis", function ()
     end)
   end)
 end)
+
+describe("loading a limiter that is in a level", function ()
+  local config, loadedGameState, cameraBoundsId
+
+  before_each(function ()
+    config = {
+      entities = {
+        cameraBounds = {
+          flags = {"limiter"}
+        }
+      },
+      levels = {
+        mushroomKingdom = {
+          cameraBounds = {100, 100, 1000, 1000}
+        }
+      }
+    }
+    
+    loadedGameState = gamestate.load(loveMock, entityTagger, command,
+                                     hid, config)
+    cameraBoundsId = entityTagger.getId("cameraBounds")
+  end)
+
+  it("should copy the component", function ()    
+    assert.is.truthy(loadedGameState.components.limiter[cameraBoundsId])
+  end)
+
+  it("should create a position and a collision box", function ()
+    assert.are.same({
+      x = 100,
+      y = 100
+    }, loadedGameState.components.position[cameraBoundsId])
+    assert.are.same({
+      origin = {x = 0,  y = 0},
+      width = 900,
+      height = 900
+    }, loadedGameState.components.collisionBox[cameraBoundsId])
+  end)
+end)

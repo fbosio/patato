@@ -221,3 +221,28 @@ describe("loading a climber entity", function ()
     assert.are.same({x = 0, y = 0}, components.velocity[playerId])
   end)
 end)
+
+describe("loading a camera entity", function ()
+  local cameraId
+
+  before_each(function ()
+    local flags = {"camera"}
+    
+    cameraId = entityTagger.tag("camera")
+    builder.flags(flags, cameraId)
+  end)
+
+  it("should copy the component", function ()
+    assert.is.truthy(components.camera[cameraId])
+  end)
+
+  it("should create a position and a collision box", function ()
+    assert.are.same({x = 0, y = 0}, components.position[cameraId])
+    assert.are.same({
+      origin = {x = 0, y = 0},
+      width = 800,
+      height = 600
+    }, components.collisionBox[cameraId])
+  end)
+end)
+
