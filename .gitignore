@@ -1,3 +1,4 @@
 .vscode
 *.aseprite
 *.gpl
+tools/copyscript.sh

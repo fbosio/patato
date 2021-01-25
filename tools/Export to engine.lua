@@ -123,7 +123,7 @@ do
   local sprOutput = "{\n\t" .. table.concat(sprBuffer, ",\n") .. "\n\t}"
   local animOutput = "{\n" .. table.concat(animBuffer, ",\n") .. "\n}"
   local output = "local M = {}\nM.sprites = {\n"
-                 .. "\timage = \"resources/" .. title .. ".png\",\n"
+                 .. "\timage = \"resources/images/" .. title .. ".png\",\n"
                  .. "\tquads = " .. sprOutput .. "\n}\n"
                  .. "M.animations = " .. animOutput .. "\nreturn M\n"
   local file = assert(io.open(path .. title .. ".lua", "w+"))

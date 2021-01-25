@@ -1,6 +1,6 @@
 local M = {}
 M.sprites = {
-	image = "resources/background.png",
+	image = "resources/images/background.png",
 	quads = {
 		{1, 1, 512, 512, 0, 0}
 	}

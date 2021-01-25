@@ -47,7 +47,7 @@ M.entities = {
       climb = 200,
       climbJump = 700
     },
-    resources = resources.patato,
+    resources = resources.images.patato,
   },
   bee = {
     flags = {"controllable"}
@@ -82,7 +82,7 @@ M.entities = {
     resources = resources.levels.secretLevel
   },
   background = {
-    resources = resources.background
+    resources = resources.images.background
   },
   mainMenu = {
     flags = {"controllable"},

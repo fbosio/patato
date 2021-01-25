@@ -5,7 +5,8 @@ function M.write(data)
   for k, v in pairs(data) do
     buffer[#buffer + 1] = "M." .. k .. " = {\n"
                           .. "  sprites = {\n"
-                          .. '    image = "resources/' .. k .. '.png",\n'
+                          .. '    image = "resources/images/' .. k
+                          .. '.png",\n'
                           .. "    quads = {\n"
                           .. "      {" .. -v[1] .. ", " .. -v[2] .. ", "
                           .. v:getWidth() .. ", " .. v:getHeight() .. "}\n"

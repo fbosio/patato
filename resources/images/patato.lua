@@ -1,6 +1,6 @@
 local M = {}
 M.sprites = {
-	image = "resources/patato.png",
+	image = "resources/images/patato.png",
 	quads = {
 		{1, 1, 28, 61, 14, 60},
 	{1, 64, 32, 58, 17, 59},
@@ -13,10 +13,10 @@ M.sprites = {
 	}
 }
 M.animations = {
-	climbingIdle = {6, 0.1, false},
 	standing = {1, 0.1, false},
 	walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
-	climbingMove = {7, 0.1, 6, 0.1, 8, 0.1, 6, 0.1, true},
-	jumping = {5, 0.1, false}
+	climbingIdle = {6, 0.1, false},
+	jumping = {5, 0.1, false},
+	climbingMove = {7, 0.1, 6, 0.1, 8, 0.1, 6, 0.1, true}
 }
 return M
