@@ -217,9 +217,8 @@ function M.setCommand(entity, input, callback, kind)
   command.set(entity, input, callback, kind)
 end
 
-function M.setCameraTarget(cameraEntity, targetEntity, focusCallback)
+function M.setCameraTarget(targetEntity, focusCallback)
   M.gameState.camera = M.gameState.camera or {}
-  M.gameState.camera.name = cameraEntity
   M.gameState.camera.target = targetEntity
   M.gameState.camera.focusCallback = focusCallback
 end

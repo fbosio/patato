@@ -88,6 +88,12 @@ end
 local function drawDebugElements(components)
   local rgba = {M.love.graphics.getColor()}
 
+  for _, box, position in iter.collisionBox(components) do
+    M.love.graphics.setColor(0, 0, 1)
+    local x, y = position.x - box.origin.x, position.y - box.origin.y
+    M.love.graphics.rectangle("line", x, y, box.width, box.height)
+  end
+
   for _, collideable, box, position in iter.collideable(components) do
     M.love.graphics.setColor(0, 0, 1, 0.3)
     local x, y = position.x - box.origin.x, position.y - box.origin.y

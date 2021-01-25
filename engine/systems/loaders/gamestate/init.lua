@@ -44,14 +44,20 @@ local function getMenuEntity()
   end
 end
 
-local function getCameraEntity()
+local function getCameraEntity()  
+  local cameraName, windowName
   for name, entityData in pairs(M.config.entities or {}) do
     for _, flag in ipairs(entityData.flags or {}) do
       if flag == "camera" then
-        return name
+        cameraName = name
+        break
+      elseif flag == "window" then
+        windowName = name
+        break
       end
     end
   end
+  return cameraName, windowName
 end
 
 local function buildEntity(name)
@@ -117,8 +123,9 @@ function M.reload(level, inMenu)
     inMenu = false
     buildDefaults()
   end
-  local cameraName = getCameraEntity()
+  local cameraName, windowName = getCameraEntity()
   if cameraName then buildEntity(cameraName) end
+  if windowName and not inMenu then buildEntity(windowName) end
   return components, inMenu
 end
 

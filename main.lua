@@ -96,7 +96,7 @@ function love.load()
     score = score + 1
   end)
   
-  engine.setCameraTarget("camera", "patato", function (t)
+  engine.setCameraTarget("patato", function (t)
     return t.position.x, t.position.y - t.collisionBox.height / 2
   end)
 end
