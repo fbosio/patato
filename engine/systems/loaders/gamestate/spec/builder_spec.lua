@@ -246,3 +246,21 @@ describe("loading a camera entity", function ()
   end)
 end)
 
+describe("loading a window entity", function ()
+  local windowId
+
+  before_each(function ()
+    local flags = {"window"}
+    
+    windowId = entityTagger.tag("window")
+    builder.flags(flags, windowId)
+  end)
+
+  it("should copy the component", function ()
+    assert.is.truthy(components.window[windowId])
+  end)
+
+  it("should create a position", function ()
+    assert.are.same({x = 0, y = 0}, components.position[windowId])
+  end)
+end)

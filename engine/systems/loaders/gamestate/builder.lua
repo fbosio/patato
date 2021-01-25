@@ -58,6 +58,11 @@ local flagStateBuilders = {
     component.setAttribute("position", entity, "x", 0)
     component.setAttribute("position", entity, "y", 0)
     component.matchCollisionBoxToScreen(entity)
+  end,
+  window = function (entity)
+    component.set("window", entity, true)
+    component.setAttribute("position", entity, "x", 0)
+    component.setAttribute("position", entity, "y", 0)
   end
 }
 for _, k in ipairs{"collector", "solid", "gravitational", "climber"} do

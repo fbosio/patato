@@ -9,6 +9,7 @@ local dependencyTree = {
   climber = {"collisionBox", "gravitational"},
   camera = "collisionBox",
   limiter = "collisionBox",
+  window = "collisionBox",
   gravitational = "velocity",
   velocity = "position",
   collisionBox = "position",
