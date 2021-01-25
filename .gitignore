@@ -2,3 +2,4 @@
 *.aseprite
 *.gpl
 tools/copyscript.sh
+tools/copyscript.bat
