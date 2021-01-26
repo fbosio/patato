@@ -123,29 +123,6 @@ function M.startGame(level)
     systems.reload(level, M.gameState.inMenu)
 end
 
-
---[[--
- Associate a callback to an option of a menu.
- @tparam string entity
-  The identifier of the menu, as defined in `config.lua`
- @tparam number index Number of option in the `options` table of the menu
-  that is defined in `config.lua`
- @tparam function callback What the option does when selected
- @usage
-  engine.setMenuOptionEffect("mainMenu", 2, function ()
-    print("Selected option 2!")
-  end)
-]]
-function M.setMenuOptionEffect(entity, index, callback)
-  M.gameState.menu = M.gameState.menu or {}
-  M.gameState.menu[entity] = M.gameState.menu[entity] or {}
-  M.gameState.menu[entity][index] = callback
-end
-
-function M.getMenuOptionEffect(entity, index)
-  return M.gameState.menu[entity][index] or function () end
-end
-
 --[[--
  Associate a callback to a collectable.
  @tparam string entity

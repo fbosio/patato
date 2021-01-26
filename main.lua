@@ -4,16 +4,18 @@ local elapsed, message, score
 love.run = engine.run
 
 function love.load()
-  engine.setMenuOptionEffect("mainMenu", 1, function ()
-    engine.startGame()  -- changeScene (call automatically if there is no menu)
-  end)
-  engine.setMenuOptionEffect("mainMenu", 2, function ()
-    elapsed = 0
-    message = "Hola, mundo"
-  end)
-  engine.setMenuOptionEffect("mainMenu", 3, function ()
-    engine.startGame("secretLevel")
-  end)
+  engine.gameState.menu.mainMenu = {
+    function ()
+      engine.startGame()
+    end,
+    function ()
+      elapsed = 0
+      message = "Hola, mundo"
+    end,
+    function ()
+      engine.startGame("secretLevel")
+    end
+  }
 
   engine.setCommand("patato", "left", function (t)
     t.velocity.x = -t.impulseSpeed.walk
@@ -88,7 +90,7 @@ function love.load()
     end
   end, "press")
   engine.setCommand("mainMenu", "start", function (t)
-    engine.getMenuOptionEffect("mainMenu", t.menu.selected)()
+    engine.gameState.menu.mainMenu[t.menu.selected]()
   end, "press")
   
   score = 0

@@ -18,13 +18,20 @@ after_each(function ()
 end)
 
 describe("loading an empty config", function ()
-  it("should create a garbage component table", function ()
-    local emptyConfig = {}
-    local loadedGameState = gamestate.load(loveMock, entityTagger, command,
-                                           emptyConfig)
+  local config, loadedGameState
+  
+  before_each(function ()
+    config = {}
+    loadedGameState = gamestate.load(loveMock, entityTagger, command, config)
     command.load(hid, loadedGameState.components)
-
+  end)
+  
+  it("should create a garbage component table", function ()
     assert.are.truthy(loadedGameState.components.garbage)
+  end)
+
+  it("should create an empty menu table", function ()
+    assert.are.same({}, loadedGameState.menu)
   end)
 end)
 
