@@ -94,12 +94,12 @@ function love.load()
   end, "press")
   
   score = 0
-  engine.setCollectableEffect("bottles", function ()
+  engine.gameState.collectableEffects.bottles = function ()
     score = score + 1
     local pitch = (love.math.random()*2 + 11) / 12
     engine.resources.sounds.sfx.collected:setPitch(pitch)
     engine.playSfx("collected")
-  end)
+  end
   
   engine.setCameraTarget("patato", function (t)
     return t.position.x, t.position.y - t.collisionBox.height / 2

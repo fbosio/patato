@@ -119,24 +119,9 @@ end
   end)
 ]]
 function M.startGame(level)
-  M.gameState.components, M.gameState.inMenu =
-    systems.reload(level, M.gameState.inMenu)
+  local components, inMenu = systems.reload(level, M.gameState.inMenu)
+  M.gameState.components, M.gameState.inMenu = components, inMenu
 end
-
---[[--
- Associate a callback to a collectable.
- @tparam string entity
-  The identifier of the collectable, as defined in `config.lua`
- @tparam function callback What the collectable does when collected
- @usage
-  engine.setCollectableEffect("healthPotion", function ()
-    health = health + 1  -- defined in outer scope
-  end)
-]]
-function M.setCollectableEffect(entity, callback)
-  M.gameState.collectableEffects[entity] = callback
-end
-
 
 --[=[--
   Set a command for an entity.
