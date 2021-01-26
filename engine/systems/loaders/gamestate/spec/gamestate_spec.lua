@@ -33,6 +33,10 @@ describe("loading an empty config", function ()
   it("should create an empty menu table", function ()
     assert.are.same({}, loadedGameState.menu)
   end)
+
+  it("should create an empty camera table", function ()
+    assert.are.same({}, loadedGameState.camera)
+  end)
 end)
 
 describe("loading an empty entities list", function ()

@@ -96,14 +96,16 @@ function love.load()
   score = 0
   engine.gameState.collectableEffects.bottles = function ()
     score = score + 1
-    local pitch = (love.math.random()*2 + 11) / 12
-    engine.resources.sounds.sfx.collected:setPitch(pitch)
-    engine.playSfx("collected")
+    local pitch = 1 + (2*love.math.random()-1) / 36
+    local sfx = engine.resources.sounds.sfx.collected
+    sfx:setPitch(pitch)
+    sfx:play()
   end
   
-  engine.setCameraTarget("patato", function (t)
+  engine.gameState.camera.target = "patato"
+  engine.gameState.camera.focusCallback = function (t)
     return t.position.x, t.position.y - t.collisionBox.height / 2
-  end)
+  end
 end
 
 function love.update(dt)

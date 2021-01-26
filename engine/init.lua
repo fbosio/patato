@@ -177,14 +177,4 @@ function M.setCommand(entity, input, callback, kind)
   command.set(entity, input, callback, kind)
 end
 
-function M.setCameraTarget(targetEntity, focusCallback)
-  M.gameState.camera = M.gameState.camera or {}
-  M.gameState.camera.target = targetEntity
-  M.gameState.camera.focusCallback = focusCallback
-end
-
-function M.playSfx(name)
-  M.resources.sounds.sfx[name]:play()
-end
-
 return M

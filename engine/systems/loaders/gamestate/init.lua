@@ -134,7 +134,7 @@ function M.load(love, entityTagger, command, config)
   M.entityTagger = entityTagger
   M.command = command
   M.config = config
-  local loaded = {menu = {}}
+  local loaded = {menu = {}, camera = {}}
   loaded.hid = hid.load(config)
   M.hid = loaded.hid
   loaded.components, loaded.inMenu = M.reload()
