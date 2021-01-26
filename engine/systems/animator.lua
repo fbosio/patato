@@ -5,10 +5,10 @@ function M.load(entityTagger)
   M.entityTagger = entityTagger
 end
 
-function M.update(dt, components, resources)
+function M.update(dt, components, entityResources)
   for entity, animation in iter.animation(components) do
     local entityName = M.entityTagger.getName(entity)
-    local resource = resources[entityName].animations[animation.name]
+    local resource = entityResources[entityName].animations[animation.name]
     animation.time = animation.time + dt
     local remainingTime = animation.time - resource.durations[animation.frame]
     if remainingTime >= 0 then

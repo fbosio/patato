@@ -221,4 +221,8 @@ function M.setCameraTarget(targetEntity, focusCallback)
   M.gameState.camera.focusCallback = focusCallback
 end
 
+function M.playSfx(name)
+  M.resources.sounds.sfx[name]:play()
+end
+
 return M

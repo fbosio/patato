@@ -38,11 +38,11 @@ local function getEntityNamesSortedByDepth(resources)
   return sorted
 end
 
-local function drawSprites(components, resources)
-  local sortedEntities = getEntityNamesSortedByDepth(resources)
+local function drawSprites(components, entityResources)
+  local sortedEntities = getEntityNamesSortedByDepth(entityResources)
   for _, entityNames in pairs(sortedEntities) do
     for _, entityName in ipairs(entityNames) do
-      local entityResources = resources[entityName]
+      local entityResources = entityResources[entityName]
       if entityResources then
         local entitySprites = entityResources.sprites
         local entityAnimations = entityResources.animations
@@ -129,11 +129,11 @@ local function drawDebugElements(components)
   drawMousePosition()
 end
 
-function M.draw(gameState, resources, release)
+function M.draw(gameState, entityResources, release)
   if gameState.inMenu then
     drawMenu(gameState.components)
   else
-    drawSprites(gameState.components, resources)
+    drawSprites(gameState.components, entityResources)
     if not release then
       drawDebugElements(gameState.components)
     end

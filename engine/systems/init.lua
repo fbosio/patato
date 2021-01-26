@@ -27,13 +27,13 @@ function M.update(dt, gameState, resources, physics)
   transporter.drag(dt, gameState.components, physics.gravity)
   messengers.update(dt, gameState)
   transporter.move(dt, gameState.components)
-  animator.update(dt, gameState.components, resources)
+  animator.update(dt, gameState.components, resources.entities)
   garbagecollector.update(gameState.components)
 end
 
 function M.draw(gameState, resources, release)
   messengers.draw(gameState)
-  renderer.draw(gameState, resources, release)
+  renderer.draw(gameState, resources.entities, release)
 end
 
 function M.keypressed(key, gameState)

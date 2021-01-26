@@ -13,10 +13,10 @@ after_each(function ()
 end)
 
 describe("updating an animation with several frames", function ()
-  local resources, playerId, components, dt
+  local entityResources, playerId, components, dt
 
   before_each(function ()
-    resources = {
+    entityResources = {
       player = {
         animations = {
           standing = {
@@ -40,7 +40,7 @@ describe("updating an animation with several frames", function ()
     }
     dt = 2
 
-    animator.update(dt, components, resources)
+    animator.update(dt, components, entityResources)
   end)
 
   it("should advance a frame", function ()
@@ -54,7 +54,7 @@ end)
 
 describe("playing a looping animation until its end", function ()
   it("should go back to its first frame", function ()
-    local resources = {
+    local entityResources = {
       player = {
         animations = {
           standing = {
@@ -78,7 +78,7 @@ describe("playing a looping animation until its end", function ()
     }
     local dt = 2
 
-    animator.update(dt, components, resources)
+    animator.update(dt, components, entityResources)
 
     assert.are.same(1, components.animation[playerId].frame)
   end)
@@ -86,7 +86,7 @@ end)
 
 describe("playing a nonlooping animation until its end", function ()
   it("should stop the animation", function ()
-    local resources = {
+    local entityResources = {
       player = {
         animations = {
           standing = {
@@ -110,7 +110,7 @@ describe("playing a nonlooping animation until its end", function ()
     }
     local dt = 2
 
-    animator.update(dt, components, resources)
+    animator.update(dt, components, entityResources)
 
     assert.are.same(3, components.animation[playerId].frame)
     assert.is.truthy(components.animation[playerId].ended)

@@ -1,6 +1,6 @@
 local M = {}
 
-local function buildSounds(configSounds)
+local function loadSounds(configSounds)
   local sounds
   for stem, name in pairs((configSounds or {}).sfx or {}) do
     sounds = sounds or {}
@@ -67,7 +67,7 @@ local function buildAnimations(entityAnimations)
   return animations
 end
 
-local function buildEntities(configEntities)
+local function loadEntities(configEntities)
   local entities
   for entityName, entityData in pairs(configEntities or {}) do
     entities = entities or {}
@@ -93,8 +93,8 @@ function M.load(love, config)
   M.love = love
 
   return {
-    sounds = buildSounds(config.sounds),
-    entities = buildEntities(config.entities)
+    sounds = loadSounds(config.sounds),
+    entities = loadEntities(config.entities)
   }
 end
 

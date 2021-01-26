@@ -94,6 +94,9 @@ function love.load()
   score = 0
   engine.setCollectableEffect("bottles", function ()
     score = score + 1
+    local pitch = (love.math.random()*2 + 11) / 12
+    engine.resources.sounds.sfx.collected:setPitch(pitch)
+    engine.playSfx("collected")
   end)
   
   engine.setCameraTarget("patato", function (t)
