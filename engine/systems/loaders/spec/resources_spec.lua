@@ -5,7 +5,10 @@ before_each(function ()
   local match = require "luassert.match"
   _ = match._
 
-  local love = {graphics = {}}
+  local love = {
+    graphics = {},
+    audio = {}
+  }
   function love.graphics.getWidth()
     return 800
   end
@@ -18,13 +21,27 @@ before_each(function ()
       setWrap = function () end
     }
   end
-  function love.graphics.newQuad()
+  function love.graphics.newQuad() end
+  function love.audio.newSource()
+    return true
   end
   loveMock = mock(love)
 end)
 
 after_each(function ()
   package.loaded["engine.systems.loaders.resources"] = nil
+end)
+
+describe("loading an entity with no resources", function ()
+  it("should not copy its resources", function ()
+    local config = {
+      entities = {player = {}}
+    }
+
+    local loadedResources = resources.load(loveMock, config)
+
+    assert.is.falsy(loadedResources.entities.player)
+  end)
 end)
 
 describe("loading an entity with a path as a sprite image", function ()
@@ -52,11 +69,11 @@ describe("loading an entity with a path as a sprite image", function ()
   end)
 
   it("should load a default sprite scale", function ()
-    assert.are.same(1, loadedResources.player.sprites.scale)
+    assert.are.same(1, loadedResources.entities.player.sprites.scale)
   end)
 
   it("should load a default sprite depth", function ()
-    assert.are.same(1, loadedResources.player.sprites.depth)
+    assert.are.same(1, loadedResources.entities.player.sprites.depth)
   end)
 end)
 
@@ -90,10 +107,10 @@ describe("loading an entity with an image and some quads", function ()
   end)
 
   it("should create the sprites with their defined origins", function ()
-    local playerSpriteOrigins = loadedResources.player.sprites.origins
-    assert.are.same({x = 16, y = 32}, playerSpriteOrigins[1])
-    assert.are.same({x = 0, y = 0}, playerSpriteOrigins[2])
-    assert.are.same({x = 16, y = 16}, playerSpriteOrigins[3])
+    local playerOrigins = loadedResources.entities.player.sprites.origins
+    assert.are.same({x = 16, y = 32}, playerOrigins[1])
+    assert.are.same({x = 0, y = 0}, playerOrigins[2])
+    assert.are.same({x = 16, y = 16}, playerOrigins[3])
   end)
 end)
 
@@ -168,7 +185,7 @@ describe("loading an entity with an image and depth", function ()
     
     local loadedResources = resources.load(loveMock, config)
 
-    assert.are.same(0, loadedResources.player.sprites.depth)
+    assert.are.same(0, loadedResources.entities.player.sprites.depth)
   end)
 end)
 
@@ -217,7 +234,7 @@ describe("loading sprites and an entity with animations", function ()
   end)
 
   it ("should create an animations table for that entity", function ()
-    local animations = loadedResources.player.animations
+    local animations = loadedResources.entities.player.animations
     local standingAnimation = animations.standing
     assert.are.same({1}, standingAnimation.frames)
     assert.are.same({1}, standingAnimation.durations)
@@ -266,8 +283,8 @@ describe("loading entities with animations with the same name", function ()
 
     local loadedResources = resources.load(loveMock, config)
 
-    assert.is.truthy(loadedResources.coin.animations.idle)
-    assert.is.truthy(loadedResources.bottle.animations.idle)
+    assert.is.truthy(loadedResources.entities.coin.animations.idle)
+    assert.is.truthy(loadedResources.entities.bottle.animations.idle)
   end)
 end)
 
@@ -288,6 +305,40 @@ describe("loading config with sprite scale", function ()
 
     local loadedResources = resources.load(loveMock, config)
 
-    assert.are.same(0.5, loadedResources.player.sprites.scale)
+    assert.are.same(0.5, loadedResources.entities.player.sprites.scale)
+  end)
+end)
+
+describe("loading config with no sounds", function ()
+  it("should not create a sounds table", function ()
+    local config = {}
+
+    local loadedResources = resources.load(loveMock, config)
+
+    assert.is.falsy(loadedResources.sounds)
+  end)
+end)
+
+describe("loading config with a sound", function ()
+  local loadedResources
+
+  before_each(function ()
+    local config = {
+      sounds = {
+        sfx = {
+          gunshot = "path/to/sound.ogg"
+        }
+      }
+    }
+
+    loadedResources = resources.load(loveMock, config)
+  end)
+
+  it("should create a source for it", function ()
+    assert.stub(loveMock.audio.newSource).was.called()
+  end)
+
+  it("should store the created source in resources table", function ()
+    assert.is.truthy(loadedResources.sounds.sfx.gunshot)
   end)
 end)

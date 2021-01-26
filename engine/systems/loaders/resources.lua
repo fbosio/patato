@@ -1,5 +1,15 @@
 local M = {}
 
+local function buildSounds(configSounds)
+  local sounds
+  for stem, name in pairs((configSounds or {}).sfx or {}) do
+    sounds = sounds or {}
+    sounds.sfx = sounds.sfx or {}
+    sounds.sfx[stem] = M.love.audio.newSource(name, "static")
+  end
+  return sounds
+end
+
 local function buildSprites(entitySprites)
   local sprites = {
     image = M.love.graphics.newImage(entitySprites.image),
@@ -57,28 +67,35 @@ local function buildAnimations(entityAnimations)
   return animations
 end
 
-function M.load(love, config)
-  M.love = love
-
-  local loaded = {}
-
-  for entityName, entityData in pairs(config.entities) do
+local function buildEntities(configEntities)
+  local entities
+  for entityName, entityData in pairs(configEntities or {}) do
+    entities = entities or {}
     local entityResources = entityData.resources or {}
-    if entityResources.sprites then
+    local sprites = entityResources.sprites
+    local animations = entityResources.animations
+    local loadedEntity = {}
+    if sprites then
       assert(entityResources.sprites.image,
              "Entity " .. entityName .. " has resources but no image declared"
              .. " in config.lua")
-      loaded[entityName] = loaded[entityName] or {}
-      loaded[entityName].sprites = buildSprites(entityResources.sprites)
+      loadedEntity.sprites = buildSprites(entityResources.sprites)
     end
-    if entityResources.animations then
-      loaded[entityName] = loaded[entityName] or {}
-      loaded[entityName].animations =
-        buildAnimations(entityResources.animations)
+    if animations then
+      loadedEntity.animations = buildAnimations(entityResources.animations)
     end
+    entities[entityName] = (sprites or animations) and loadedEntity
   end
+  return entities
+end
 
-  return loaded
+function M.load(love, config)
+  M.love = love
+
+  return {
+    sounds = buildSounds(config.sounds),
+    entities = buildEntities(config.entities)
+  }
 end
 
 return M

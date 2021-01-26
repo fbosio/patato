@@ -2,6 +2,8 @@ local resources = require "resources"
 
 local M = {}
 
+M.sounds = resources.sounds
+
 M.physics = {
   gravity = 5000
 }
