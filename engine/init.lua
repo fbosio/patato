@@ -5,9 +5,7 @@
  @module engine
 ]]
 
-local config
-pcall(function () config = require "config" end)
-
+local config = require "config"
 local entityTagger = require "engine.tagger"
 local systems = require "engine.systems"
 local command = require "engine.command"

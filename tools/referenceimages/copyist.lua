@@ -20,7 +20,7 @@ function M.write(data)
   end
   buffer[#buffer + 1] = "\nreturn M\n"
 
-  local file = assert(io.open("resources/levels.lua", "w"))
+  local file = assert(io.open("resources/metadata/levels.lua", "w"))
   file:write(table.concat(buffer, "\n"))
   file:close()
 end

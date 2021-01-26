@@ -80,7 +80,7 @@ do
       tagsMap[tag.name] = tagSpriteNumbers
       -- Add to the sprites buffer only data from unique frames
       if isNewFrameData then
-        sprBuffer[#sprBuffer+1] = "\t{"
+        sprBuffer[#sprBuffer+1] = "\t\t{"
           .. tostring(x) .. ", "
           .. tostring(y) .. ", "
           .. tostring(frameRectangle.width) .. ", "
@@ -118,15 +118,16 @@ for tagName, frameNumbers in pairs(tagsMap) do
 end
 
 -- Write output file
-local path, title = spr.filename:match("^(.+[/\\])(.-).([^.]*)$")
+local path, dir, title =
+  spr.filename:match("^(.+[/\\])(.+[/\\])(.-).([^.]*)$")
 do
-  local sprOutput = "{\n\t" .. table.concat(sprBuffer, ",\n") .. "\n\t}"
+  local sprOutput = "{\n" .. table.concat(sprBuffer, ",\n") .. "\n\t}"
   local animOutput = "{\n" .. table.concat(animBuffer, ",\n") .. "\n}"
   local output = "local M = {}\nM.sprites = {\n"
                  .. "\timage = \"resources/images/" .. title .. ".png\",\n"
                  .. "\tquads = " .. sprOutput .. "\n}\n"
                  .. "M.animations = " .. animOutput .. "\nreturn M\n"
-  local file = assert(io.open(path .. title .. ".lua", "w+"))
+  local file = assert(io.open(path .. "metadata/" .. title .. ".lua", "w+"))
   file:write(output)
   file:close()
 end
@@ -134,7 +135,7 @@ end
 app.command.ExportSpriteSheet{
   ui = false,
   type = SpriteSheetType.ROWS,
-  textureFilename = path .. "/" .. title .. ".png",
+  textureFilename = path .. dir .. title .. ".png",
   innerPadding = innerPadding,
   trim = true,
   splitTags = true,

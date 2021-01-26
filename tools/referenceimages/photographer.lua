@@ -58,7 +58,7 @@ function M.shoot(name, level, bounds)
       end
     end
   end
-  local file = assert(io.open("resources/" .. name .. ".png", "wb"))
+  local file = assert(io.open("resources/images/" .. name .. ".png", "wb"))
   file:write(data:encode("png"):getString())
   file:close()
 end

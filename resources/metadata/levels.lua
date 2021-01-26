@@ -2,7 +2,7 @@ local M = {}
 
 M.garden = {
   sprites = {
-    image = "resources/garden.png",
+    image = "resources/images/garden.png",
     quads = {
       {10, 135, 710, 735}
     },
@@ -14,7 +14,7 @@ M.garden = {
 }
 M.secretLevel = {
   sprites = {
-    image = "resources/secretLevel.png",
+    image = "resources/images/secretLevel.png",
     quads = {
       {-20, -540, 380, 60}
     },
