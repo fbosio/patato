@@ -14,7 +14,9 @@ function M.write(data)
                           .. "    depth = 2\n"
                           .. "  },\n"
                           .. "  animations = {\n"
-                          .. "    {1, 1}\n"
+                          .. "    {\n"
+                          .. "      {sprite = 1, duration = 1}\n"
+                          .. "    }\n"
                           .. "  }\n"
                           .. "}"
   end

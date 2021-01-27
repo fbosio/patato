@@ -10,6 +10,9 @@ function M.update(dt, components, entityResources)
     local entityName = M.entityTagger.getName(entity)
     local resource = entityResources[entityName].animations[animation.name]
     animation.time = animation.time + dt
+    for k, v in pairs(resource) do
+      print(k, v)
+    end
     local remainingTime = animation.time - resource[animation.frame].duration
     if remainingTime >= 0 then
       animation.time = remainingTime

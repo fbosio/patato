@@ -13,10 +13,26 @@ M.sprites = {
 	}
 }
 M.animations = {
-	walking = {2, 0.1, 3, 0.1, 4, 0.1, 3, 0.1, true},
-	standing = {1, 0.1, false},
-	climbingIdle = {6, 0.1, false},
-	climbingMove = {7, 0.1, 6, 0.1, 8, 0.1, 6, 0.1, true},
-	jumping = {5, 0.1, false}
+	climbingMove = {
+		{sprite = 7, duration = 0.1}, 
+		{sprite = 6, duration = 0.1}, 
+		{sprite = 8, duration = 0.1}, 
+		{sprite = 6, duration = 0.1}
+	},
+	standing = {
+		{sprite = 1, duration = 0.1}
+	},
+	walking = {
+		{sprite = 2, duration = 0.1}, 
+		{sprite = 3, duration = 0.1}, 
+		{sprite = 4, duration = 0.1}, 
+		{sprite = 3, duration = 0.1}
+	},
+	jumping = {
+		{sprite = 5, duration = 0.1}
+	},
+	climbingIdle = {
+		{sprite = 6, duration = 0.1}
+	}
 }
 return M

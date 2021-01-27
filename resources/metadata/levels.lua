@@ -9,7 +9,9 @@ M.garden = {
     depth = 2
   },
   animations = {
-    {1, 1}
+    {
+      {sprite = 1, duration = 1}
+    }
   }
 }
 M.secretLevel = {
@@ -21,7 +23,9 @@ M.secretLevel = {
     depth = 2
   },
   animations = {
-    {1, 1}
+    {
+      {sprite = 1, duration = 1}
+    }
   }
 }
 

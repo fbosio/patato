@@ -6,6 +6,8 @@ M.sprites = {
 	}
 }
 M.animations = {
-	idle = {1, 0.1, false}
+	idle = {
+		{sprite = 1, duration = 0.1}
+	}
 }
 return M

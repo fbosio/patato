@@ -102,19 +102,20 @@ local animBuffer = {}
 for tagName, frameNumbers in pairs(tagsMap) do
   local animDataBuffer = {}
   for _, frameNumber in ipairs(frameNumbers) do
-    animDataBuffer[#animDataBuffer+1] = frameNumber
-    animDataBuffer[#animDataBuffer+1] = spr.frames[frameNumber].duration
-  end
-  local suffixIndex = tagName:find("_loop")
-  local nameWithoutSuffix = tagName:sub(1, suffixIndex and suffixIndex - 1)
-  local looping = false
-  if nameWithoutSuffix ~= tagName then
-    tagName = nameWithoutSuffix
-    looping = true
+    --[[{
+      {sprite = 2, duration = 0.5},
+      {sprite = 3, duration = 0.5, sfx = "wilhelmScream"},
+      {sprite = 4, duration = 0.5},
+      {sprite = 3, duration = 0.5}
+    }]]
+    animDataBuffer[#animDataBuffer+1] = "\n\t\t{"
+      .. "sprite = " .. frameNumber .. ", "
+      .. "duration = " .. spr.frames[frameNumber].duration .. ""
+    .. "}"
   end
   animBuffer[#animBuffer+1] = "\t" .. tagName .. " = {"
-    .. table.concat(animDataBuffer, ", ") .. ", " .. tostring(looping)
-  .. "}"
+    .. table.concat(animDataBuffer, ", ")
+  .. "\n\t}"
 end
 
 -- Write output file
