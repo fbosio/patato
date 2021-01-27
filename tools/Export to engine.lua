@@ -38,6 +38,7 @@ do
       -- Check if the frame data was already added
       local isNewFrameData = false
       local uniqueSpriteNumber = spriteNumber
+      local frameSfx
       for _, layer in ipairs(spr.layers) do
         if layer ~= originLayer then
           local cel = layer:cel(frameNumber)
@@ -62,22 +63,26 @@ do
               uniqueCelsSprNumber[cel] = spriteNumber
               uniqueSpriteNumber = spriteNumber
             end
+            frameSfx = cel.data
           end
         end
       end
       -- Get sprite origin
-      local cel = originLayer:cel(frameNumber)
-      if not cel then
+      local originCel = originLayer:cel(frameNumber)
+      if not originCel then
         print("No cel in " .. tostring(frameNumber) .. "."
               .. " Using (0, 0) as origin.")
         origin.x, origin.y = 0, 0
       else
-        origin.x = cel.position.x - frameRectangle.x
-        origin.y = cel.position.y - frameRectangle.y
+        origin.x = originCel.position.x - frameRectangle.x
+        origin.y = originCel.position.y - frameRectangle.y
       end
-      local tagSpriteNumbers = tagsMap[tag.name] or {}
-      tagSpriteNumbers[#tagSpriteNumbers+1] = uniqueSpriteNumber
-      tagsMap[tag.name] = tagSpriteNumbers
+      local tagFrames = tagsMap[tag.name] or {}
+      tagFrames[#tagFrames+1] = {
+        spriteNumber = uniqueSpriteNumber,
+        sfx = frameSfx
+      }
+      tagsMap[tag.name] = tagFrames
       -- Add to the sprites buffer only data from unique frames
       if isNewFrameData then
         sprBuffer[#sprBuffer+1] = "\t\t{"
@@ -99,19 +104,18 @@ end
 
 -- Build animations buffer using tags map builded before
 local animBuffer = {}
-for tagName, frameNumbers in pairs(tagsMap) do
+for tagName, tagFrames in pairs(tagsMap) do
   local animDataBuffer = {}
-  for _, frameNumber in ipairs(frameNumbers) do
-    --[[{
-      {sprite = 2, duration = 0.5},
-      {sprite = 3, duration = 0.5, sfx = "wilhelmScream"},
-      {sprite = 4, duration = 0.5},
-      {sprite = 3, duration = 0.5}
-    }]]
-    animDataBuffer[#animDataBuffer+1] = "\n\t\t{"
+  for _, frameData in ipairs(tagFrames) do
+    local frameNumber = frameData.spriteNumber
+    local newAnimData = "\n\t\t{"
       .. "sprite = " .. frameNumber .. ", "
-      .. "duration = " .. spr.frames[frameNumber].duration .. ""
-    .. "}"
+      .. "duration = " .. spr.frames[frameNumber].duration
+    if frameData.sfx ~= "" then
+      newAnimData = newAnimData .. ', sfx = "' .. frameData.sfx .. '"'
+    end
+    newAnimData = newAnimData .. "}"
+    animDataBuffer[#animDataBuffer+1] = newAnimData
   end
   animBuffer[#animBuffer+1] = "\t" .. tagName .. " = {"
     .. table.concat(animDataBuffer, ", ")

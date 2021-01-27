@@ -13,26 +13,26 @@ M.sprites = {
 	}
 }
 M.animations = {
-	climbingMove = {
-		{sprite = 7, duration = 0.1}, 
-		{sprite = 6, duration = 0.1}, 
-		{sprite = 8, duration = 0.1}, 
-		{sprite = 6, duration = 0.1}
-	},
 	standing = {
 		{sprite = 1, duration = 0.1}
-	},
-	walking = {
-		{sprite = 2, duration = 0.1}, 
-		{sprite = 3, duration = 0.1, sfx = "footstep"}, 
-		{sprite = 4, duration = 0.1}, 
-		{sprite = 3, duration = 0.1, sfx = "footstep"}
 	},
 	jumping = {
 		{sprite = 5, duration = 0.1}
 	},
 	climbingIdle = {
 		{sprite = 6, duration = 0.1}
+	},
+	climbingMove = {
+		{sprite = 7, duration = 0.1}, 
+		{sprite = 6, duration = 0.1}, 
+		{sprite = 8, duration = 0.1}, 
+		{sprite = 6, duration = 0.1}
+	},
+	walking = {
+		{sprite = 2, duration = 0.1}, 
+		{sprite = 3, duration = 0.1, sfx = "footstep"}, 
+		{sprite = 4, duration = 0.1}, 
+		{sprite = 3, duration = 0.1, sfx = "footstep"}
 	}
 }
 return M
