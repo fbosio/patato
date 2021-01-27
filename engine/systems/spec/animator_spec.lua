@@ -1,10 +1,23 @@
-local animator, entityTagger
+local animator, entityTagger, entityResources, playerId, dt
 
 before_each(function ()
   animator = require "engine.systems.animator"
   entityTagger = require "engine.tagger"
 
   animator.load(entityTagger)
+  entityResources = {
+    player = {
+      animations = {
+        standing = {
+          {sprite = 1, duration = 5},
+          {sprite = 2, duration = 8},
+          {sprite = 3, duration = 10}
+        }
+      }
+    }
+  }
+  playerId = entityTagger.tag("player")
+  dt = 2
 end)
 
 after_each(function ()
@@ -13,32 +26,18 @@ after_each(function ()
 end)
 
 describe("updating an animation with several frames", function ()
-  local entityResources, playerId, components, dt
+  local components
 
   before_each(function ()
-    entityResources = {
-      player = {
-        animations = {
-          standing = {
-            frames = {1, 2, 3},
-            durations = {5, 8, 10},
-            looping = false
-          }
-        }
-      }
-    }
-    playerId = entityTagger.tag("player")
     components = {
       animation = {
         [playerId] = {
           name = "standing",
           frame = 1,
-          time = 4,
-          ended = false
+          time = 4
         }
       }
     }
-    dt = 2
 
     animator.update(dt, components, entityResources)
   end)
@@ -52,67 +51,20 @@ describe("updating an animation with several frames", function ()
   end)
 end)
 
-describe("playing a looping animation until its end", function ()
+describe("playing an animation until its end", function ()
   it("should go back to its first frame", function ()
-    local entityResources = {
-      player = {
-        animations = {
-          standing = {
-            frames = {1, 2, 3},
-            durations = {5, 8, 10},
-            looping = true
-          }
-        }
-      }
-    }
-    local playerId = entityTagger.tag("player")
     local components = {
       animation = {
         [playerId] = {
           name = "standing",
           frame = 3,
-          time = 8,
-          ended = false
+          time = 8
         }
       }
     }
-    local dt = 2
 
     animator.update(dt, components, entityResources)
 
     assert.are.same(1, components.animation[playerId].frame)
-  end)
-end)
-
-describe("playing a nonlooping animation until its end", function ()
-  it("should stop the animation", function ()
-    local entityResources = {
-      player = {
-        animations = {
-          standing = {
-            frames = {1, 2, 3},
-            durations = {5, 8, 10},
-            looping = false
-          }
-        }
-      }
-    }
-    local playerId = entityTagger.tag("player")
-    local components = {
-      animation = {
-        [playerId] = {
-          name = "standing",
-          frame = 3,
-          time = 8,
-          ended = false
-        }
-      }
-    }
-    local dt = 2
-
-    animator.update(dt, components, entityResources)
-
-    assert.are.same(3, components.animation[playerId].frame)
-    assert.is.truthy(components.animation[playerId].ended)
   end)
 end)

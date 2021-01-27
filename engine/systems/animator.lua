@@ -10,15 +10,11 @@ function M.update(dt, components, entityResources)
     local entityName = M.entityTagger.getName(entity)
     local resource = entityResources[entityName].animations[animation.name]
     animation.time = animation.time + dt
-    local remainingTime = animation.time - resource.durations[animation.frame]
+    local remainingTime = animation.time - resource[animation.frame].duration
     if remainingTime >= 0 then
       animation.time = remainingTime
-      if animation.frame == #resource.frames then
-        if resource.looping then
-          animation.frame = 1
-        else
-          animation.ended = true
-        end
+      if animation.frame == #resource then
+        animation.frame = 1
       else
         animation.frame = animation.frame + 1
       end

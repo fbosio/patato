@@ -45,22 +45,9 @@ end
 local function buildAnimations(entityAnimations)
   local animations = {}
   for name, entityAnimation in pairs(entityAnimations) do
-    local animation = {
-      frames = {},
-      durations = {},
-      looping = false
-    }
-    for j, v in ipairs(entityAnimation) do
-      if type(v) == "boolean" then
-        animation.looping = v
-        break
-      end
-      local i = math.ceil(j/2)
-      if j % 2 == 0 then
-        animation.durations[i] = v
-      else
-        animation.frames[i] = v
-      end
+    local animation = {}
+    for k, v in ipairs(entityAnimation) do
+      animation[k] = v
     end
     animations[name] = animation
   end

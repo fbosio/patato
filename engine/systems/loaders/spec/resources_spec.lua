@@ -206,10 +206,10 @@ describe("loading an entity with sprites table and no image", function ()
 end)
 
 describe("loading sprites and an entity with animations", function ()
-  local loadedResources
+  local loadedResources, config
 
   before_each(function ()
-    local config = {
+    config = {
       entities = {
         player = {
           resources = {
@@ -222,8 +222,15 @@ describe("loading sprites and an entity with animations", function ()
               },
             },
             animations = {
-              standing = {1, 1},
-              walking = {2, 0.5, 3, 0.5, 4, 0.5, 3, 0.5, true}
+              standing = {
+                {sprite = 1, duration = 1}
+              },
+              walking = {
+                {sprite = 2, duration = 0.5},
+                {sprite = 3, duration = 0.5},
+                {sprite = 4, duration = 0.5},
+                {sprite = 3, duration = 0.5}
+              }
             }
           }
         }
@@ -235,15 +242,9 @@ describe("loading sprites and an entity with animations", function ()
 
   it ("should create an animations table for that entity", function ()
     local animations = loadedResources.entities.player.animations
-    local standingAnimation = animations.standing
-    assert.are.same({1}, standingAnimation.frames)
-    assert.are.same({1}, standingAnimation.durations)
-    assert.is.falsy(standingAnimation.looping)
-
-    local walkingAnimation = animations.walking
-    assert.are.same({2, 3, 4, 3}, walkingAnimation.frames)
-    assert.are.same({0.5, 0.5, 0.5, 0.5}, walkingAnimation.durations)
-    assert.is.truthy(walkingAnimation.looping)
+    assert.are.same(config.entities.player.resources.animations, animations)
+    assert.are_not.equal(config.entities.player.resources.animations,
+                         animations)
   end)
 end)
 
@@ -261,7 +262,9 @@ describe("loading entities with animations with the same name", function ()
               }
             },
             animations = {
-              idle = {1, 1}
+              idle = {
+                {sprite = 1, duration = 1}
+              }
             }
           }
         },
@@ -274,7 +277,9 @@ describe("loading entities with animations with the same name", function ()
               }
             },
             animations = {
-              idle = {1, 1}
+              idle = {
+                {sprite = 1, duration = 1}
+              }
             }
           }
         }
