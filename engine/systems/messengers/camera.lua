@@ -36,7 +36,7 @@ function M.update(components, cameraData)
 
   targetEntity = snapToWindow(components, targetEntity)
   local entityComponents = buildArguments(targetEntity, components)
-  local x, y = cameraData.focusCallback(entityComponents)
+  local x, y = cameraData.focus(entityComponents)
   local cameraTB = getTranslatedBox(cameraPos, cameraBox)
   translate.horizontalCenter(cameraTB, x)
   translate.verticalCenter(cameraTB, y)

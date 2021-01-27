@@ -37,7 +37,7 @@ describe("with a camera, its target", function ()
     }
     cameraData = {
       target = "player",
-      focusCallback = function (t)
+      focus = function (t)
         return t.position.x, t.position.y
       end
     }

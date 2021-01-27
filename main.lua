@@ -36,10 +36,9 @@ function love.load()
   engine.setCommand("patato", "jump", function (t)
     if t.climber.climbing then
       t.climber.climbing = false
-      t.velocity.y = -t.impulseSpeed.jump
       t.gravitational.enabled = true
-      t.animation.name = "jumping"
-    elseif t.velocity.y == 0 then
+    end
+    if t.climber.climbing or t.velocity.y == 0 then
       t.animation.name = "jumping"
       t.velocity.y = -t.impulseSpeed.jump
     end
@@ -103,12 +102,12 @@ function love.load()
   end
   
   engine.gameState.camera.target = "patato"
-  engine.gameState.camera.focusCallback = function (t)
+  engine.gameState.camera.focus = function (t)
     return t.position.x, t.position.y - t.collisionBox.height / 2
   end
 end
 
-function love.update(dt)
+function love.update(dt)  
   if elapsed then
     elapsed = elapsed + dt
     if elapsed > 1 then
