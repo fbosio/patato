@@ -39,16 +39,46 @@ describe("loading an empty config", function ()
   it("should map the joystick START button", function ()
     assert.are.same(10, loadedHid.joystick.buttons.start)
   end)
+
+  it("should create a command for each input", function ()
+    assert.are.same({
+      hold = {
+        left = false,
+        right = false,
+        up = false,
+        down = false,
+        start = false
+      },
+      press = {
+        left = false,
+        right = false,
+        up = false,
+        down = false,
+        start = false
+      },
+      release = {
+        left = false,
+        right = false,
+        up = false,
+        down = false,
+        start = false
+      }
+    }, loadedHid.commands)
+  end)
 end)
 
 describe("loading an empty keys structure", function ()
-  it("should load default movement and start keys", function ()
-    local config = {
+  local config, loadedHid
+  
+  before_each(function ()
+    config = {
       inputs = {keyboard = {}}
     }
-
-    local loadedHid = hid.load(config)
-
+  
+    loadedHid = hid.load(config)
+  end)
+  
+  it("should load default movement and start keys", function ()
     assert.are.same({
       left = "a",
       up = "w",
@@ -56,6 +86,32 @@ describe("loading an empty keys structure", function ()
       right = "d",
       start = "return"
     }, loadedHid.keys)
+  end)
+
+  it("should create a command for each input", function ()
+    assert.are.same({
+      hold = {
+        left = false,
+        right = false,
+        up = false,
+        down = false,
+        start = false
+      },
+      press = {
+        left = false,
+        right = false,
+        up = false,
+        down = false,
+        start = false
+      },
+      release = {
+        left = false,
+        right = false,
+        up = false,
+        down = false,
+        start = false
+      }
+    }, loadedHid.commands)
   end)
 end)
 
@@ -105,7 +161,9 @@ describe("loading some movement keys", function ()
 end)
 
 describe("loading some keys that are not for movement", function ()
-  it("should copy the defined keys", function ()
+  local loadedHid
+  
+  before_each(function ()
     local config = {
       inputs = {
         keyboard = {
@@ -114,11 +172,22 @@ describe("loading some keys that are not for movement", function ()
         }
       }
     }
+  
+    loadedHid = hid.load(config)
+  end)
 
-    local loadedHid = hid.load(config)
-
+  it("should copy the defined keys", function ()
     assert.are.same("j", loadedHid.keys["super cool action 1"])
     assert.are.same("k", loadedHid.keys["super cool action 2"])
+  end)
+
+  it("should create commands for these keys", function ()
+    assert.are.same(false, loadedHid.commands.press["super cool action 1"])
+    assert.are.same(false, loadedHid.commands.hold["super cool action 1"])
+    assert.are.same(false, loadedHid.commands.release["super cool action 1"])
+    assert.are.same(false, loadedHid.commands.press["super cool action 2"])
+    assert.are.same(false, loadedHid.commands.hold["super cool action 2"])
+    assert.are.same(false, loadedHid.commands.release["super cool action 2"])
   end)
 end)
 
@@ -142,7 +211,7 @@ describe("loading an empty joystick structure", function ()
   end)
 end)
 
-describe("loading some buttons", function ()
+describe("loading some buttons", function () 
   it("should fill lacking button with default value", function ()
     local config = {
       inputs = {

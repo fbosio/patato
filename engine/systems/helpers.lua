@@ -1,6 +1,6 @@
 local M = {}
 
-function  M.buildArguments(entity, components)
+function M.buildArguments(entity, components)
   local entityComponents = {}
   for componentName, component in pairs(components) do
     for k, v in pairs(component) do
@@ -27,9 +27,12 @@ function  M.buildArguments(entity, components)
     entityComponents.animation = entityComponents.animation or {}
   end
   return setmetatable(entityComponents, {
-    __index = function (_, attr)
-      error("Unexpected component \"" .. attr .. "\".", 2)
-    end
+    __index = function (_, component) return setmetatable({}, {
+      __index = function (_, attribute)
+        error('Unexpected attribute "' .. attribute .. '" in component "'
+              .. component .. '".', 2)
+      end
+    }) end
   })
 end
 

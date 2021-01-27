@@ -16,81 +16,6 @@ function love.load()
       engine.startGame("secretLevel")
     end
   }
-
-  engine.setCommand("patato", "left", function (t)
-    t.velocity.x = -t.impulseSpeed.walk
-    t.animation.name = "walking"
-  end, "hold")
-  engine.setCommand("patato", "right", function (t)
-    t.velocity.x = t.impulseSpeed.walk
-    t.animation.name = "walking"
-  end, "hold")
-  engine.setCommand("patato", "left", function (t)
-    t.velocity.x = 0
-    t.animation.name = "standing"
-  end, "release")
-  engine.setCommand("patato", "right", function (t)
-    t.velocity.x = 0
-    t.animation.name = "standing"
-  end, "release")
-  engine.setCommand("patato", "jump", function (t)
-    if t.climber.climbing then
-      t.climber.climbing = false
-      t.gravitational.enabled = true
-    end
-    if t.climber.climbing or t.velocity.y == 0 then
-      t.animation.name = "jumping"
-      t.velocity.y = -t.impulseSpeed.jump
-    end
-  end, "press")
-  engine.setCommand("patato", "up", function (t)
-    t.climber.climbing = true
-    t.animation.name = "climbingIdle"
-  end, "press")
-  engine.setCommand("patato", "down", function (t)
-    t.climber.climbing = true
-    t.animation.name = "climbingIdle"
-  end, "press")
-  engine.setCommand("patato", "up", function (t)
-    if t.climber.climbing and t.climber.trellis then
-      t.velocity.y = -t.impulseSpeed.climb
-      t.animation.name = "climbingMove"
-    end
-  end, "hold")
-  engine.setCommand("patato", "down", function (t)
-    if t.climber.climbing and t.climber.trellis then
-      t.velocity.y = t.impulseSpeed.climb
-      t.animation.name = "climbingMove"
-    end
-  end, "hold")
-  engine.setCommand("patato", "up", function (t)
-    if t.climber.climbing then
-      t.velocity.y = 0
-      t.animation.name = "climbingIdle"
-    end
-  end, "release")
-  engine.setCommand("patato", "down", function (t)
-    if t.climber.climbing then
-      t.velocity.y = 0
-      t.animation.name = "climbingIdle"
-    end
-  end, "release")
-
-  engine.setCommand("mainMenu", "up", function (t)
-    t.menu.selected = t.menu.selected - 1
-    if t.menu.selected == 0 then
-      t.menu.selected = #t.menu.options
-    end
-  end, "press")
-  engine.setCommand("mainMenu", "down", function (t)
-    t.menu.selected = t.menu.selected + 1
-    if t.menu.selected == #t.menu.options + 1 then
-      t.menu.selected = 1
-    end
-  end, "press")
-  engine.setCommand("mainMenu", "start", function (t)
-    engine.gameState.menu.mainMenu[t.menu.selected]()
-  end, "press")
   
   score = 0
   engine.gameState.collectableEffects.bottles = function ()
@@ -107,7 +32,67 @@ function love.load()
   end
 end
 
-function love.update(dt)  
+function love.update(dt)
+  local commands = engine.gameState.hid.commands
+
+  if engine.gameState.inMenu then
+    local menu = engine.getComponents("mainMenu").menu
+    if commands.press.up then
+      menu.selected = menu.selected - 1
+      if menu.selected == 0 then
+        menu.selected = #menu.options
+      end
+    end
+    if commands.press.down then
+      menu.selected = menu.selected + 1
+      if menu.selected == #menu.options + 1 then
+        menu.selected = 1
+      end
+    end
+    if commands.press.start then
+      engine.gameState.menu.mainMenu[menu.selected]()
+    end
+  else
+    local patato = engine.getComponents("patato")
+    if commands.hold.left and not commands.hold.right then
+      patato.velocity.x = -patato.impulseSpeed.walk
+      patato.animation.name = "walking"
+    elseif commands.hold.right and not commands.hold.left then
+      patato.velocity.x = patato.impulseSpeed.walk
+      patato.animation.name = "walking"
+    else
+      patato.velocity.x = 0
+      patato.animation.name = "standing"
+    end
+    if commands.press.jump then
+      if patato.climber.climbing then
+        patato.climber.climbing = false
+        patato.gravitational.enabled = true
+      end
+      if patato.climber.climbing or patato.velocity.y == 0 then
+        patato.animation.name = "jumping"
+        patato.velocity.y = -patato.impulseSpeed.jump
+      end
+    end
+    if (commands.press.up or commands.press.down)
+        and not patato.climber.climbing then
+      patato.climber.climbing = true
+      patato.animation.name = "climbingIdle"
+    end
+    if patato.climber.climbing and patato.climber.trellis then
+      if commands.hold.up and not commands.hold.down then
+        patato.velocity.y = -patato.impulseSpeed.climb
+        patato.animation.name = "climbingMove"
+      elseif commands.hold.down and not commands.hold.up then
+        patato.velocity.y = patato.impulseSpeed.climb
+        patato.animation.name = "climbingMove"
+      else
+        patato.velocity.y = 0
+        patato.animation.name = "climbingIdle"
+      end
+    end
+  end
+  
   if elapsed then
     elapsed = elapsed + dt
     if elapsed > 1 then

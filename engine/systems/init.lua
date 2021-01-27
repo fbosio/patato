@@ -23,7 +23,7 @@ function M.reload(level, inMenu)
 end
 
 function M.update(dt, gameState, resources, physics)
-  controller.update(gameState.hid, gameState.components)
+  controller.update(gameState.hid)
   transporter.drag(dt, gameState.components, physics.gravity)
   messengers.update(dt, gameState)
   transporter.move(dt, gameState.components)
@@ -37,26 +37,23 @@ function M.draw(gameState, resources, release)
 end
 
 function M.keypressed(key, gameState)
-  controller.keypressed(key, gameState.hid, gameState.components)
+  controller.keypressed(key, gameState.hid)
 end
 
 function M.keyreleased(key, gameState)
-  controller.keyreleased(key, gameState.hid, gameState.components)
+  controller.keyreleased(key, gameState.hid)
 end
 
 function M.joystickpressed(joystick, button, gameState)
-  controller.joystickpressed(joystick, button, gameState.hid, 
-                             gameState.components)
+  controller.joystickpressed(joystick, button, gameState.hid)
 end
 
 function M.joystickreleased(joystick, button, gameState)
-  controller.joystickreleased(joystick, button, gameState.hid, 
-                              gameState.components)
+  controller.joystickreleased(joystick, button, gameState.hid)
 end
 
 function M.joystickhat(joystick, hat, direction, gameState)
-  controller.joystickhat(joystick, hat, direction, gameState.hid, 
-                         gameState.components)
+  controller.joystickhat(joystick, hat, direction, gameState.hid)
 end
 
 function M.joystickadded(joystick, gameState)

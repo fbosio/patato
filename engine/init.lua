@@ -8,6 +8,7 @@
 local config = require "config"
 local entityTagger = require "engine.tagger"
 local systems = require "engine.systems"
+local helpers = require "engine.systems.helpers"
 local command = require "engine.command"
 local handlers = require "engine.handlers"
 
@@ -77,8 +78,8 @@ function M.run()
   
     if love.timer then dt = love.timer.step() end
   
-    update(dt)
     if love.update then love.update(dt) end
+    update(dt)
   
     if love.graphics and love.graphics.isActive() then
       love.graphics.origin()
@@ -175,6 +176,11 @@ end
 ]=]
 function M.setCommand(entity, input, callback, kind)
   command.set(entity, input, callback, kind)
+end
+
+function M.getComponents(entity)
+  local id = entityTagger.getId(entity)
+  return helpers.buildArguments(id, M.gameState.components)
 end
 
 return M

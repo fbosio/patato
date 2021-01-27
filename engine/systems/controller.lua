@@ -1,59 +1,50 @@
-local helpers = require "engine.systems.helpers"
 local M = {}
-local buildArguments = helpers.buildArguments
 
 function M.load(love, entityTagger)
   M.love = love
   M.entityTagger = entityTagger
 end
 
-function M.update(hid, components)
-  for entityName, entityCommands in pairs(hid.commands.hold or {}) do
-    for input, callback in pairs(entityCommands) do
-      local physicalKey = hid.keys[input]
-      local physicalHat = hid.joystick.hats[input]
-      local physicalButton = hid.joystick.buttons[input]
-      local isHatDown, isButtonDown
-      if hid.joystick.current then
-        local current = hid.joystick.current
-        isHatDown = physicalHat == current:getHat()
-        isButtonDown = current:isDown(physicalButton)
+function M.update(hid)
+  for name, physicalKey in pairs(hid.keys) do
+    if M.love.keyboard.isDown(physicalKey) then
+      hid.commands.press[name] = false
+      hid.commands.hold[name] = true
+    end
+  end
+
+  if hid.joystick.current then
+    for name, physicalHat in pairs(hid.joystick.hats) do
+      if hid.joystick.current:getHat() == physicalHat then
+        hid.commands.press[name] = false
+        hid.commands.hold[name] = true
       end
-      if M.love.keyboard.isDown(physicalKey) or isHatDown or isButtonDown then
-        local entities = M.entityTagger.getIds(entityName)
-        for _, entity in ipairs(entities) do
-          local controllables = components.controllable or {}
-          local controllableEntity = (controllables[entity] or {}).hold or {}
-          controllableEntity[input] = true
-          local entityComponents = buildArguments(entity, components)
-          callback(entityComponents)
-        end
+    end
+    for name, physicalButton in pairs(hid.joystick.buttons) do
+      if hid.joystick.current:isDown(physicalButton) then
+        hid.commands.press[name] = false
+        hid.commands.hold[name] = true
       end
     end
   end
 end
 
-local function checkEvent(input, kind, hidInputs, commands, components)
-  for entityName, entityCommands in pairs(commands[kind] or {}) do
-    for commandInput, callback in pairs(entityCommands) do
-      local physicalInput = hidInputs[commandInput]
-      local entities = M.entityTagger.getIds(entityName)
-      if physicalInput == input then
-        for _, entity in ipairs(entities) do
-          local entityComponents = buildArguments(entity, components)
-          callback(entityComponents)
-        end
+local function checkEvent(input, hidInputs, commandKind, commands)
+  for name, physicalInput in pairs(hidInputs) do
+    if input == physicalInput then
+      for kind, _ in pairs(commands) do
+        commands[kind][name] = commandKind == kind
       end
     end
   end
 end
 
-function M.keypressed(key, hid, components)
-  checkEvent(key, "press", hid.keys, hid.commands, components)
+function M.keypressed(key, hid)
+  checkEvent(key, hid.keys, "press", hid.commands)
 end
 
-function M.keyreleased(key, hid, components)
-  checkEvent(key, "release", hid.keys, hid.commands, components)
+function M.keyreleased(key, hid)
+  checkEvent(key, hid.keys, "release", hid.commands)
 end
 
 function M.joystickadded(joystick, hid)
@@ -65,40 +56,31 @@ function M.joystickremoved(joystick, hid)
                          or hid.joystick.current
 end
 
-function M.joystickhat(joystick, hat, direction, hid, components)
+function M.joystickhat(joystick, hat, direction, hid)
   if joystick == hid.joystick.current and hat == 1 then
     if direction == "c" then
-      for entityName, entityCommands in pairs(hid.commands.release or {}) do
-        for input, callback in pairs(entityCommands) do
-          local entities = M.entityTagger.getIds(entityName)
-          for _, entity in ipairs(entities) do
-            local controllables = components.controllable or {}
-            local controllableEntity = (controllables[entity] or {}).hold or {}
-            if controllableEntity[input] then
-              controllableEntity[input] = false
-              local entityComponents = buildArguments(entity, components)
-              callback(entityComponents)
-            end
-          end
+      for name, _ in pairs(hid.joystick.hats) do
+        if hid.commands.hold[name] or hid.commands.press[name] then
+          hid.commands.press[name] = false
+          hid.commands.hold[name] = false
+          hid.commands.release[name] = true
         end
       end
     else
-      checkEvent(nil, "press", {}, hid.commands, components)
+      checkEvent(direction, hid.joystick.hats, "press", hid.commands)
     end
   end
 end
 
-function M.joystickpressed(joystick, button, hid, components)
+function M.joystickpressed(joystick, button, hid)
   if joystick == hid.joystick.current then
-    checkEvent(button, "press", hid.joystick.buttons, hid.commands,
-               components)
+    checkEvent(button, hid.joystick.buttons, "press", hid.commands)
   end
 end
 
-function M.joystickreleased(joystick, button, hid, components)
+function M.joystickreleased(joystick, button, hid)
   if joystick == hid.joystick.current then
-    checkEvent(button, "release", hid.joystick.buttons, hid.commands,
-               components)
+    checkEvent(button, hid.joystick.buttons, "release", hid.commands)
   end
 end
 

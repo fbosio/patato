@@ -1,7 +1,9 @@
 local M = {}
 
 function M.load(config)
-  local loaded = {}
+  local loaded = {
+    commands = {press = {}, hold = {}, release = {}}
+  }
 
   local defaults = {
     keys = {
@@ -34,7 +36,15 @@ function M.load(config)
       loaded.joystick[k][input] = loaded.joystick[k][input] or v
     end
   end
-
+  for _, t in ipairs{loaded.keys, loaded.joystick.hats,
+                     loaded.joystick.buttons} do
+    for input, _ in pairs(t) do
+      loaded.commands.press[input] = false
+      loaded.commands.hold[input] = false
+      loaded.commands.release[input] = false
+    end
+  end
+  
   return loaded
 end
 
