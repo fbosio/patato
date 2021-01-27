@@ -67,7 +67,7 @@ end
 
 function M.isIncluded(tbox1, tbox2)
   return tbox1.left >= tbox2.left and tbox1.top >= tbox2.top
-    and tbox1.right <= tbox2.right and tbox1.bottom >= tbox2.bottom
+    and tbox1.right <= tbox2.right and tbox1.bottom <= tbox2.bottom
 end
 
 M.translate = {
