@@ -105,14 +105,11 @@ local function buildDefaults()
 end
 
 function M.reload(level, inMenu)
-  local components = {
-      garbage = {}
-  }
+  local components = {garbage = {}}
   M.entityTagger.clear()
   checkEntitiesCompatibility()
   local menuName = getMenuEntity()
-  M.command.load(M.hid, components)
-  builder.load(M.love, M.entityTagger, M.command, menuName, components)
+  builder.load(M.love, M.entityTagger, menuName, components)
   if menuName and not inMenu then
     buildEntity(menuName)
     inMenu = true
@@ -129,10 +126,9 @@ function M.reload(level, inMenu)
   return components, inMenu
 end
 
-function M.load(love, entityTagger, command, config)
+function M.load(love, entityTagger, config)
   M.love = love
   M.entityTagger = entityTagger
-  M.command = command
   M.config = config
   local loaded = {menu = {}, camera = {}}
   loaded.hid = hid.load(config)

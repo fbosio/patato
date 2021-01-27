@@ -9,7 +9,6 @@ local config = require "config"
 local entityTagger = require "engine.tagger"
 local systems = require "engine.systems"
 local helpers = require "engine.systems.helpers"
-local command = require "engine.command"
 local handlers = require "engine.handlers"
 
 
@@ -25,7 +24,7 @@ local M = {}
 ]]
 
 local function load()
-  local world = systems.load(love, entityTagger, command, config)
+  local world = systems.load(love, entityTagger, config)
   
   for k, v in pairs(world) do
     M[k] = v
@@ -122,60 +121,6 @@ end
 function M.startGame(level)
   local components, inMenu = systems.reload(level, M.gameState.inMenu)
   M.gameState.components, M.gameState.inMenu = components, inMenu
-end
-
---[=[--
-  Set a command for an entity.
-
-  @tparam string entity Name of the entity.
-  
-  @tparam string input Input that will trigger the command. Specified in the
-    `inputs` table in `config.lua`.
-
-  @tparam function callback What to do when the command is triggered.
-    It receives a table that has the entity components.
-  
-  @tparam string kind Must be one of the following.
-
-  - `"press"`
-  - `"hold"`
-  - `"release"`
- 
-  @usage
-    --[[ Example config.lua
-      local M = {}
-
-      M.inputs = {
-        keyboard = {
-          right = "d",
-          jump = "space"
-        }
-      }
-
-      M.entities = {
-        player = {
-          flags = {"controllable"},
-          impulseSpeed = {
-            walk = 500,
-            jump = 1000
-          }
-        }
-      }
-
-      return M
-    ]]
-    engine.setCommand("player", "right", function (t)
-      t.velocity.x = t.impulseSpeed.walk
-    end, "hold")
-    engine.setCommand("player", "jump", function (t)
-      t.velocity.y = -t.impulseSpeed.jump
-    end, "press")
-    engine.setCommand("player", "right", function (t)
-      t.velocity.x = 0
-    end, "release")
-]=]
-function M.setCommand(entity, input, callback, kind)
-  command.set(entity, input, callback, kind)
 end
 
 function M.getComponents(entity)

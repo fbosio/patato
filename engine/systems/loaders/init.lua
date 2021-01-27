@@ -6,9 +6,9 @@ local gamestate = require "engine.systems.loaders.gamestate"
 
 local M = {}
 
-function M.load(love, entityTagger, command, config)
+function M.load(love, entityTagger, config)
   local loadedConfig = configLoader.load(config)
-  local gameState = gamestate.load(love, entityTagger, command, loadedConfig)
+  local gameState = gamestate.load(love, entityTagger, loadedConfig)
   return {
     release = mode.load(loadedConfig),
     physics = physics.load(loadedConfig),

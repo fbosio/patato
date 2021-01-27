@@ -8,8 +8,8 @@ local loaders = require "engine.systems.loaders"
 
 local M = {}
 
-function M.load(love, entityTagger, command, config)
-  local world = loaders.load(love, entityTagger, command, config)
+function M.load(love, entityTagger, config)
+  local world = loaders.load(love, entityTagger, config)
   controller.load(love, entityTagger)
   animator.load(entityTagger)
   renderer.load(love, entityTagger)
