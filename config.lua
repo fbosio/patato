@@ -66,7 +66,7 @@ M.entities = {
   },
   cameraWindow = {
     flags = {"window"},
-    collisionBox = {50, 100, 100, 200}
+    collisionBox = {100, 100, 200, 200}
   },
   soilSurfaces = {
     collideable = "rectangle",

@@ -1,4 +1,6 @@
 local engine = require "engine"
+local patato = require "game.patato"
+local menu = require "game.menu"
 local elapsed, message, score
 
 love.run = engine.run
@@ -36,61 +38,10 @@ function love.update(dt)
   local commands = engine.gameState.hid.commands
 
   if engine.gameState.inMenu then
-    local menu = engine.getComponents("mainMenu").menu
-    if commands.press.up then
-      menu.selected = menu.selected - 1
-      if menu.selected == 0 then
-        menu.selected = #menu.options
-      end
-    end
-    if commands.press.down then
-      menu.selected = menu.selected + 1
-      if menu.selected == #menu.options + 1 then
-        menu.selected = 1
-      end
-    end
-    if commands.press.start then
-      engine.gameState.menu.mainMenu[menu.selected]()
-    end
+    menu.update(commands, engine.gameState.menu.mainMenu,
+                engine.getComponents("mainMenu").menu)
   else
-    local patato = engine.getComponents("patato")
-    if commands.hold.left and not commands.hold.right then
-      patato.velocity.x = -patato.impulseSpeed.walk
-      patato.animation.name = "walking"
-    elseif commands.hold.right and not commands.hold.left then
-      patato.velocity.x = patato.impulseSpeed.walk
-      patato.animation.name = "walking"
-    else
-      patato.velocity.x = 0
-      patato.animation.name = "standing"
-    end
-    if commands.press.jump then
-      if patato.climber.climbing then
-        patato.climber.climbing = false
-        patato.gravitational.enabled = true
-      end
-      if patato.climber.climbing or patato.velocity.y == 0 then
-        patato.animation.name = "jumping"
-        patato.velocity.y = -patato.impulseSpeed.jump
-      end
-    end
-    if (commands.press.up or commands.press.down)
-        and not patato.climber.climbing then
-      patato.climber.climbing = true
-      patato.animation.name = "climbingIdle"
-    end
-    if patato.climber.climbing and patato.climber.trellis then
-      if commands.hold.up and not commands.hold.down then
-        patato.velocity.y = -patato.impulseSpeed.climb
-        patato.animation.name = "climbingMove"
-      elseif commands.hold.down and not commands.hold.up then
-        patato.velocity.y = patato.impulseSpeed.climb
-        patato.animation.name = "climbingMove"
-      else
-        patato.velocity.y = 0
-        patato.animation.name = "climbingIdle"
-      end
-    end
+    patato.update(commands, engine.getComponents("patato"))
   end
   
   if elapsed then
