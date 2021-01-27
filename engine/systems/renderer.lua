@@ -51,8 +51,8 @@ local function drawSprites(components, entityResources)
           local animation = (components.animation or {})[entity]
           local position = (components.position or {})[entity]
             local t = entityAnimations[animation.name]
-            local quad = entitySprites.quads[t.frames[animation.frame]]
-            local origin = entitySprites.origins[t.frames[animation.frame]]
+            local quad = entitySprites.quads[t[animation.frame].sprite]
+            local origin = entitySprites.origins[t[animation.frame].sprite]
             local x, y = position.x, position.y
             local scale = entitySprites.scale
             local direction = animation.flipX and -1 or 1
