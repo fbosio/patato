@@ -55,8 +55,9 @@ local function drawSprites(components, entityResources)
             local origin = entitySprites.origins[t.frames[animation.frame]]
             local x, y = position.x, position.y
             local scale = entitySprites.scale
-            M.love.graphics.draw(entitySprites.image, quad, x, y, 0, scale,
-                                 scale, origin.x, origin.y)
+            local direction = animation.flipX and -1 or 1
+            M.love.graphics.draw(entitySprites.image, quad, x, y, 0,
+                                 scale * direction, scale, origin.x, origin.y)
         end
       end
     end

@@ -135,7 +135,8 @@ describe("loading an entity with animations", function ()
     local playerAnimation = components.animation[playerId]
     assert.are.same(1, playerAnimation.frame)
     assert.are.same(0, playerAnimation.time)
-    assert.are.falsy(playerAnimation.ended)
+    assert.is.falsy(playerAnimation.ended)
+    assert.is.falsy(playerAnimation.flipX)
   end)
 end)
 

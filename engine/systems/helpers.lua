@@ -8,11 +8,13 @@ function M.buildArguments(entity, components)
         if componentName == "animation" then
           local proxy = {}
           setmetatable(proxy, {
-            __newindex = function (_, attr, newName)
-              if attr == "name" and v.name ~= newName then
-                v.name = newName
+            __newindex = function (_, attr, value)
+              if attr == "name" and v.name ~= value then
+                v.name = value
                 v.frame = 1
                 v.time = 0
+              elseif attr == "flipX" then
+                v.flipX = value
               end
             end
           })

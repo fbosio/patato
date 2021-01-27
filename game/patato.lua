@@ -27,15 +27,15 @@ function M.update(commands, t)
   else
     if commands.hold.left and not commands.hold.right then
       t.velocity.x = -t.impulseSpeed.walk
-      t.animation.name = "walking"
+      t.animation.flipX = true
+      t.animation.name = t.velocity.y == 0 and "walking" or "jumping"
     elseif commands.hold.right and not commands.hold.left then
       t.velocity.x = t.impulseSpeed.walk
-      t.animation.name = "walking"
+      t.animation.flipX = false
+      t.animation.name = t.velocity.y == 0 and "walking" or "jumping"
     else
       t.velocity.x = 0
-      if t.velocity.y == 0 then
-        t.animation.name = "standing"
-      end
+      t.animation.name = t.velocity.y == 0 and "standing" or "jumping"
     end
     if commands.press.up or commands.press.down then
       t.climber.climbing = true
