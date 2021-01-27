@@ -24,9 +24,9 @@ M.animations = {
 	},
 	walking = {
 		{sprite = 2, duration = 0.1}, 
-		{sprite = 3, duration = 0.1}, 
+		{sprite = 3, duration = 0.1, sfx = "footstep"}, 
 		{sprite = 4, duration = 0.1}, 
-		{sprite = 3, duration = 0.1}
+		{sprite = 3, duration = 0.1, sfx = "footstep"}
 	},
 	jumping = {
 		{sprite = 5, duration = 0.1}

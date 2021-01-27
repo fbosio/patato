@@ -25,6 +25,7 @@ function love.load()
     local pitch = 1 + (2*love.math.random()-1) / 36
     local sfx = engine.resources.sounds.sfx.collected
     sfx:setPitch(pitch)
+    sfx:stop()
     sfx:play()
   end
   
@@ -41,7 +42,8 @@ function love.update(dt)
     menu.update(commands, engine.gameState.menu.mainMenu,
                 engine.getComponents("mainMenu").menu)
   else
-    patato.update(commands, engine.getComponents("patato"))
+    patato.update(commands, engine.resources.sounds.sfx,
+                  engine.getComponents("patato"))
   end
   
   if elapsed then

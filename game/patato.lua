@@ -1,6 +1,6 @@
 local M = {}
 
-function M.update(commands, t)
+function M.update(commands, sfx, t)
   if t.climber.trellis then
     if commands.hold.left and not commands.hold.right then
       t.velocity.x = -t.impulseSpeed.climb
@@ -25,6 +25,9 @@ function M.update(commands, t)
       t.animation.name = "climbingIdle"
     end
   else
+    if t.velocity.y == 0 and t.animation.name == "jumping" then
+      sfx.footstep:play()
+    end
     if commands.hold.left and not commands.hold.right then
       t.velocity.x = -t.impulseSpeed.walk
       t.animation.flipX = true

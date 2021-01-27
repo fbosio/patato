@@ -27,7 +27,7 @@ function M.update(dt, gameState, resources, physics)
   transporter.drag(dt, gameState.components, physics.gravity)
   messengers.update(dt, gameState)
   transporter.move(dt, gameState.components)
-  animator.update(dt, gameState.components, resources.entities)
+  animator.update(dt, gameState.components, resources)
   garbagecollector.update(gameState.components)
 end
 
