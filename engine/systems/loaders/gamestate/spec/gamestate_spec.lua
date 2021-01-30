@@ -614,3 +614,26 @@ describe("loading a limiter that is in a level", function ()
     }, loadedGameState.components.collisionBox[cameraBoundsId])
   end)
 end)
+
+describe("loading a musicalizer that is in a level", function ()
+  it("should copy the component", function ()
+    local config = {
+      entities = {
+        music = {
+          flags = {"musicalizer"}
+        }
+      },
+      levels = {
+        mushroomKingdom = {
+          music = "Classic Mario Tune"
+        }
+      }
+    }
+
+    local loadedGameState = gamestate.load(loveMock, entityTagger, config)
+
+    local musicId = entityTagger.getId("music")
+    assert.are.same("Classic Mario Tune",
+                    loadedGameState.components.musicalizer[musicId].bgm)
+  end)
+end)

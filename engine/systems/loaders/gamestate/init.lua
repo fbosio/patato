@@ -63,7 +63,7 @@ end
 local function buildEntity(name)
   local entity = M.entityTagger.tag(name)
   for k, v in pairs(M.config.entities[name]) do
-    if k ~= "load" and k ~= "buildFromVertices" then
+    if k ~= "load" and k ~= "buildFromVertices" and k ~= "buildMusic" then
       assert(builder[k], "Unexpected component \"" .. k .. "\" for entity \""
              .. name .. "\" in config.lua")(v, entity)
     end
@@ -77,12 +77,22 @@ local function buildEntitiesInLevels(level)
     local levelData = M.config.levels[level or firstLevel] or {}
     local levelEntityData = levelData[entityName]
     if levelEntityData then
-      if type(levelEntityData[1]) ~= "table" then
-        levelEntityData = {levelEntityData}
-      end
-      for _, vertices in ipairs(levelEntityData) do
-        local entity = buildEntity(entityName)
-        builder.buildFromVertices(vertices, entity, entityData)
+      if type(levelEntityData) == "string" then
+        for _, flag in pairs(entityData.flags or {}) do
+          if flag == "musicalizer" then
+            local entity = buildEntity(entityName)
+            builder.buildMusic(levelEntityData, entity)
+            break
+          end
+        end
+      else
+        if type(levelEntityData[1]) ~= "table" then
+          levelEntityData = {levelEntityData}
+        end
+        for _, vertices in ipairs(levelEntityData) do
+          local entity = buildEntity(entityName)
+          builder.buildFromVertices(vertices, entity, entityData)
+        end
       end
     end
   end

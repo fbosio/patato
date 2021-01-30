@@ -86,6 +86,9 @@ M.entities = {
   background = {
     resources = resources.background
   },
+  music = {
+    flags = {"musicalizer"},
+  },
   mainMenu = {
     flags = {"controllable"},
     menu = {
@@ -99,6 +102,7 @@ M.entities.background.resources.sprites.tiled = true
 
 M.levels = {
   garden = {
+    music = "garden",
     cameraBounds = {0, 0, 1000, 1000},
     background = {0, 0},
     gardenArtwork = {0, 0},

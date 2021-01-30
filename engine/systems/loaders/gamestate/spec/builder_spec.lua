@@ -262,3 +262,12 @@ describe("loading a window entity", function ()
     assert.are.same({x = 0, y = 0}, components.position[windowId])
   end)
 end)
+
+describe("loading a musicalizer entity", function ()
+  it("should copy the component", function ()
+    local flags = {"musicalizer"}
+
+    musicalizerId = entityTagger.tag("musicalizer")
+    builder.flags(flags, musicalizerId)
+  end)
+end)
