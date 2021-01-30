@@ -5,11 +5,12 @@
  @module engine
 ]]
 
-local config = require "config"
+local config = love.filesystem.getInfo("config.lua") and require "config"
 local entityTagger = require "engine.tagger"
 local systems = require "engine.systems"
 local helpers = require "engine.systems.helpers"
 local handlers = require "engine.handlers"
+local helloworld = require "engine.helloworld"
 
 
 local M = {}
@@ -29,15 +30,16 @@ local function load()
   for k, v in pairs(world) do
     M[k] = v
   end
-
+  
   handlers.load(M)
 
   if not config then
-    -- TODO: hello world
+    helloworld.load(entityTagger)
   end
 end
 
 local function update(dt)
+  helloworld.update(M.gameState.components, M.gameState.hid.commands)
   systems.update(dt, M.gameState, M.resources, M.physics)
 end
 
@@ -133,20 +135,6 @@ end
  @tparam string entity Name of the entity, as defined in `config.lua`.
  @treturn table Components of the entity.
  @usage
-  -- In config.lua
-  local M = {}
-
-  M.entities = {
-    player = {
-      -- Add components "velocity" and "impulseSpeed" to the entity
-      flags = {"controllable"}
-    }
-  }
-
-  return M
-
-
-  -- In main.lua
   local engine = require "engine"
 
   love.run = engine.run
