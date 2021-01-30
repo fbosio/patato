@@ -347,3 +347,27 @@ describe("loading config with a sound", function ()
     assert.is.truthy(loadedResources.sounds.sfx.gunshot)
   end)
 end)
+
+describe("loading config with music", function ()
+  local loadedResources
+
+  before_each(function ()
+    local config = {
+      sounds = {
+        bgm = {
+          discoBoy = "path/to/music.ogg"
+        }
+      }
+    }
+
+    loadedResources = resources.load(loveMock, config)
+  end)
+
+  it("should create a source for it", function ()
+    assert.stub(loveMock.audio.newSource).was.called()
+  end)
+
+  it("should store the created source in resources table", function ()
+    assert.is.truthy(loadedResources.sounds.bgm.discoBoy)
+  end)
+end)

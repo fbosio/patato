@@ -7,6 +7,11 @@ local function loadSounds(configSounds)
     sounds.sfx = sounds.sfx or {}
     sounds.sfx[stem] = M.love.audio.newSource(name, "static")
   end
+  for stem, name in pairs((configSounds or {}).bgm or {}) do
+    sounds = sounds or {}
+    sounds.bgm = sounds.bgm or {}
+    sounds.bgm[stem] = M.love.audio.newSource(name, "stream")
+  end
   return sounds
 end
 
