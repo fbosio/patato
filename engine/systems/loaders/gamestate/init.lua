@@ -61,12 +61,15 @@ local function getCameraEntity()
 end
 
 local function buildEntity(name)
+  local wrongComponentNames = {"load", "buildFromVertices", "buildMusic"}
   local entity = M.entityTagger.tag(name)
   for k, v in pairs(M.config.entities[name]) do
-    if k ~= "load" and k ~= "buildFromVertices" and k ~= "buildMusic" then
-      assert(builder[k], "Unexpected component \"" .. k .. "\" for entity \""
-             .. name .. "\" in config.lua")(v, entity)
+    local errorMessage = 'Unexpected component "' .. k .. '" for entity "'
+                         .. name .. '" in config.lua'
+    for _, wrongK in ipairs(wrongComponentNames) do
+      assert(k ~= wrongK, errorMessage)
     end
+    assert(builder[k], errorMessage)(v, entity)
   end
   return entity
 end
