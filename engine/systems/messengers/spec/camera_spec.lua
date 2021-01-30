@@ -1,4 +1,4 @@
-local camera, entityTaggerMock
+local camera, entityTaggerMock, components, cameraData
 
 before_each(function ()
   camera = require "engine.systems.messengers.camera"
@@ -7,6 +7,32 @@ before_each(function ()
     return name
   end
   camera.load({}, entityTaggerMock)
+
+  components = {
+    camera = {myCamera = {enabled = true}},
+    position = {
+      myCamera = {x = 0, y = 0},
+      player = {x = 1528, y = 500}
+    },
+    collisionBox = {
+      myCamera = {
+        origin = {x = 0, y = 0},
+        width = 800,
+        height = 600
+      },
+      player = {
+        origin = {x = 16, y = 64},
+        width = 32,
+        height = 64
+      }
+    }
+  }
+  cameraData = {
+    target = "player",
+    focus = function (t)
+      return t.position.x, t.position.y
+    end
+  }
 end)
 
 after_each(function ()
@@ -14,35 +40,6 @@ after_each(function ()
 end)
 
 describe("with a camera, its target", function ()
-  local components, cameraData
-  before_each(function ()
-    components = {
-      camera = {myCamera = true},
-      position = {
-        myCamera = {x = 0, y = 0},
-        player = {x = 1528, y = 500}
-      },
-      collisionBox = {
-        myCamera = {
-          origin = {x = 0, y = 0},
-          width = 800,
-          height = 600
-        },
-        player = {
-          origin = {x = 16, y = 64},
-          width = 32,
-          height = 64
-        }
-      }
-    }
-    cameraData = {
-      target = "player",
-      focus = function (t)
-        return t.position.x, t.position.y
-      end
-    }
-  end)
-
   describe("and no limiter", function ()
     it("should follow the target", function ()
       camera.update(components, cameraData)
@@ -125,5 +122,15 @@ describe("with a camera, its target", function ()
         assert.are.same({x = 126, y = 100}, components.position.myCamera)
       end)
     end)
+  end)
+end)
+
+describe("with a disabled camera and its target", function ()
+  it("should not follow the target", function ()
+    components.camera.myCamera.enabled = false
+
+    camera.update(components, cameraData)
+
+    assert.are.same({x = 0, y = 0}, components.position.myCamera)
   end)
 end)

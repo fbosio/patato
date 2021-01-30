@@ -30,9 +30,9 @@ end
 function M.update(components, cameraData)
   if not cameraData then return end
 
-  local _, isCamera, cameraBox, cameraPos = iter.camera()(components)
+  local _, camera, cameraBox, cameraPos = iter.camera()(components)
   local targetEntity = M.entityTagger.getId(cameraData.target)
-  if not isCamera or not targetEntity then return end
+  if not camera.enabled or not targetEntity then return end
 
   targetEntity = snapToWindow(components, targetEntity)
   local entityComponents = buildArguments(targetEntity, components)

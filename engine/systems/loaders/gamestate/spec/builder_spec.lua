@@ -254,7 +254,7 @@ describe("loading a camera entity", function ()
   end)
 
   it("should copy the component", function ()
-    assert.is.truthy(components.camera[cameraId])
+    assert.is.truthy(components.camera[cameraId].enabled)
   end)
 
   it("should create a position and a collision box", function ()
