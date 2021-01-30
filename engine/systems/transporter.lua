@@ -12,8 +12,10 @@ end
 
 function M.move(dt, components)
   for _, velocity, position in iter.velocity(components) do
-    position.x = position.x + velocity.x*dt
-    position.y = position.y + velocity.y*dt
+    if velocity.enabled then
+      position.x = position.x + velocity.x*dt
+      position.y = position.y + velocity.y*dt
+    end
   end
 end
 

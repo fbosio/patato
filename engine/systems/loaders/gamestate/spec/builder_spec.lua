@@ -34,7 +34,11 @@ describe("loading a nonmenu controllable entity", function ()
 
   it("should set default components to the entity", function ()
     assert.are.same({x = 400, y = 300}, components.position[playerId])
-    assert.are.same({x = 0, y = 0}, components.velocity[playerId])
+    assert.are.same({
+      enabled = true,
+      x = 0,
+      y = 0
+    }, components.velocity[playerId])
     assert.are.same({walk = 400}, components.impulseSpeed[playerId])
   end)
 end)
@@ -159,7 +163,11 @@ describe("loading a collector entity", function ()
 
   it("should set default components to the entity", function ()
     assert.are.same({x = 400, y = 300}, components.position[playerId])
-    assert.are.same({x = 0, y = 0}, components.velocity[playerId])
+    assert.are.same({
+      enabled = true,
+      x = 0,
+      y = 0
+    }, components.velocity[playerId])
   end)
 end)
 
@@ -179,7 +187,11 @@ describe("loading a solid entity", function ()
 
   it("should set default components to the entity", function ()
     assert.are.same({x = 400, y = 300}, components.position[playerId])
-    assert.are.same({x = 0, y = 0}, components.velocity[playerId])
+    assert.are.same({
+      enabled = true,
+      x = 0,
+      y = 0
+    }, components.velocity[playerId])
   end)
 end)
 
@@ -199,7 +211,11 @@ describe("loading a gravitational entity", function ()
 
   it("should set default components to the entity", function ()
     assert.are.same({x = 400, y = 300}, components.position[anvilId])
-    assert.are.same({x = 0, y = 0}, components.velocity[anvilId])
+    assert.are.same({
+      enabled = true,
+      x = 0,
+      y = 0
+    }, components.velocity[anvilId])
   end)
 end)
 
@@ -219,7 +235,11 @@ describe("loading a climber entity", function ()
 
   it("should set default components to the entity", function ()
     assert.are.same({x = 400, y = 300}, components.position[playerId])
-    assert.are.same({x = 0, y = 0}, components.velocity[playerId])
+    assert.are.same({
+      enabled = true,
+      x = 0,
+      y = 0
+    }, components.velocity[playerId])
   end)
 end)
 

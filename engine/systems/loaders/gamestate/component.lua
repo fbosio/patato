@@ -23,6 +23,7 @@ function M.setDefaultPosition(entity)
 end
 
 function M.setDefaultVelocity(entity)
+  M.setAttribute("velocity", entity, "enabled", true)
   M.setAttribute("velocity", entity, "x", 0)
   M.setAttribute("velocity", entity, "y", 0)
 end

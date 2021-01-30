@@ -26,6 +26,7 @@ describe("receiving an entity with nonzero velocity", function ()
   it("should update its position", function ()
     components.velocity = {
       player = {
+        enabled = true,
         x = 140,
         y = -70
       }
@@ -43,10 +44,33 @@ describe("receiving an entity with nonzero velocity", function ()
   end)
 end)
 
-describe("receiving gravity and a enabled gravitational entity", function ()
+describe("receiving an entity with disabled velocity", function ()
+  it("should not update its position", function ()
+    components.velocity = {
+      player = {
+        enabled = false,
+        x = 140,
+        y = -70
+      }
+    }
+    components.position = {
+      player = {
+        x = -397,
+        y = 254
+      }
+    }
+    
+    transporter.move(dt, components)
+
+    assert.are.same({x = -397, y = 254}, components.position.player)
+  end)
+end)
+
+describe("receiving gravity and an enabled gravitational entity", function ()
   it("should upate the velocity of the entity", function ()
     components.velocity = {
       anvil = {
+        enabled = true,
         x = 0,
         y = 0
       }
@@ -67,6 +91,7 @@ describe("receiving gravity and a disabled gravitational entity", function ()
     local gravity = 7000
     components.velocity = {
       anvil = {
+        enabled = true,
         x = 0,
         y = 0
       }
