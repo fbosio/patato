@@ -51,7 +51,8 @@ describe("updating an animation with several frames", function ()
         [playerId] = {
           name = "standing",
           frame = 1,
-          time = 4
+          time = 4,
+          enabled = true
         }
       }
     }
@@ -75,7 +76,8 @@ describe("playing an animation until its end", function ()
         [playerId] = {
           name = "standing",
           frame = 3,
-          time = 8
+          time = 8,
+          enabled = true
         }
       }
     }
@@ -93,7 +95,8 @@ describe("playing an animation with a frame with sound", function ()
         [playerId] = {
           name = "walking",
           frame = 1,
-          time = 3
+          time = 3,
+          enabled = true
         }
       }
     }

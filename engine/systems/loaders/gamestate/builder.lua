@@ -94,6 +94,7 @@ function M.resources(resources, entity)
   component.setAttribute("animation", entity, "time", 0)
   component.setAttribute("animation", entity, "ended", false)
   component.setAttribute("animation", entity, "flipX", false)
+  component.setAttribute("animation", entity, "enabled", true)
 end
 
 function M.impulseSpeed(speeds, entity)

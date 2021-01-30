@@ -132,11 +132,14 @@ describe("loading an entity with animations", function ()
 
     local playerId = entityTagger.tag("player")
     builder.resources(resources, playerId)
-    local playerAnimation = components.animation[playerId]
-    assert.are.same(1, playerAnimation.frame)
-    assert.are.same(0, playerAnimation.time)
-    assert.is.falsy(playerAnimation.ended)
-    assert.is.falsy(playerAnimation.flipX)
+    assert.are.same({
+      name = "walking",
+      frame = 1,
+      time = 0,
+      ended = false,
+      flipX = false,
+      enabled = true
+    }, components.animation[playerId])
   end)
 end)
 
