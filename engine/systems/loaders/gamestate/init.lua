@@ -82,7 +82,7 @@ local function buildEntitiesInLevels(level)
     if levelEntityData then
       if type(levelEntityData) == "string" then
         for _, flag in pairs(entityData.flags or {}) do
-          if flag == "musicalizer" then
+          if flag == "jukebox" then
             local entity = buildEntity(entityName)
             builder.buildMusic(levelEntityData, entity)
             break

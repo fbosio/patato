@@ -17,7 +17,8 @@ local dependencyTree = {
   -- Atoms
   position = {},
   garbage = {},
-  menu = {}
+  menu = {},
+  jukebox = {}
 }
 
 local function getDependencies(componentName, dependenciesSeq, i)

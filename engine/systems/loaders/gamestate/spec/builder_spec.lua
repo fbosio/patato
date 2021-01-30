@@ -263,11 +263,11 @@ describe("loading a window entity", function ()
   end)
 end)
 
-describe("loading a musicalizer entity", function ()
+describe("loading a jukebox entity", function ()
   it("should copy the component", function ()
-    local flags = {"musicalizer"}
+    local flags = {"jukebox"}
 
-    musicalizerId = entityTagger.tag("musicalizer")
-    builder.flags(flags, musicalizerId)
+    local jukeboxId = entityTagger.tag("jukebox")
+    builder.flags(flags, jukeboxId)
   end)
 end)

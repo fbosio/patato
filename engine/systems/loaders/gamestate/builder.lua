@@ -35,7 +35,7 @@ function M.buildFromVertices(vertices, entity, entityData)
 end
 
 function M.buildMusic(name, entity)
-  component.setAttribute("musicalizer", entity, "bgm", name)
+  component.setAttribute("jukebox", entity, "bgm", name)
 end
 
 local flagStateBuilders = {
@@ -66,8 +66,8 @@ local flagStateBuilders = {
     component.setAttribute("position", entity, "x", 0)
     component.setAttribute("position", entity, "y", 0)
   end,
-  musicalizer = function (entity)
-    component.set("musicalizer", entity, {})
+  jukebox = function (entity)
+    component.set("jukebox", entity, {})
   end
 }
 for _, k in ipairs{"collector", "solid", "gravitational", "climber"} do

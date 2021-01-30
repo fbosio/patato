@@ -87,7 +87,7 @@ M.entities = {
     resources = resources.background
   },
   music = {
-    flags = {"musicalizer"},
+    flags = {"jukebox"},
   },
   mainMenu = {
     flags = {"controllable"},

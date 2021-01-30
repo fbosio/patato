@@ -615,12 +615,12 @@ describe("loading a limiter that is in a level", function ()
   end)
 end)
 
-describe("loading a musicalizer that is in a level", function ()
+describe("loading a jukebox that is in a level", function ()
   it("should copy the component", function ()
     local config = {
       entities = {
         music = {
-          flags = {"musicalizer"}
+          flags = {"jukebox"}
         }
       },
       levels = {
@@ -634,6 +634,6 @@ describe("loading a musicalizer that is in a level", function ()
 
     local musicId = entityTagger.getId("music")
     assert.are.same("Classic Mario Tune",
-                    loadedGameState.components.musicalizer[musicId].bgm)
+                    loadedGameState.components.jukebox[musicId].bgm)
   end)
 end)

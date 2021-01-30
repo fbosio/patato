@@ -5,6 +5,7 @@ local animator = require "engine.systems.animator"
 local garbagecollector = require "engine.systems.garbagecollector"
 local renderer = require "engine.systems.renderer"
 local loaders = require "engine.systems.loaders"
+local musicalizer = require "engine.systems.musicalizer"
 
 local M = {}
 
@@ -14,12 +15,16 @@ function M.load(love, entityTagger, config)
   animator.load(entityTagger)
   renderer.load(love, entityTagger)
   messengers.load(love, entityTagger)
+  musicalizer.load(world)
 
   return world
 end
 
 function M.reload(level, inMenu)
-  return loaders.reload(level, inMenu)
+  local components
+  components, inMenu = loaders.reload(level, inMenu)
+  musicalizer.reload(components)
+  return components, inMenu
 end
 
 function M.update(dt, gameState, resources, physics)
