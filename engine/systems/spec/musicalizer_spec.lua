@@ -10,7 +10,7 @@ end)
 
 describe("loading a jukebox pointing to a background music", function ()
   it("should play that music and stop the rest", function ()
-    function newSource()
+    local function newSource()
       local source = {}
       function source:play() end
       function source:isPlaying()
