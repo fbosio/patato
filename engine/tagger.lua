@@ -25,8 +25,8 @@ end
 
 function M.getName(entity)
   for name, ids in pairs(tags) do
-    for _, id in ipairs(ids) do
-      if entity == id then
+    for _, v in ipairs(ids) do
+      if entity == v then
         return name
       end
     end

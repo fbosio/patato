@@ -38,11 +38,11 @@ local function getEntityNamesSortedByDepth(resources)
   return sorted
 end
 
-local function drawSprites(components, entityResources)
-  local sortedEntities = getEntityNamesSortedByDepth(entityResources)
+local function drawSprites(components, entitiesResources)
+  local sortedEntities = getEntityNamesSortedByDepth(entitiesResources)
   for _, entityNames in pairs(sortedEntities) do
     for _, entityName in ipairs(entityNames) do
-      local entityResources = entityResources[entityName]
+      local entityResources = entitiesResources[entityName]
       if entityResources then
         local entitySprites = entityResources.sprites
         local entityAnimations = entityResources.animations
@@ -113,16 +113,12 @@ local function drawDebugElements(components)
     end
   end
 
-  for _, isTrellis, box, position in iter.trellis(components) do
-    if isTrellis then
-      drawRectangle(position, box, 0.4, 0.4, 1, 0.3)
-    end
+  for _, _, box, position in iter.trellis(components) do
+    drawRectangle(position, box, 0.4, 0.4, 1, 0.3)
   end
 
-  for _, isCollectable, box, position in iter.collectable(components) do
-    if isCollectable then
-      drawRectangle(position, box, 0.4, 1, 0.4, 0.3)
-    end
+  for _, _, box, position in iter.collectable(components) do
+    drawRectangle(position, box, 0.4, 1, 0.4, 0.3)
   end
   
   M.love.graphics.setColor(rgba)
@@ -130,14 +126,11 @@ local function drawDebugElements(components)
   drawMousePosition()
 end
 
-function M.draw(gameState, entityResources, release)
-  if gameState.inMenu then
-    drawMenu(gameState.components)
-  else
-    drawSprites(gameState.components, entityResources)
-    if not release then
-      drawDebugElements(gameState.components)
-    end
+function M.draw(gameState, entitiesResources, release)
+  drawMenu(gameState.components)
+  drawSprites(gameState.components, entitiesResources)
+  if not release then
+    drawDebugElements(gameState.components)
   end
 end
 
