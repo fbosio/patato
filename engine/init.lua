@@ -106,23 +106,57 @@ end
 --[[--
  Hide menu and load a specific level of the game.
 
- Used often without arguments inside a @{setMenuOptionEffect} callback when a
- menu entity that has a `"Start Game"` option, or similar, is defined in
- `config.lua`.
+ Used often without arguments inside a callback when a menu entity that has a
+ `"Start Game"` option, or similar, is defined in `config.lua`.
 
  @tparam[opt=config.firstLevel] string level
   Name of the level, as defined in `config.lua`.
  @usage
   -- In this case, "Start Game" is the option number 1 of the menu
-  engine.setMenuOptionEffect("mainMenu", 1, function ()
-    engine.startGame()
-  end)
+  engine.gameState.menu.mainMenu = {
+    function ()
+      engine.startGame()
+    end,
+    function ()
+      print("Hello, world!")
+    end
+  }
 ]]
 function M.startGame(level)
   local components, inMenu = systems.reload(level, M.gameState.inMenu)
   M.gameState.components, M.gameState.inMenu = components, inMenu
 end
 
+--[[--
+ Return components of an entity with their current status in the game.
+
+ @tparam string entity Name of the entity, as defined in `config.lua`.
+ @treturn table Components of the entity.
+ @usage
+  -- In config.lua
+  local M = {}
+
+  M.entities = {
+    player = {
+      -- Add components "velocity" and "impulseSpeed" to the entity
+      flags = {"controllable"}
+    }
+  }
+
+  return M
+
+
+  -- In main.lua
+  local engine = require "engine"
+
+  love.run = engine.run
+
+  function love.update()
+    local player = engine.getComponents("player")
+    -- "player" has "velocity" and "impulseSpeed" because it is "controllable"
+    player.velocity.x = player.impulseSpeed.walk
+  end
+]]
 function M.getComponents(entity)
   local id = entityTagger.getId(entity)
   return helpers.buildArguments(id, M.gameState.components)
