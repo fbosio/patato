@@ -82,7 +82,7 @@ describe("loading an entity with only an empty speed list", function ()
 end)
 
 describe("bulding world with nonempty menu and other entities", function ()
-  local config, loadedGameState, mainMenuId, playerOneId, playerTwoId
+  local config, loadedGameState
 
   before_each(function ()
     config = {
@@ -102,18 +102,18 @@ describe("bulding world with nonempty menu and other entities", function ()
       }
     }
     loadedGameState = gamestate.load(loveMock, entityTagger, config)
-    mainMenuId = entityTagger.getId("mainMenu")
-    playerOneId = entityTagger.getId("playerOne")
-    playerTwoId = entityTagger.getId("playerTwo")
   end)
-
+  
   it("should load components with menu entity", function ()
+    local menuId = entityTagger.getId("mainMenu")
     assert.are.same({"Start"},
-                    loadedGameState.components.menu[mainMenuId].options)
-    assert.are.truthy(loadedGameState.components.controllable[mainMenuId])
+                    loadedGameState.components.menu[menuId].options)
+    assert.are.truthy(loadedGameState.components.controllable[menuId].enabled)
   end)
 
   it("should not copy entities that have not the menu component", function ()
+    local playerOneId = entityTagger.getId("playerOne")
+    local playerTwoId = entityTagger.getId("playerTwo")
     assert.is.falsy(loadedGameState.components.controllable[playerOneId])
     assert.is.falsy(loadedGameState.components.controllable[playerTwoId])
     assert.is.falsy(loadedGameState.components.position)
@@ -156,10 +156,10 @@ describe("loading a level with defined entity and position", function ()
     local loadedGameState = gamestate.load(loveMock, entityTagger,
                                            config)
 
-    local playerId = entityTagger.getId("sonic")
-    assert.is.truthy(loadedGameState.components.controllable[playerId])
-    assert.are.same(200, loadedGameState.components.position[playerId].x)
-    assert.are.same(300, loadedGameState.components.position[playerId].y)
+    local sonicId = entityTagger.getId("sonic")
+    assert.is.truthy(loadedGameState.components.controllable[sonicId].enabled)
+    assert.are.same(200, loadedGameState.components.position[sonicId].x)
+    assert.are.same(300, loadedGameState.components.position[sonicId].y)
   end)
 end)
 
@@ -185,10 +185,10 @@ describe("load two levels and the name of the first one", function ()
     local loadedGameState = gamestate.load(loveMock, entityTagger,
                                            config)
 
-    local playerId = entityTagger.getId("sonic")
-    assert.is.truthy(loadedGameState.components.controllable[playerId])
-    assert.are.same(200, loadedGameState.components.position[playerId].x)
-    assert.are.same(300, loadedGameState.components.position[playerId].y)
+    local sonicId = entityTagger.getId("sonic")
+    assert.is.truthy(loadedGameState.components.controllable[sonicId].enabled)
+    assert.are.same(200, loadedGameState.components.position[sonicId].x)
+    assert.are.same(300, loadedGameState.components.position[sonicId].y)
   end)
 end)
 

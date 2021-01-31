@@ -29,7 +29,7 @@ describe("loading a nonmenu controllable entity", function ()
   end)
 
   it("should create a component for the entity", function ()
-    assert.is.truthy(components.controllable[playerId])
+    assert.is.truthy(components.controllable[playerId].enabled)
   end)
 
   it("should set default components to the entity", function ()

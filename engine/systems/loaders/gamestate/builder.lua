@@ -40,7 +40,7 @@ end
 
 local flagStateBuilders = {
   controllable = function (entity)
-    component.set("controllable", entity, {})
+    component.setAttribute("controllable", entity, "enabled", true)
     if not M.menuName then
       component.setDefaults(entity)
     end
