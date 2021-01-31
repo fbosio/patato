@@ -5,7 +5,7 @@ before_each(function ()
   collider = require "engine.systems.messengers.collision.init"
   components = {
     solid = {
-      player = {},
+      player = {enabled = true},
     },
     collisionBox = {
       player = {
@@ -1427,5 +1427,35 @@ describe("with two adjacent slopes", function ()
           assert.are.same(426, components.position.player.x)
         end)
       end)
+  end)
+end)
+
+describe("with a block and a disabled solid overlapping it", function ()
+  it("should keep the solid in its place", function ()
+    components.collideable = {
+      block = {name = "block"}
+    }
+    components.position = {
+      player = {
+        x = 374,
+        y = 290
+      },
+      block = {
+        x = 400,
+        y = 300
+      }
+    }
+    components.velocity = {
+      player = {
+        x = 0,
+        y = 0
+      }
+    }
+    components.solid.player.enabled = false
+
+    collider.update(dt, components)
+
+    assert.are.same(374, components.position.player.x)
+    assert.are.same(290, components.position.player.y)
   end)
 end)
