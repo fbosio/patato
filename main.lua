@@ -44,6 +44,16 @@ function love.update(dt)
   else
     patato.update(commands, engine.resources.sounds.sfx,
                   engine.getComponents("patato"))
+    if commands.press.start then
+      local bgm = engine.getComponents("music").jukebox.bgm
+      if engine.gameState.paused then
+        engine.resources.sounds.bgm[bgm]:setVolume(1)
+        engine.unpause()
+      else
+        engine.resources.sounds.bgm[bgm]:setVolume(0.5)
+        engine.pause()
+      end
+    end
   end
   
   if elapsed then

@@ -6,6 +6,7 @@ local garbagecollector = require "engine.systems.garbagecollector"
 local renderer = require "engine.systems.renderer"
 local loaders = require "engine.systems.loaders"
 local musicalizer = require "engine.systems.musicalizer"
+local pauser = require "engine.systems.pauser"
 
 local M = {}
 
@@ -67,6 +68,14 @@ end
 
 function M.joystickremoved(joystick, gameState)
   controller.joystickremoved(joystick, gameState.hid)
+end
+
+function M.pause(components)
+  pauser.pause(components)
+end
+
+function M.unpause(components)
+  pauser.unpause(components)
 end
 
 return M

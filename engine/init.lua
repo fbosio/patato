@@ -150,4 +150,14 @@ function M.getComponents(entity)
   return helpers.buildArguments(id, M.gameState.components)
 end
 
+function M.pause()
+  M.gameState.paused = true
+  systems.pause(M.gameState.components)
+end
+
+function M.unpause()
+  M.gameState.paused = false
+  systems.unpause(M.gameState.components)
+end
+
 return M

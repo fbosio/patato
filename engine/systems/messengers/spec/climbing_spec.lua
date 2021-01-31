@@ -197,17 +197,17 @@ describe("with a trellis", function ()
     end)
   end)
 
-  describe("and a disabled climber trying to climb", function ()
-    it("should not consider the climber", function ()
-      components.position.player = {x = 32, y = -96}
+  describe("and a disabled climber not contacting a trellis", function ()
+    it("should keep the climber unchanged", function ()
+      components.position.player = {x = -96, y = 0}
       components.climber.player.enabled = false
       components.climber.player.climbing = true
       components.climber.player.trellis = "trellis"
 
       climbing.update(dt, components)
       
-      assert.is.falsy(components.climber.player.climbing)
-      assert.is.falsy(components.climber.player.trellis)
+      assert.is.truthy(components.climber.player.climbing)
+      assert.is.same("trellis", components.climber.player.trellis)
     end)
   end)
 end)

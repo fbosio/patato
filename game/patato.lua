@@ -1,6 +1,7 @@
 local M = {}
 
 function M.update(commands, sfx, t)
+  if not t.controllable.enabled then return end
   if t.climber.trellis then
     if commands.hold.left and not commands.hold.right then
       t.velocity.x = -t.impulseSpeed.climb

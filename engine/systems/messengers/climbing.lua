@@ -72,9 +72,6 @@ function M.update(dt, components)
         climber.climbing = false
         grav.enabled = true
       end
-    else
-      climber.climbing = false
-      climber.trellis = nil
     end
   end
 end
