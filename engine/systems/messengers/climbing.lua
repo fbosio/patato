@@ -41,35 +41,40 @@ end
 
 function M.update(dt, components)
   for _, climber, cBox, grav, vel, pos in iter.climber(components) do
-    local translatedCB = getTranslatedBox(pos, cBox)
+    if climber.enabled then
+      local translatedCB = getTranslatedBox(pos, cBox)
+      local isClimberCollidingWithNoTrellises = true
+      
+      for trellisEntity, isTrellis, tBox, tPos in iter.trellis(components) do
+        if isTrellis then
+          local translatedTB = getTranslatedBox(tPos, tBox)
 
-    local isClimberCollidingWithNoTrellises = true
-    for trellisEntity, isTrellis, tBox, tPos in iter.trellis(components) do
-      if isTrellis then
-        local translatedTB = getTranslatedBox(tPos, tBox)
-
-        if areOverlapped(translatedCB, translatedTB) then
-          isClimberCollidingWithNoTrellises = false
-          if climber.climbing then
-            snapClimberToTrellis(translatedCB, translatedTB)
-            stopClimber(dt, translatedCB, translatedTB, vel)
-            grav.enabled = false
-            if not climber.trellis then
-              vel.y = 0
+          if areOverlapped(translatedCB, translatedTB) then
+            isClimberCollidingWithNoTrellises = false
+            if climber.climbing then
+              snapClimberToTrellis(translatedCB, translatedTB)
+              stopClimber(dt, translatedCB, translatedTB, vel)
+              grav.enabled = false
+              if not climber.trellis then
+                vel.y = 0
+              end
+              climber.trellis = trellisEntity
+            else
+              climber.trellis = nil
             end
-            climber.trellis = trellisEntity
           else
             climber.trellis = nil
           end
-        else
-          climber.trellis = nil
         end
       end
-    end
 
-    if isClimberCollidingWithNoTrellises then
+      if isClimberCollidingWithNoTrellises then
+        climber.climbing = false
+        grav.enabled = true
+      end
+    else
       climber.climbing = false
-      grav.enabled = true
+      climber.trellis = nil
     end
   end
 end

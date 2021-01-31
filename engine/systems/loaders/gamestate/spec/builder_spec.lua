@@ -182,7 +182,7 @@ describe("loading a solid entity", function ()
   end)
 
   it("should copy the component", function ()
-    assert.is.truthy(components.solid[playerId])
+    assert.is.truthy(components.solid[playerId].enabled)
   end)
 
   it("should set default components to the entity", function ()
@@ -230,7 +230,7 @@ describe("loading a climber entity", function ()
   end)
 
   it("should copy the component", function ()
-    assert.is.truthy(components.climber[playerId])
+    assert.is.truthy(components.climber[playerId].enabled)
   end)
 
   it("should set default components to the entity", function ()
