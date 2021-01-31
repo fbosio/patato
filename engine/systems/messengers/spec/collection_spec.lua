@@ -9,10 +9,11 @@ after_each(function ()
 end)
 
 describe("loading a collector that collides with a collectable", function ()
-  it("should remove the collectable", function ()
-    local components = {
+  local components, collectableEffects
+  before_each(function ()
+    components = {
       collector = {
-        mario = true
+        mario = {enabled = true}
       },
       collectable = {
         coin = {name = "coin"}
@@ -41,12 +42,26 @@ describe("loading a collector that collides with a collectable", function ()
       },
       garbage = {}
     }
-    local collectableEffects = {
+    collectableEffects = {
       coin = function () end
     }
+  end)
 
-    collection.update(components, collectableEffects)
+  describe("and the collector is enabled", function ()
+    it("should remove the collectable", function ()
+      collection.update(components, collectableEffects)
+      
+      assert.are.truthy(components.garbage.coin)
+    end)
+  end)
 
-    assert.are.truthy(components.garbage.coin)
+  describe("and the collector is disabled", function ()
+    it("should keep the collectable", function ()
+      components.collector.mario.enabled = false
+
+      collection.update(components, collectableEffects)
+      
+      assert.are.falsy(components.garbage.coin)
+    end)
   end)
 end)

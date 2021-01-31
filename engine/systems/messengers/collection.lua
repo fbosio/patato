@@ -12,8 +12,8 @@ local M = {}
 ]]
 
 function M.update(components, collectableEffects)
-  for _, isCr, crBox, crPos in iter.collector(components) do
-    if isCr then
+  for _, cr, crBox, crPos in iter.collector(components) do
+    if cr.enabled then
       local crTBox = getTranslatedBox(crPos, crBox)
       
       for ceEntity, ce, ceBox, cePos in iter.collectable(components) do

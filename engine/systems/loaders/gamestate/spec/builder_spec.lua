@@ -158,7 +158,7 @@ describe("loading a collector entity", function ()
   end)
 
   it("should copy the component", function ()
-    assert.is.truthy(components.collector[playerId])
+    assert.is.truthy(components.collector[playerId].enabled)
   end)
 
   it("should set default components to the entity", function ()
