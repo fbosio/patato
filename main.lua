@@ -1,6 +1,7 @@
 local engine = require "engine"
 local patato = require "game.patato"
 local menu = require "game.menu"
+local bee = require "game.bee"
 local elapsed, message, score
 
 love.run = engine.run
@@ -46,6 +47,9 @@ function love.update(dt)
     local patatoEntity = engine.getEntity("patato")
     patato.update(commands, engine.resources.sounds.sfx,
                   engine.getComponents(patatoEntity))
+    for beeEntity in engine.entities("bee") do
+      bee.update(engine.getComponents(beeEntity))
+    end
     if commands.press.start then
       local musicEntity = engine.getEntity("music")
       local bgm = engine.getComponents(musicEntity).jukebox.bgm

@@ -52,7 +52,11 @@ M.entities = {
     resources = resources.patato,
   },
   bee = {
-    flags = {"controllable"}
+    flags = {"solid"},
+    collisionBox = {0, 0, 60, 30},
+    impulseSpeed = {
+      fly = 200
+    }
   },
   bottles = {
     flags = {"collectable"},
@@ -107,7 +111,7 @@ M.levels = {
     background = {0, 0},
     gardenArtwork = {0, 0},
     patato = {250, 100},
-    bee = {450, 105},
+    bee = {570, 170},
     bottles = {
       {325, 80},
       {385, 80},

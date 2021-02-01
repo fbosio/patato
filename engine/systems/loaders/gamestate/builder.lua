@@ -101,6 +101,10 @@ function M.impulseSpeed(speeds, entity)
   for attribute, speed in pairs(speeds) do
     component.setAttribute("impulseSpeed", entity, attribute, speed)
   end
+  if next(speeds) then
+    component.setDefaultPosition(entity)
+    component.setDefaultVelocity(entity)
+  end
 end
 
 function M.menu(data, entity)
