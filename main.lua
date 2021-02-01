@@ -39,13 +39,16 @@ function love.update(dt)
   local commands = engine.gameState.hid.commands
 
   if engine.gameState.inMenu then
+    local menuEntity = engine.getEntity("mainMenu")
     menu.update(commands, engine.gameState.menu.mainMenu,
-                engine.getComponents("mainMenu").menu)
+                engine.getComponents(menuEntity).menu)
   else
+    local patatoEntity = engine.getEntity("patato")
     patato.update(commands, engine.resources.sounds.sfx,
-                  engine.getComponents("patato"))
+                  engine.getComponents(patatoEntity))
     if commands.press.start then
-      local bgm = engine.getComponents("music").jukebox.bgm
+      local musicEntity = engine.getEntity("music")
+      local bgm = engine.getComponents(musicEntity).jukebox.bgm
       if engine.gameState.paused then
         engine.resources.sounds.bgm[bgm]:setVolume(1)
         engine.unpause()

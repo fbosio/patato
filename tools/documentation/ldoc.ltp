@@ -27,7 +27,7 @@ $(markup(item.description))
 @     for parm in ldoc.modules.iter(item.params) do
 @       for p in ldoc.modules.iter(item:subparam(parm)) do
 * _$(item:display_name_of(p))_ (**$(item:type_of_param(p))**):
-  $(item.params.map[p])
+  $(markup(item.params.map[p]))
 @       end
 @     end
 

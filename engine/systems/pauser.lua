@@ -24,7 +24,6 @@ end
 
 function M.unpause(components)
   for componentEnable, enabled in pairs(previousState) do
-    print(componentEnable)
     for entity, component in pairs(components[componentEnable] or {}) do
       component.enabled = enabled[entity]
     end

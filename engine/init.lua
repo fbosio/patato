@@ -132,7 +132,9 @@ end
 --[[--
  Return components of an entity with their current status in the game.
 
- @tparam string entity Name of the entity, as defined in `config.lua`.
+ @tparam string entity An unique identifier internally handled by the engine.
+  Use @{entities} for iterating through all the identifiers of a name
+  and @{getEntity} for get just one identifier of the name.
  @treturn table Components of the entity.
  @usage
   local engine = require "engine"
@@ -146,8 +148,41 @@ end
   end
 ]]
 function M.getComponents(entity)
-  local id = entityTagger.getId(entity)
-  return helpers.buildArguments(id, M.gameState.components)
+  return helpers.buildArguments(entity, M.gameState.components)
+end
+
+local function entitiesIter(t, i)
+  i = i + 1
+  return t[i]
+end
+
+--[[--
+ Return three values (an iterator function, a table of entities associated with
+ `name`, and `0`) so that the construction
+
+ ```
+  for v in engine.entities(name) do body end
+ ```
+
+ will iterate over the entities up to the first absent one.
+ @tparam string name Name of the entity.
+]]
+function M.entities(name)
+  return entitiesIter, entityTagger.getIds(name), 0
+end
+
+--[[--
+ Return the "first" entity of the given `name`.
+
+ Entities are stored in an arbitrary order, so this function should be used
+ when there is just one entity associated with the name.
+
+ @tparam string name Name of the entity.
+ @return The entity itself.
+]]
+function M.getEntity(name)
+  local iter, t, i = M.entities(name)
+  return iter(t, i)
 end
 
 function M.pause()
