@@ -8,15 +8,13 @@ after_each(function ()
   package.loaded["engine.systems.messengers.collection"] = nil
 end)
 
-describe("loading a collector that collides with a collectable", function ()
+describe("loading two overlapping flaps", function ()
   local components, collectableEffects
   before_each(function ()
     components = {
-      collector = {
-        mario = {enabled = true}
-      },
-      collectable = {
-        coin = {name = "coin"}
+      flap = {
+        mario = {enabled = true},
+        coin = {enabled = true}
       },
       collisionBox = {
         mario = {
@@ -42,26 +40,38 @@ describe("loading a collector that collides with a collectable", function ()
       },
       garbage = {}
     }
-    collectableEffects = {
-      coin = function () end
-    }
   end)
 
-  describe("and the collector is enabled", function ()
-    it("should remove the collectable", function ()
-      collection.update(components, collectableEffects)
-      
-      assert.are.truthy(components.garbage.coin)
+  describe("and both flaps are enabled", function ()
+    before_each(function ()
+      collection.update(components)
+    end)
+
+    it("should mark both as overlapped", function ()
+      assert.are.same("coin", components.flap.mario.overlap)
+      assert.are.same("mario", components.flap.coin.overlap)
+    end)
+
+    describe("and then one flap is disabled", function ()
+      it("should unmark both flaps", function ()
+        components.flap.mario.enabled = false
+  
+        collection.update(components)
+        
+        assert.are.falsy(components.flap.mario.overlap)
+        assert.are.falsy(components.flap.coin.overlap)
+      end)
     end)
   end)
 
-  describe("and the collector is disabled", function ()
-    it("should keep the collectable", function ()
-      components.collector.mario.enabled = false
+  describe("and one flap is disabled", function ()
+    it("should mark no entities", function ()
+      components.flap.mario.enabled = false
 
-      collection.update(components, collectableEffects)
+      collection.update(components)
       
-      assert.are.falsy(components.garbage.coin)
+      assert.are.falsy(components.flap.mario.overlap)
+      assert.are.falsy(components.flap.coin.overlap)
     end)
   end)
 end)

@@ -192,12 +192,12 @@ describe("load two levels and the name of the first one", function ()
   end)
 end)
 
-describe("loading a collectable entity that is not in any level", function ()
+describe("loading a flap entity that is not in any level", function ()
   it("should not copy the component", function ()
     local config = {
       entities = {
         item = {
-          flags = {"collectable"}
+          flags = {"flap"}
         }
       }
     }
@@ -205,18 +205,18 @@ describe("loading a collectable entity that is not in any level", function ()
     local loadedGameState = gamestate.load(loveMock, entityTagger,
                                            config)
 
-    assert.is.falsy(loadedGameState.components.collectable)
+    assert.is.falsy(loadedGameState.components.flap)
   end)
 end)
 
-describe("loading collectable entities that are in a level", function ()
+describe("loading flap entities that are in a level", function ()
   local config, loadedGameState
 
   before_each(function ()
     config = {
       entities = {
         bottle = {
-          flags = {"collectable"}
+          flags = {"flap"}
         }
       },
       levels = {
@@ -233,14 +233,14 @@ describe("loading collectable entities that are in a level", function ()
     loadedGameState = gamestate.load(loveMock, entityTagger, config)
   end)
   
-  it("sould copy the collectable components with its name", function ()
-    local collectable = loadedGameState.components.collectable
-    assert.are.same("bottle", collectable[1].name)
-    assert.are.same("bottle", collectable[2].name)
-    assert.are.same("bottle", collectable[3].name)
+  it("sould copy the flap components", function ()
+    local flap = loadedGameState.components.flap
+    assert.is.truthy(flap[1].enabled)
+    assert.is.truthy(flap[2].enabled)
+    assert.is.truthy(flap[3].enabled)
   end)
 
-  it("should copy the positions of the collectable components", function ()
+  it("should copy the positions of the flap components", function ()
     local position = loadedGameState.components.position
     assert.are.same(0, position[1].x)
     assert.are.same(10, position[1].y)
@@ -248,42 +248,6 @@ describe("loading collectable entities that are in a level", function ()
     assert.are.same(10, position[2].y)
     assert.are.same(20, position[3].x)
     assert.are.same(0, position[3].y)
-  end)
-end)
-
-describe("loading an entity that is both collector and collectable", function ()
-  local config
-  before_each(function ()
-    config = {
-      entities = {
-        absurdSpecimen = {
-          flags = {"collector", "collectable"}
-        }
-      }
-    }
-  end)
-
-  describe("without levels defined", function ()
-    it("should throw an error", function ()
-      assert.has_error(function ()
-        gamestate.load(loveMock, entityTagger, config)
-      end)
-    end)
-  end)
-
-  describe("with a level defined", function ()
-    it("should throw an error", function ()
-      config.levels = {
-        absurdSpecimen = {
-          {0, 10},
-          {10, 10},
-          {20, 0}
-        }
-      }
-      assert.has_error(function ()
-        gamestate.load(loveMock, entityTagger, config)
-      end)
-    end)
   end)
 end)
 

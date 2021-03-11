@@ -116,10 +116,6 @@ local function drawDebugElements(components)
   for _, _, box, position in iter.trellis(components) do
     drawRectangle(position, box, 0.4, 0.4, 1, 0.3)
   end
-
-  for _, _, box, position in iter.collectable(components) do
-    drawRectangle(position, box, 0.4, 1, 0.4, 0.3)
-  end
   
   M.love.graphics.setColor(rgba)
   drawPositions(components)

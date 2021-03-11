@@ -21,15 +21,6 @@ function love.load()
   }
   
   score = 0
-  engine.gameState.collectableEffects.bottles = function ()
-    score = score + 1
-    local pitch = 1 + (2*love.math.random()-1) / 36
-    local sfx = engine.resources.sounds.sfx.collected
-    sfx:setPitch(pitch)
-    sfx:stop()
-    sfx:play()
-  end
-  engine.gameState.collectableEffects.bee = function () end
   
   engine.gameState.camera.target = "patato"
   engine.gameState.camera.focus = function (t)
@@ -49,7 +40,19 @@ function love.update(dt)
     patato.update(commands, engine.resources.sounds.sfx,
                   engine.getComponents(patatoEntity))
     for beeEntity in engine.entities("bee") do
-      bee.update(engine.getComponents(beeEntity))
+      bee.update(engine.getComponents(beeEntity), patatoEntity)
+    end
+    for bottleEntity in engine.entities("bottles") do
+      local t = engine.getComponents(bottleEntity)
+      if t.flap.overlap == patatoEntity then
+        score = score + 1
+        local pitch = 1 + (2*love.math.random()-1) / 36
+        local sfx = engine.resources.sounds.sfx.collected
+        sfx:setPitch(pitch)
+        sfx:stop()
+        sfx:play()
+        t.garbage = true
+      end
     end
     if commands.press.start then
       local musicEntity = engine.getEntity("music")

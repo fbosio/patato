@@ -45,10 +45,6 @@ local flagStateBuilders = {
       component.setDefaults(entity)
     end
   end,
-  collectable = function (entity)
-    local name = M.entityTagger.getName(entity)
-    component.setAttribute("collectable", entity, "name", name)
-  end,
   trellis = function (entity)
     component.set("trellis", entity, true)
   end,
@@ -70,7 +66,7 @@ local flagStateBuilders = {
     component.set("jukebox", entity, {})
   end
 }
-for _, k in ipairs{"collector", "solid", "gravitational", "climber"} do
+for _, k in ipairs{"flap", "solid", "gravitational", "climber"} do
   flagStateBuilders[k] = function (entity)
     component.setAttribute(k, entity, "enabled", true)
     component.setDefaultPosition(entity)

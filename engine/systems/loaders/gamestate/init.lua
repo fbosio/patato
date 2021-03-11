@@ -106,7 +106,7 @@ local function buildDefaults()
     local mustBeBuilt = not data.collideable
     if not mustBeBuilt then break end
     for _, flag in ipairs(data.flags or {}) do
-      if flag == "collectable" or flag == "trellis" then
+      if flag == "flap" or flag == "trellis" then
         mustBeBuilt = false
         break
       end

@@ -37,7 +37,12 @@ function M.buildArguments(entity, components)
         error('Unexpected attribute "' .. attribute .. '" in component "'
               .. component .. '".', 2)
       end
-    }) end
+    }) end,
+    __newindex = function (_, component, value)
+      if component == "garbage" then
+        components[component][entity] = value
+      end
+    end
   })
 end
 

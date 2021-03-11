@@ -37,7 +37,7 @@ M.entities = {
   patato = {
     flags = {
       "controllable",
-      "collector",
+      "flap",
       "solid",
       "gravitational",
       "climber"
@@ -52,14 +52,14 @@ M.entities = {
     resources = resources.patato,
   },
   bee = {
-    flags = {"solid", "collectable"},
+    flags = {"solid", "flap"},
     collisionBox = {0, 0, 60, 30},
     impulseSpeed = {
       fly = 200
     }
   },
   bottles = {
-    flags = {"collectable"},
+    flags = {"flap"},
     collisionBox = {15, 45, 35, 45}
   },
   camera = {

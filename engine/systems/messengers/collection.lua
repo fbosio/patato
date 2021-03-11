@@ -7,21 +7,23 @@ local areOverlapped = helpers.areOverlapped
 local M = {}
 
 --[[
-  cr = collector,
-  ce = collectable,
+  fl = flap
 ]]
 
-function M.update(components, collectableEffects)
-  for _, cr, crBox, crPos in iter.collector(components) do
-    if cr.enabled then
-      local crTBox = getTranslatedBox(crPos, crBox)
+function M.update(components)
+  for fl1Entity, fl1, fl1Box, fl1Pos in iter.flap(components) do
+    fl1.overlap = nil
+    if fl1.enabled then
+      local fl1TBox = getTranslatedBox(fl1Pos, fl1Box)
       
-      for ceEntity, ce, ceBox, cePos in iter.collectable(components) do
-        local ceTBox = getTranslatedBox(cePos, ceBox)
-        
-        if areOverlapped(crTBox, ceTBox) then
-          collectableEffects[ce.name]()
-          components.garbage[ceEntity] = true
+      for fl2Entity, fl2, fl2Box, fl2Pos in iter.flap(components) do
+        if fl1Entity ~= fl2Entity and fl2.enabled then
+          local fl2TBox = getTranslatedBox(fl2Pos, fl2Box)
+          
+          if areOverlapped(fl1TBox, fl2TBox) then
+            fl1.overlap = fl2Entity
+            fl2.overlap = fl1Entity
+          end
         end
       end
     end

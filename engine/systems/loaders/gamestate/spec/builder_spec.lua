@@ -147,18 +147,18 @@ describe("loading an entity with animations", function ()
   end)
 end)
 
-describe("loading a collector entity", function ()
+describe("loading a flap entity", function ()
   local playerId
 
   before_each(function ()
-    local flags = {"collector"}
+    local flags = {"flap"}
 
     playerId = entityTagger.tag("player")
     builder.flags(flags, playerId)
   end)
 
   it("should copy the component", function ()
-    assert.is.truthy(components.collector[playerId].enabled)
+    assert.is.truthy(components.flap[playerId].enabled)
   end)
 
   it("should set default components to the entity", function ()
