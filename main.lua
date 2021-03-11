@@ -29,6 +29,7 @@ function love.load()
     sfx:stop()
     sfx:play()
   end
+  engine.gameState.collectableEffects.bee = function () end
   
   engine.gameState.camera.target = "patato"
   engine.gameState.camera.focus = function (t)

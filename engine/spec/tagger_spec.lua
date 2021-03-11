@@ -24,6 +24,14 @@ describe("tagging an entity once", function ()
   it("should return the entity name when needed", function ()
     assert.are.same("player", entityTagger.getName(id))
   end)
+
+  describe("and then removing the tag", function ()
+    it("should return nil when trying to get the id", function ()
+      entityTagger.remove(id)
+      
+      assert.is.falsy(entityTagger.getId("player"))
+    end)
+  end)
 end)
 
 describe("tagging an entity twice", function ()

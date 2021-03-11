@@ -1,37 +1,42 @@
-local garbagecollector
+local garbagecollector, entityTagger
 
 before_each(function ()
   garbagecollector = require "engine.systems.garbagecollector"
+  entityTagger = require "engine.tagger"
 end)
 
 after_each(function ()
   package.loaded["engine.systems.garbagecollector"] = nil
+  package.loaded["engine.tagger"] = nil
 end)
 
 describe("Loading an entity that is marked as garbage", function ()
-  local components
+  local components, markedEntity, nonMarkedEntity
 
   before_each(function ()
+    markedEntity = entityTagger.tag("markedEntity")
+    nonMarkedEntity = entityTagger.tag("nonMarkedEntity")
+
     components = {
       garbage = {
-        markedEntity = true,
-        nonMarkedEntity = false
+        [markedEntity] = true,
+        [nonMarkedEntity] = false
       },
       position = {
-        markedEntity = {
+        [markedEntity] = {
           x = 45,
           y = 289
         },
-        nonMarkedEntity = {
+        [nonMarkedEntity] = {
           x = 40,
           y = 270
         }
       },
       collectable = {
-        markedEntity = true
+        [markedEntity] = true
       },
       collisionBox = {
-        markedEntity = {
+        [markedEntity] = {
           origin = {
             x = 25,
             y = 25
@@ -41,7 +46,7 @@ describe("Loading an entity that is marked as garbage", function ()
           x = 45,
           y = 289
         },
-        nonMarkedEntity = {
+        [nonMarkedEntity] = {
           origin = {
             x = 20,
             y = 135
@@ -65,7 +70,11 @@ describe("Loading an entity that is marked as garbage", function ()
   end)
 
   it("should not remove components from other entities", function ()
-    assert.is.truthy(components.position.nonMarkedEntity)
-    assert.is.truthy(components.collisionBox.nonMarkedEntity)
+    assert.is.truthy(components.position[nonMarkedEntity])
+    assert.is.truthy(components.collisionBox[nonMarkedEntity])
+  end)
+
+  it("should remove its tags", function ()
+    assert.is.falsy(entityTagger.getId("markedEntity"))
   end)
 end)

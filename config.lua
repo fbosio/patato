@@ -52,7 +52,7 @@ M.entities = {
     resources = resources.patato,
   },
   bee = {
-    flags = {"solid"},
+    flags = {"solid", "collectable"},
     collisionBox = {0, 0, 60, 30},
     impulseSpeed = {
       fly = 200

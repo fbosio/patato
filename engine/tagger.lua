@@ -33,6 +33,10 @@ function M.getName(entity)
   end
 end
 
+function M.remove(entity)
+  tags[M.getName(entity)] = nil
+end
+
 
 M.clear()
 
