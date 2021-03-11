@@ -34,7 +34,12 @@ function M.getName(entity)
 end
 
 function M.remove(entity)
-  tags[M.getName(entity)] = nil
+  local ids = tags[M.getName(entity)]
+  for i, v in ipairs(ids) do
+    if entity == v then
+      table.remove(ids, i)
+    end
+  end
 end
 
 

@@ -53,4 +53,12 @@ describe("tagging an entity twice", function ()
       assert.are.same({id1, id2}, entityTagger.getIds("player"))
     end)
   end)
+
+  describe("and then removing one id", function ()
+    it("should return only the remaining id", function ()
+      entityTagger.remove(id1)
+      
+      assert.are.same({id2}, entityTagger.getIds("player"))
+    end)
+  end)
 end)
