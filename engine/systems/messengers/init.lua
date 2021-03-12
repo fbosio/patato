@@ -12,7 +12,7 @@ end
 function M.update(dt, gameState)
   camera.update(gameState.components, gameState.camera)
   climbing.update(dt, gameState.components)
-  collection.update(gameState.components, gameState.collectableEffects)
+  collection.update(gameState.components)
   collision.update(dt, gameState.components)
 end
 

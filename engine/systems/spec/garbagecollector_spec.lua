@@ -32,7 +32,7 @@ describe("Loading an entity that is marked as garbage", function ()
           y = 270
         }
       },
-      collectable = {
+      flap = {
         [markedEntity] = true
       },
       collisionBox = {
@@ -65,7 +65,7 @@ describe("Loading an entity that is marked as garbage", function ()
   it("should remove all of its components", function ()
     assert.is.falsy(components.garbage.markedEntity)
     assert.is.falsy(components.position.markedEntity)
-    assert.is.falsy(components.collectable.markedEntity)
+    assert.is.falsy(components.flap.markedEntity)
     assert.is.falsy(components.collisionBox.markedEntity)
   end)
 

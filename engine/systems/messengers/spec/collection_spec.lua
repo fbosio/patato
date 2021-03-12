@@ -9,7 +9,7 @@ after_each(function ()
 end)
 
 describe("loading two overlapping flaps", function ()
-  local components, collectableEffects
+  local components
   before_each(function ()
     components = {
       flap = {

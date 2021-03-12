@@ -1,6 +1,4 @@
 local builder = require "engine.systems.loaders.gamestate.builder"
-local collectableeffects =
-  require "engine.systems.loaders.gamestate.collectableeffects"
 local hid = require "engine.systems.loaders.gamestate.hid"
 
 local M = {}
@@ -21,7 +19,6 @@ end
 
 local function checkEntitiesCompatibility()
   local incompatiblePairs = {
-    {"collectable", "collector"},
     {"collideable", "solid"},
     {"climber", "trellis"}
   }
@@ -147,7 +144,6 @@ function M.load(love, entityTagger, config)
   loaded.hid = hid.load(config)
   M.hid = loaded.hid
   loaded.components, loaded.inMenu = M.reload()
-  loaded.collectableEffects = collectableeffects.load()
   return loaded
 end
 
